@@ -86,7 +86,7 @@ class Game {
   }
 
   async crearFondo() {
-    this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/background/bg.jpg"));
+    this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/background/1.png"));
     this.fondo.zIndex = -999999999999999999999;
     this.fondo.tileScale.set(0.5);
     this.fondo.width = this.anchoDelMapa;
@@ -142,7 +142,7 @@ class Game {
   }
 
   async cargarTexturas() {
-    await PIXI.Assets.load(["assets/bg.jpg"]);
+    await PIXI.Assets.load(["assets/Background/1.png"]);
   }
   crearEnemigos(cant, bando) {
     for (let i = 0; i < cant; i++) {
