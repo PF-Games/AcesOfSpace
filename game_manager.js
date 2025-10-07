@@ -86,7 +86,7 @@ class Game {
   }
 
   async crearFondo() {
-    this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
+    this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/background/bg.jpg"));
     this.fondo.zIndex = -999999999999999999999;
     this.fondo.tileScale.set(0.5);
     this.fondo.width = this.anchoDelMapa;
