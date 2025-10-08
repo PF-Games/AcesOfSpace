@@ -49,7 +49,6 @@ class Entity {
     this.velocidad.y += this.aceleracion.y;
 
     //variaciones de la velocidad
-    this.rebotar();
     this.aplicarFriccion();
     this.limitarVelocidad();
 
@@ -76,20 +75,6 @@ class Entity {
     this.velocidad.y *= 0.95;
   }
 
-  rebotar() {
-    //ejemplo mas realista
-    if (this.posicion.x > this.juego.width || this.posicion.x < 0) {
-      //si la coordenada X de este conejito es mayor al ancho del stage,
-      //o si la coordenada X.. es menor q 0 (o sea q se fue por el lado izquierdo)
-      //multiplicamos por -0.99, o sea que se invierte el signo (si era positivo se hace negativo y vicecversa)
-      //y al ser 0.99 pierde 1% de velocidad
-      this.velocidad.x *= -0.99;
-    }
-
-    if (this.posicion.y > this.juego.height || this.posicion.y < 0) {
-      this.velocidad.y *= -0.99;
-    }
-  }
 
   asignarTarget(quien) {
     this.target = quien;
