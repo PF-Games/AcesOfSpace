@@ -39,7 +39,7 @@ class Game {
       const y = Math.random() * this.height;
       //crea una instancia de clase Conejito, el constructor de dicha clase toma como parametros la textura
       // q queremos usar,X,Y y una referencia a la instancia del juego (this)
-      const conejito = new Conejito(texture, x, y, this);
+      const conejito = new Ship(texture, x, y, this);
       this.conejitos.push(conejito);
     }
 
