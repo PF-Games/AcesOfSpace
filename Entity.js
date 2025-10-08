@@ -9,14 +9,14 @@ class Entity {
   aceleracionMaxima = 0.2;
   velocidadMaxima = 3;
 
-  constructor(texture, x, y, juego) {
+  constructor(texture, x, y, game) {
     this.vision = Math.random() * 200 + 300;
     //guarda una referencia a la instancia del juego
     this.posicion = { x: x, y: y };
     this.velocidad = { x: Math.random() * 10, y: Math.random() * 10 };
     this.aceleracion = { x: 0, y: 0 };
 
-    this.juego = juego;
+    this.game = game;
     //generamos un ID para este conejito
     this.id = Math.floor(Math.random() * 99999999);
 
@@ -35,7 +35,7 @@ class Entity {
     //a su vez el juego tiene una propiedad llamada pixiApp, q es la app de PIXI misma,
     //q a su vez tiene el stage. Y es el Stage de pixi q tiene un metodo para agregar 'hijos'
     //(el stage es como un container/nodo)
-    this.juego.pixiApp.stage.addChild(this.sprite);
+    this.game.pixiApp.stage.addChild(this.sprite);
   }
 
   tick() {
