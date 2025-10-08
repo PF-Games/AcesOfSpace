@@ -1,6 +1,6 @@
 class Ship extends Entity {
-  constructor(x, y, game) {
-    super(x, y, game);
+  constructor(texture, x, y, game) {
+    super(texture, x, y, game);
  }
 }
 
