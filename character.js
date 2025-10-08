@@ -6,7 +6,8 @@ class Character {
     health;
 
   constructor(texture, x, y, game) {
-    super(texture, x, y, game);
+    this.posicion = { x: x, y: y };
+    this.game = game;
  }
 }
 
