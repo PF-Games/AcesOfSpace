@@ -3,6 +3,7 @@ class Game {
   ships = [];
   width;
   height;
+  player;
 
 
   constructor() {
@@ -33,6 +34,7 @@ class Game {
 
     //cargamos la imagen bunny.png y la guardamos en la variable texture
     const texture = await PIXI.Assets.load("Assets/Ships/Unity/Alien1.png");
+    const texture2 = await PIXI.Assets.load("Assets/Ships/Unity/Alien 2.png");
 
     //creamos 10 instancias de la clase ship
     for (let i = 0; i < 20; i++) {
@@ -43,6 +45,8 @@ class Game {
       const ship = new BlackShip(texture, x, y, this);
       this.ships.push(ship);
     }
+
+     const player = new MainChar(texture, 900, 900, this);
 
     //agregamos el metodo this.gameLoop al ticker.
     //es decir: en cada frame vamos a ejecutar el metodo this.gameLoop
@@ -64,7 +68,9 @@ class Game {
       //ejecutamos el metodo tick de cada ship
       aShip.tick();
       aShip.render();
-    }
+      }
+      player.tick();
+      player.render();
   }
 
   getRandomShip() {
