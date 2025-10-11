@@ -1,4 +1,4 @@
-class Character {
+class Character extends Entity {
     sprite;
     id;
     x = 0;
@@ -6,8 +6,7 @@ class Character {
     health;
 
   constructor(texture, x, y, game) {
-    this.posicion = { x: x, y: y };
-    this.game = game;
+    super(texture, x, y, game);
  }
 }
 
