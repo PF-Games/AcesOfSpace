@@ -1,6 +1,3 @@
-//const cors = require('cors');
-//app.use(cors());
-
 function radianesAGrados(radianes) {
   return radianes * (180 / Math.PI);
 }
