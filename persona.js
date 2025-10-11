@@ -84,18 +84,14 @@ class Persona extends GameObject {
     this.velocidadLineal = calcularDistancia(this.velocidad, { x: 0, y: 0 });
   }
 
-  async crearSpritesheetAnimado(bando) {
-    this.sprite = (
-      await AnimatedCharacter.CreateCharacterFromMegaSpritesheet(
-        `/assets/pixelart/personajes/${bando}.png`,
-        64,
-        64
-      )
-    ).character;
-
+  async crearSprite() {
+    this.sprite = new PIXI.Sprite(
+      await PIXI.Assets.load("assets/pixelart/afip.png")
+    );
     this.sprite.anchor.set(0.5, 1);
-
     this.container.addChild(this.sprite);
+
+    this.render();
   }
 
   alineacion() {
@@ -283,73 +279,9 @@ class Persona extends GameObject {
     return enemigoMasCerca;
   }
 
-  
-  cambiarDeAnimacionSegunLaVelocidadYAngulo() {
-    /**
-     * SISTEMA DE ANIMACIÓN BASADO EN FÍSICA
-     *
-     * Mapea el estado físico del agente a animaciones visuales:
-     *
-     * 1. SELECCIÓN DE ANIMACIÓN POR VELOCIDAD:
-     *    - Muerte: animación "hurt" sin loop
-     *    - Correr: velocidad > 70% del máximo
-     *    - Caminar: velocidad > 0.1 píxeles/frame
-     *    - Idle: velocidad ≤ 0.1 píxeles/frame
-     *
-     * 2. VELOCIDAD DE ANIMACIÓN ADAPTATIVA:
-     *    - Correr: speed = 0.25 × (v_actual / v_max)
-     *    - Caminar: speed = 0.05 + 0.3 × (v_actual / v_max)
-     *    - Esto sincroniza la animación con la velocidad real
-     *
-     * 3. DIRECCIÓN CARDINAL (4 direcciones):
-     *    - Divide el círculo en 4 sectores de 90°
-     *    - Mapea ángulos de movimiento a direcciones de sprite
-     *    - Nota: Las direcciones están invertidas por el sistema de coordenadas
-     */
-    if (this.velocidadLineal == undefined || this.angulo == undefined) {
-      return;
-    }
 
-    if (this.muerto) {
-      this.sprite.changeAnimation("hurt");
-      this.sprite.loop = false;
-      return;
-    }
 
-    if (this.velocidadLineal > this.velocidadMaxima * 0.7) {
-      this.sprite.changeAnimation("run");
-      this.sprite.animationSpeed =
-        (0.25 * this.velocidadLineal) / this.velocidadMaxima;
-    } else if (this.velocidadLineal > 0.1) {
-      this.sprite.changeAnimation("walk");
-      this.sprite.animationSpeed =
-        0.05 + (0.3 * this.velocidadLineal) / this.velocidadMaxima;
-    } else {
-      this.sprite.changeAnimation("idle");
-    }
-
-    /**
-     * MAPEO DE DIRECCIÓN CARDINAL
-     *
-     * Divide el espacio en 4 sectores de 90°:
-     * - Sector 1: [315°, 45°) → Derecha (sprite: "left")
-     * - Sector 2: [45°, 135°) → Abajo (sprite: "up")
-     * - Sector 3: [135°, 225°) → Izquierda (sprite: "right")
-     * - Sector 4: [225°, 315°) → Arriba (sprite: "down")
-     *
-     * Nota: Las direcciones del sprite están invertidas debido al
-     * sistema de coordenadas y la orientación del spritesheet
-     */
-    if (this.angulo >= 315 || this.angulo < 45) {
-      this.sprite.changeDirection("left");
-    } else if (this.angulo >= 45 && this.angulo < 135) {
-      this.sprite.changeDirection("up");
-    } else if (this.angulo >= 135 && this.angulo < 225) {
-      this.sprite.changeDirection("right");
-    } else if (this.angulo >= 225 && this.angulo < 315) {
-      this.sprite.changeDirection("down");
-    }
-  }
+    
 
   render() {
     /**
@@ -366,7 +298,7 @@ class Persona extends GameObject {
     if (!this.container || !this.sprite) return;
     super.render();
 
-    this.cambiarDeAnimacionSegunLaVelocidadYAngulo();
+    
 
     // Ordenamiento en profundidad para perspectiva isométrica
     this.container.zIndex = this.posicion.y;

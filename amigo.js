@@ -10,7 +10,7 @@ class Amigo extends Persona {
     this.factorSeguirAlLider = 0.63;
     this.factorCohesion = 0.1; //a los amigos les bajo la cohesion pq igual estan siguiendo al lider
     this.factorAlineacion = 0.05; //a los amigos les bajo la alineacion pq igual estan siguiendo al lider
-    this.crearSpritesheetAnimado(this.bando);
+    this.crearSprite();
   }
 
   seguirAlLider() {
