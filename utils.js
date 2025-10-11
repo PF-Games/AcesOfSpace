@@ -22,3 +22,6 @@ function limitarVector(vector, magnitudMaxima) {
   // Si ya está dentro del límite, se devuelve igual
   return { ...vector };
 }
+
+
+
