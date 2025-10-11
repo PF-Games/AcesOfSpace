@@ -4,9 +4,10 @@ class Game {
   width;
   height;
 
+
   constructor() {
-    this.width = 1280;
-    this.height = 720;
+    this.width = 1920;
+    this.height = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
     this.initPIXI();
   }
@@ -36,7 +37,7 @@ class Game {
     //creamos 10 instancias de la clase ship
     for (let i = 0; i < 20; i++) {
       const x = Math.random() * this.width;
-      const y = Math.random() * this.height;
+      const y = Math.random() * 3 //spawninicial;
       //crea una instancia de clase Conejito, el constructor de dicha clase toma como parametros la textura
       // q queremos usar,X,Y y una referencia a la instancia del juego (this)
       const ship = new BlackShip(texture, x, y, this);
