@@ -5,8 +5,30 @@ class Celda {
     this.x = x;
     this.y = y;
     this.tamanoCelda = tamanoCelda;
-    this.dibujame();//agregado 14-10
+    this.centroX = this.x * this.tamanoCelda + this.tamanoCelda / 2;
+    this.centroY = this.y * this.tamanoCelda + this.tamanoCelda / 2;
+    
+    // Crear el texto para mostrar la posición Y
+    this.textoDebug = new PIXI.Text({
+      text: Math.floor(this.centroY),
+      style: {
+        fontSize: 12,
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 2
+      }
+    });
+    
+    // Posicionar el texto en el centro de la celda
+    this.textoDebug.x = this.centroX;
+    this.textoDebug.y = this.centroY;
+    this.textoDebug.anchor.set(0.5); // centrar el texto
+    
+    this.juego.containerPrincipal.addChild(this.textoDebug);
+    this.dibujame();//agregado 14-10, borrar cuando no esté en debug
   }
+
+  
 
   dibujame() {
     this.juego.dibujador
@@ -16,7 +38,7 @@ class Celda {
         this.tamanoCelda,
         this.tamanoCelda
       )
-      .stroke();
+      .stroke({ width: 1, color: 0x00ff00, alpha: 0.5 });
   }
 
   agregar(entidad) {
