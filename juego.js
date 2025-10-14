@@ -11,6 +11,7 @@ class Juego {
   height;
   
   
+  
 
   constructor() {
     this.updateDimensions();
@@ -21,6 +22,7 @@ class Juego {
     this.setupResizeHandler();
     this.tamanoCelda = 100; //14-10
     this.contadorDeFrame = 0; //14-10
+    this.cohetes = [];
   }
 
   updateDimensions() {
@@ -107,6 +109,7 @@ class Juego {
     this.pixiApp.stage.addChild(this.containerPrincipal);
     await this.cargarTexturas();
     this.crearFondo();
+    this.agregarControlDeCohetes(); 
     this.crearProtagonista();
     this.crearEnemigos(5, 2);
     this.crearEnemigos(5, 3);
@@ -157,6 +160,38 @@ class Juego {
       this.objetosInanimados.push(arbol);
     }
   }
+
+
+  //14-10
+
+  agregarControlDeCohetes() {
+  this.pixiApp.canvas.onclick = (event) => {
+    const x = event.x - this.containerPrincipal.x;
+    const y = event.y - this.containerPrincipal.y;
+    
+    // Buscar enemigo más cercano al click
+    let enemigoMasCercano = null;
+    let distMenor = Infinity;
+    
+    for (let enemigo of this.enemigos) {
+      const dist = calcularDistancia({x, y}, enemigo.posicion);
+      if (dist < distMenor) {
+        distMenor = dist;
+        enemigoMasCercano = enemigo;
+      }
+    }
+    
+    if (enemigoMasCercano) {
+      const cohete = new Cohete(
+        this.protagonista.posicion.x,
+        this.protagonista.posicion.y,
+        this,
+        enemigoMasCercano
+      );
+      this.cohetes.push(cohete);
+    }
+  };
+}
 
   /* ESTO POR AHORA NO LO USO PERO ME VA A VENIR BIEN PARA CREAR LOS COHETES
   crearAmigos() {
@@ -220,6 +255,11 @@ class Juego {
    // this.grid.update();
     this.hacerQLaCamaraSigaAlProtagonista();  
     this.actualizarUI();
+
+  for (let cohete of this.cohetes) {
+  cohete.tick();
+  cohete.render();
+}
   }
 
   hacerQLaCamaraSigaAlProtagonista() {
@@ -237,6 +277,8 @@ class Juego {
    actualizarUI() {
     this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); //tiempoRestante.toString();
   }
+
+
    
 
   finDelJuego() {
