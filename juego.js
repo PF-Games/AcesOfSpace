@@ -40,6 +40,29 @@ class Juego {
     });
   }
 
+
+  crearUI() {
+  this.ui = new PIXI.Container();
+  this.ui.name = "UI";
+  this.pixiApp.stage.addChild(this.ui);
+  
+  this.fpsText = new PIXI.Text({
+    text: "FPS: 60",
+    style: {
+      fontFamily: "Arial",
+      fontSize: 24,
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4
+    }
+  });
+  
+  this.fpsText.x = this.width - 120;
+  this.fpsText.y = 20;
+  this.ui.addChild(this.fpsText);
+ // this.fpsText.text = `FPS: ${this.pixiApp.ticker.FPS.toFixed(2)}`;
+}
+
   //async indica q este metodo es asyncronico, es decir q puede usar "await"
   async initPIXI() {
     //creamos la aplicacion de pixi y la guardamos en la propiedad pixiApp
@@ -66,6 +89,7 @@ class Juego {
 
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
+    this.crearUI();
     this.crearNivel();
         
   }
@@ -185,7 +209,9 @@ class Juego {
       unpersona.tick();
       unpersona.render();
     }
-    this.hacerQLaCamaraSigaAlProtagonista();
+   // this.grid.update();
+    this.hacerQLaCamaraSigaAlProtagonista();  
+    this.actualizarUI();
   }
 
   hacerQLaCamaraSigaAlProtagonista() {
@@ -198,6 +224,11 @@ class Juego {
          this.containerPrincipal.y = this.mouse.y;
          }*/
   } 
+
+
+   actualizarUI() {
+    this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); //tiempoRestante.toString();
+  }
    
 
   finDelJuego() {
