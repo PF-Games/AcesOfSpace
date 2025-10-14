@@ -1,3 +1,5 @@
+//NO ESTÁ CARGADO EN EL HTML
+
 /**
  * SISTEMA DE ANIMACIÓN DE PERSONAJES PARA PIXI.JS v8
  * ====================================================
@@ -26,6 +28,7 @@
  * - Un solo sprite que cambia sus texturas según la animación/dirección
  * - Cada animación tiene 4 direcciones: up, left, down, right
  */
+
 
 
 class AnimatedCharacter extends PIXI.AnimatedSprite {
