@@ -20,7 +20,7 @@ class Protagonista extends Persona {
 
   async crearSprite() {
     this.sprite = new PIXI.Sprite(
-      await PIXI.Assets.load("assets/pixelart/afip.png")
+      await PIXI.Assets.load("Assets2/Ships/Unity/Cruiser 3.png")
     );
     this.sprite.anchor.set(0.5, 1);
     this.container.addChild(this.sprite);
