@@ -1,3 +1,6 @@
+//NO ESTA CARGADO EN HTML
+
+
 class Game {
   pixiApp;
   ships = [];

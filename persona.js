@@ -86,7 +86,7 @@ class Persona extends GameObject {
 
   async crearSprite() {
     this.sprite = new PIXI.Sprite(
-      await PIXI.Assets.load("assets/pixelart/afip.png")
+      await PIXI.Assets.load(`assets/pixelart/${this.bando}.png`)
     );
     this.sprite.anchor.set(0.5, 1);
     this.container.addChild(this.sprite);
