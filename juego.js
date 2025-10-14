@@ -243,7 +243,21 @@ class Juego {
     alert("Te moriste! fin del juego");
   }
 
+/*
+  shootProjectile(ship, target){
+    const projectile = new PIXI.Graphics();
+    projectile.beginFill(0xffff00);
+    projectile.drawCircle(0, 0, 5);
+    projectile.endFill()
 
+    projectile.x = this.protagonista.x;
+    projectile.y = this.protagonista.y;
+
+    projectile.target = 
+  }
+
+  */
+ 
   /*
   getPersonaRandom() {
     return this.personas[Math.floor(this.personas.length * Math.random())];
