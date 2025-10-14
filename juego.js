@@ -9,6 +9,8 @@ class Juego {
   protagonista;
   width;
   height;
+  
+  
 
   constructor() {
     this.updateDimensions();
@@ -17,12 +19,17 @@ class Juego {
     this.mouse = { posicion: { x: 0, y: 0 } };
     this.initPIXI();
     this.setupResizeHandler();
+    this.tamanoCelda = 100; //14-10
+    this.contadorDeFrame = 0; //14-10
   }
 
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-  }
+    this.ancho = this.anchoDelMapa || 1000;  // para que Grid funcione 10-4
+    this.alto = this.altoDelMapa || 3000;     // para que Grid funcione 10-4
+}
+  
 
   setupResizeHandler() {
     window.addEventListener("resize", () => {
@@ -60,6 +67,7 @@ class Juego {
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
     this.crearNivel();
+        
   }
 
   async crearFondo() {
@@ -84,6 +92,12 @@ class Juego {
     //this.crearAmigos();
     this.crearArboles();
     this.crearAutos();
+     //estas 5 14-10
+    this.dibujador = new PIXI.Graphics();
+    this.containerPrincipal.addChild(this.dibujador);
+    this.ancho = this.anchoDelMapa;
+    this.alto = this.altoDelMapa;
+    this.grid = new Grid(this, this.tamanoCelda);
   }
   async cargarTexturas() {
     await PIXI.Assets.load(["assets/bg.jpg"]);
@@ -159,14 +173,18 @@ class Juego {
     };
   }
 
+  
+
   gameLoop(time) {
     //iteramos por todos los personas
+    //this.dibujador.clear();//14-10
+    this.contadorDeFrame++;//14-10
+    
     for (let unpersona of this.personas) {
       //ejecutamos el metodo tick de cada persona
       unpersona.tick();
       unpersona.render();
     }
-
     this.hacerQLaCamaraSigaAlProtagonista();
   }
 
@@ -174,7 +192,13 @@ class Juego {
     if (!this.protagonista) return;
     this.containerPrincipal.x = -this.protagonista.posicion.x + this.width / 2;
     this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;
-  }
+    /* ESTO INTENTÉ HACERLO YO PARA MOVER LA CÁMARA Y NO ME SALIO
+      if (this.mouse.apretado){
+         this.containerPrincipal.x = this.mouse.x;
+         this.containerPrincipal.y = this.mouse.y;
+         }*/
+  } 
+   
 
   finDelJuego() {
     alert("Te moriste! fin del juego");
