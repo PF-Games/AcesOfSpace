@@ -20,6 +20,7 @@ class Cohete extends GameObject {
   }
 
   tick() {
+    if (this.destruido) return; // Agregar esta línea
     if (!this.target || this.target.muerto) {
       this.destruir();
       return;
@@ -44,8 +45,8 @@ class Cohete extends GameObject {
   this.juego.cohetes = this.juego.cohetes.filter(c => c !== this);
 }
   render() {
-    if (!this.container) return;
-    super.render();
-    this.container.zIndex = this.posicion.y;
-  }
+  if (!this.container || this.destruido) return; // Agregar verificación de destruido
+  super.render();
+  this.container.zIndex = this.posicion.y;
+}
 }
