@@ -218,17 +218,20 @@ class Persona extends GameObject {
   morir() {
     if (this.muerto) return;
 
-    this.muerto = true;
-    this.juego.personas = this.juego.personas.filter(
-      (persona) => persona !== this
-    );
-    this.juego.enemigos = this.juego.enemigos.filter(
-      (persona) => persona !== this
-    );
-    this.juego.amigos = this.juego.amigos.filter((persona) => persona !== this);
+  this.muerto = true;
+  this.juego.personas = this.juego.personas.filter(
+    (persona) => persona !== this
+  );
+  this.juego.enemigos = this.juego.enemigos.filter(
+    (persona) => persona !== this
+  );
+  this.juego.amigos = this.juego.amigos.filter((persona) => persona !== this);
 
-    // if (this.sprite) this.sprite.destroy();
-    // if (this.container) this.container.destroy();
+  // Agregar estas líneas para destruir visualmente
+  if (this.sprite) this.sprite.destroy();
+  if (this.container) this.container.destroy();
+  this.container = null;
+
 
     this.borrarmeComoTargetDeTodos();
   }

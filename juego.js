@@ -9,9 +9,9 @@ class Juego {
   protagonista;
   width;
   height;
-  
-  
-  
+
+
+
 
   constructor() {
     this.updateDimensions();
@@ -30,8 +30,8 @@ class Juego {
     this.height = window.innerHeight;
     this.ancho = this.anchoDelMapa || 1000;  // para que Grid funcione 10-4
     this.alto = this.altoDelMapa || 3000;     // para que Grid funcione 10-4
-}
-  
+  }
+
 
   setupResizeHandler() {
     window.addEventListener("resize", () => {
@@ -44,26 +44,26 @@ class Juego {
 
 
   crearUI() {
-  this.ui = new PIXI.Container();
-  this.ui.name = "UI";
-  this.pixiApp.stage.addChild(this.ui);
-  
-  this.fpsText = new PIXI.Text({
-    text: "FPS: 60",
-    style: {
-      fontFamily: "Arial",
-      fontSize: 24,
-      fill: "#ffffff",
-      stroke: "#000000",
-      strokeThickness: 4
-    }
-  });
-  
-  this.fpsText.x = this.width - 120;
-  this.fpsText.y = 20;
-  this.ui.addChild(this.fpsText);
- // this.fpsText.text = `FPS: ${this.pixiApp.ticker.FPS.toFixed(2)}`;
-}
+    this.ui = new PIXI.Container();
+    this.ui.name = "UI";
+    this.pixiApp.stage.addChild(this.ui);
+
+    this.fpsText = new PIXI.Text({
+      text: "FPS: 60",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 4
+      }
+    });
+
+    this.fpsText.x = this.width - 120;
+    this.fpsText.y = 20;
+    this.ui.addChild(this.fpsText);
+    // this.fpsText.text = `FPS: ${this.pixiApp.ticker.FPS.toFixed(2)}`;
+  }
 
   //async indica q este metodo es asyncronico, es decir q puede usar "await"
   async initPIXI() {
@@ -93,7 +93,7 @@ class Juego {
     this.pixiApp.stage.sortableChildren = true;
     this.crearUI();
     this.crearNivel();
-        
+
   }
 
   async crearFondo() {
@@ -109,7 +109,7 @@ class Juego {
     this.pixiApp.stage.addChild(this.containerPrincipal);
     await this.cargarTexturas();
     this.crearFondo();
-    this.agregarControlDeCohetes(); 
+    this.agregarControlDeCohetes();
     this.crearProtagonista();
     this.crearEnemigos(5, 2);
     this.crearEnemigos(5, 3);
@@ -119,7 +119,7 @@ class Juego {
     //this.crearAmigos(); ESTO NO LO USO PERO LO NECESITO PARA LOS COHETES
     this.crearArboles();
     this.crearAutos();
-     //estas 5 14-10
+    //estas 5 14-10
     this.asignarProtagonistaComoTargetATodosLospersonas()
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
@@ -165,33 +165,33 @@ class Juego {
   //14-10
 
   agregarControlDeCohetes() {
-  this.pixiApp.canvas.onclick = (event) => {
-    const x = event.x - this.containerPrincipal.x;
-    const y = event.y - this.containerPrincipal.y;
-    
-    // Buscar enemigo más cercano al click
-    let enemigoMasCercano = null;
-    let distMenor = Infinity;
-    
-    for (let enemigo of this.enemigos) {
-      const dist = calcularDistancia({x, y}, enemigo.posicion);
-      if (dist < distMenor) {
-        distMenor = dist;
-        enemigoMasCercano = enemigo;
+    this.pixiApp.canvas.onclick = (event) => {
+      const x = event.x - this.containerPrincipal.x;
+      const y = event.y - this.containerPrincipal.y;
+
+      // Buscar enemigo más cercano al click
+      let enemigoMasCercano = null;
+      let distMenor = Infinity;
+
+      for (let enemigo of this.enemigos) {
+        const dist = calcularDistancia({ x, y }, enemigo.posicion);
+        if (dist < distMenor) {
+          distMenor = dist;
+          enemigoMasCercano = enemigo;
+        }
       }
-    }
-    
-    if (enemigoMasCercano) {
-      const cohete = new Cohete(
-        this.protagonista.posicion.x,
-        this.protagonista.posicion.y,
-        this,
-        enemigoMasCercano
-      );
-      this.cohetes.push(cohete);
-    }
-  };
-}
+
+      if (enemigoMasCercano) {
+        const cohete = new Cohete(
+          this.protagonista.posicion.x,
+          this.protagonista.posicion.y,
+          this,
+          enemigoMasCercano
+        );
+        this.cohetes.push(cohete);
+      }
+    };
+  }
 
   /* ESTO POR AHORA NO LO USO PERO ME VA A VENIR BIEN PARA CREAR LOS COHETES
   crearAmigos() {
@@ -240,26 +240,26 @@ class Juego {
     };
   }
 
-  
+
 
   gameLoop(time) {
     //iteramos por todos los personas
     //this.dibujador.clear();//14-10
     this.contadorDeFrame++;//14-10
-    
+
     for (let unpersona of this.personas) {
       //ejecutamos el metodo tick de cada persona
       unpersona.tick();
       unpersona.render();
     }
-   // this.grid.update();
-    this.hacerQLaCamaraSigaAlProtagonista();  
+    // this.grid.update();
+    this.hacerQLaCamaraSigaAlProtagonista();
     this.actualizarUI();
 
-  for (let cohete of this.cohetes) {
-  cohete.tick();
-  cohete.render();
-}
+    for (let cohete of this.cohetes) {
+      cohete.tick();
+      cohete.render();
+    }
   }
 
   hacerQLaCamaraSigaAlProtagonista() {
@@ -271,41 +271,41 @@ class Juego {
          this.containerPrincipal.x = this.mouse.x;
          this.containerPrincipal.y = this.mouse.y;
          }*/
-  } 
+  }
 
 
-   actualizarUI() {
+  actualizarUI() {
     this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); //tiempoRestante.toString();
   }
 
 
-   
+
 
   finDelJuego() {
     alert("Te moriste! fin del juego");
   }
 
-/*
-  shootProjectile(ship, target){
-    const projectile = new PIXI.Graphics();
-    projectile.beginFill(0xffff00);
-    projectile.drawCircle(0, 0, 5);
-    projectile.endFill()
+  /*
+    shootProjectile(ship, target){
+      const projectile = new PIXI.Graphics();
+      projectile.beginFill(0xffff00);
+      projectile.drawCircle(0, 0, 5);
+      projectile.endFill()
+  
+      projectile.x = this.protagonista.x;
+      projectile.y = this.protagonista.y;
+  
+      projectile.target = 
+    }
+  
+    */
 
-    projectile.x = this.protagonista.x;
-    projectile.y = this.protagonista.y;
-
-    projectile.target = 
-  }
-
-  */
- 
   /*
   getPersonaRandom() {
     return this.personas[Math.floor(this.personas.length * Math.random())];
   }
 */
- 
+
   // asignarTargets() {
   //   for (let cone of this.personas) {
   //     cone.asignarTarget(this.getpersonaRandom());
@@ -313,10 +313,10 @@ class Juego {
   // }
 
   asignarProtagonistaComoTargetATodosLospersonas() {
-     for (let cone of this.enemigos) {
-       cone.asignarTarget(this.protagonista);
-     }
-   }
+    for (let cone of this.enemigos) {
+      cone.asignarTarget(this.protagonista);
+    }
+  }
 
   // asignarPerseguidorRandomATodos() {
   //   for (let cone of this.personas) {
