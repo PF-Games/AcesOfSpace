@@ -21,16 +21,16 @@ class Enemigo extends Persona {
 
     this.verificarSiEstoyMuerto();
 
-    this.enemigos = this.buscarPersonasQueNoSonDeMiBando();
-    this.amigos = this.buscarPersonasDeMiBando();
-    this.enemigoMasCerca = this.buscarEnemigoMasCerca();
+   // this.enemigos = this.protagonista(); //this.buscarPersonasQueNoSonDeMiBando();
+   // this.amigos = this.buscarPersonasDeMiBando();
+   // this.enemigoMasCerca = this.buscarEnemigoMasCerca();
 
     // this.pegarSiEstaEnMiRango();
 
     this.calcularAnguloYVelocidadLineal();
-
+/*
     if (this.enemigoMasCerca) {
       // this.asignarTarget(this.enemigoMasCerca);
-    }
+    }*/
   }
 }

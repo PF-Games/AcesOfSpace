@@ -10,7 +10,7 @@ class Entity {
   velocidadMaxima = 3;
 
   constructor(texture, x, y, game) {
-    this.vision = Math.random() * 200 + 300;
+    this.vision = 8000 //Math.random() * 300 + 400; pongo vision absoluta
     //guarda una referencia a la instancia del juego
     this.posicion = { x: x, y: y };
     this.velocidad = { x: Math.random() * 10, y: Math.random() * 10 };

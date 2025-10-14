@@ -113,10 +113,11 @@ class Juego {
     this.crearEnemigos(5, 4);
     this.crearEnemigos(5, 5);
     this.crearEnemigos(5, 6);
-    //this.crearAmigos();
+    //this.crearAmigos(); ESTO NO LO USO PERO LO NECESITO PARA LOS COHETES
     this.crearArboles();
     this.crearAutos();
      //estas 5 14-10
+    this.asignarProtagonistaComoTargetATodosLospersonas()
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
     this.ancho = this.anchoDelMapa;
@@ -129,10 +130,11 @@ class Juego {
   crearEnemigos(cant, bando) {
     for (let i = 0; i < cant; i++) {
       const x = Math.random() * this.anchoDelMapa;
-      const y = Math.random() * this.altoDelMapa + 2500;
+      const y = 2050; //Math.random() * this.altoDelMapa + 2500;
       const persona = new Enemigo(x, y, this, bando);
       this.personas.push(persona);
       this.enemigos.push(persona);
+      this.target = juego.protagonista; // hice esto pero no funciono
     }
   }
 
@@ -155,6 +157,8 @@ class Juego {
       this.objetosInanimados.push(arbol);
     }
   }
+
+  /* ESTO POR AHORA NO LO USO PERO ME VA A VENIR BIEN PARA CREAR LOS COHETES
   crearAmigos() {
     for (let i = 0; i < 30; i++) {
       const x = Math.random() * this.anchoDelMapa;
@@ -164,6 +168,10 @@ class Juego {
       this.amigos.push(persona);
     }
   }
+
+  */
+
+
   crearProtagonista() {
     const x = 479;
     const y = 3000;
@@ -235,21 +243,24 @@ class Juego {
     alert("Te moriste! fin del juego");
   }
 
+
+  /*
   getPersonaRandom() {
     return this.personas[Math.floor(this.personas.length * Math.random())];
   }
-
+*/
+ 
   // asignarTargets() {
   //   for (let cone of this.personas) {
   //     cone.asignarTarget(this.getpersonaRandom());
   //   }
   // }
 
-  // asignarElMouseComoTargetATodosLospersonas() {
-  //   for (let cone of this.personas) {
-  //     cone.asignarTarget(this.mouse);
-  //   }
-  // }
+  asignarProtagonistaComoTargetATodosLospersonas() {
+     for (let cone of this.enemigos) {
+       cone.asignarTarget(this.protagonista);
+     }
+   }
 
   // asignarPerseguidorRandomATodos() {
   //   for (let cone of this.personas) {

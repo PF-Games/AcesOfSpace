@@ -59,9 +59,9 @@ class Protagonista extends Persona {
     this.verificarSiEstoyMuerto();
 
     // Actualizar contexto táctico
-    this.enemigos = this.buscarPersonasQueNoSonDeMiBando();
-    this.amigos = this.buscarPersonasDeMiBando();
-    this.enemigoMasCerca = this.buscarEnemigoMasCerca();
+   // this.enemigos = this.buscarPersonasQueNoSonDeMiBando();
+   // this.amigos = this.buscarPersonasDeMiBando();
+   // this.enemigoMasCerca = this.buscarEnemigoMasCerca();
 
     // Datos para animación
     this.calcularAnguloYVelocidadLineal();

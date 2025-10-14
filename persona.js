@@ -6,7 +6,7 @@ class Persona extends GameObject {
     this.bando = 0; //bando default
 
     this.coraje = Math.random();
-    this.vision = Math.random() * 400 + 200;
+    this.vision = 8000 //Math.random() * 300 + 400; pongo vision absoluta
 
     this.fuerzaDeAtaque = 0.01 + Math.random() * 0.01;
     this.radio = 13 + Math.random() * 2;
@@ -23,6 +23,8 @@ class Persona extends GameObject {
     this.amigos = [];
   }
 
+  /*
+
   buscarPersonasDeMiBando() {
     return this.juego.personas.filter(
       (persona) => persona.bando === this.bando
@@ -34,6 +36,8 @@ class Persona extends GameObject {
       (persona) => persona.bando !== this.bando
     );
   }
+
+  */
 
   tick() {
     /**

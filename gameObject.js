@@ -22,7 +22,7 @@ class GameObject {
 
   constructor(x, y, juego) {
     // Rango de visión aleatorio entre 400-700 píxeles
-    this.vision = Math.random() * 300 + 400;
+    this.vision = 8000 //Math.random() * 300 + 400; pongo vision absoluta
 
     // Sistema de física vectorial 2D
     this.posicion = { x: x, y: y }; // Posición actual en píxeles
