@@ -172,8 +172,9 @@ class Juego {
       // Buscar enemigo más cercano al click
       let enemigoMasCercano = null;
       let distMenor = Infinity;
-
+      // IMPORTANTE: CREAR UNA FUNCION BUSCAR NAVE MAS CERCANA QUE MANEJE ESTO
       for (let enemigo of this.enemigos) {
+        if (enemigo.isTargeted) continue;
         const dist = calcularDistancia({ x, y }, enemigo.posicion);
         if (dist < distMenor) {
           distMenor = dist;
@@ -182,6 +183,7 @@ class Juego {
       }
 
       if (enemigoMasCercano) {
+        enemigoMasCercano.isTargeted = true
         const cohete = new Cohete(
           this.protagonista.posicion.x,
           this.protagonista.posicion.y,
@@ -263,14 +265,14 @@ class Juego {
   }
 
   hacerQLaCamaraSigaAlProtagonista() {
-    if (!this.protagonista) return;
+    /*if (!this.protagonista) return;
     this.containerPrincipal.x = -this.protagonista.posicion.x + this.width / 2;
-    this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;
-    /* ESTO INTENTÉ HACERLO YO PARA MOVER LA CÁMARA Y NO ME SALIO
+    this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;*/
+    // ESTO INTENTÉ HACERLO YO PARA MOVER LA CÁMARA Y NO ME SALIO
       if (this.mouse.apretado){
-         this.containerPrincipal.x = this.mouse.x;
-         this.containerPrincipal.y = this.mouse.y;
-         }*/
+         this.containerPrincipal.x = this.mouse.posicion.x;
+         this.containerPrincipal.y = this.mouse.posicion.y;
+         }
   }
 
 
