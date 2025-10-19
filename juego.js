@@ -18,6 +18,13 @@ class Juego {
     this.anchoDelMapa = 1920;
     this.altoDelMapa = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
+
+    // Variables para el zoom
+    this.zoom = 1;
+    this.minZoom = 0.1;
+    this.maxZoom = 2;
+    this.zoomStep = 0.1;
+
     this.initPIXI();
     this.setupResizeHandler();
     this.tamanoCelda = 100; //14-10
@@ -261,14 +268,46 @@ class Juego {
       };
       this.mouse.apretado = false;
     };
+  
+
+      // Event listener para la rueda del mouse (zoom)
+    this.pixiApp.canvas.addEventListener("wheel", (event) => {
+      event.preventDefault(); // Prevenir el scroll de la página
+
+      const zoomDelta = event.deltaY > 0 ? -this.zoomStep : this.zoomStep;
+      const nuevoZoom = Math.max(
+        this.minZoom,
+        Math.min(this.maxZoom, this.zoom + zoomDelta)
+      );
+
+      if (nuevoZoom !== this.zoom) {
+        // Obtener la posición del mouse antes del zoom
+        const mouseX = event.x;
+        const mouseY = event.y;
+
+        // Calcular el punto en coordenadas del mundo antes del zoom
+        const worldPosX = (mouseX - this.containerPrincipal.x) / this.zoom;
+        const worldPosY = (mouseY - this.containerPrincipal.y) / this.zoom;
+
+        // Aplicar el nuevo zoom
+        this.zoom = nuevoZoom;
+        this.containerPrincipal.scale.set(this.zoom);
+
+        // Ajustar la posición del contenedor para mantener el mouse en el mismo punto del mundo
+        this.containerPrincipal.x = mouseX - worldPosX * this.zoom;
+        this.containerPrincipal.y = mouseY - worldPosY * this.zoom;
+      }
+    });
   }
 
-
-
-
-
-
-  
+  convertirCoordenadaDelMouse(mouseX, mouseY) {
+    // Convertir coordenadas del mouse del viewport a coordenadas del mundo
+    // teniendo en cuenta la posición y escala del containerPrincipal
+    return {
+      x: (mouseX - this.containerPrincipal.x) / this.zoom,
+      y: (mouseY - this.containerPrincipal.y) / this.zoom,
+    };
+  }
 
 
 
