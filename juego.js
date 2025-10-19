@@ -126,7 +126,11 @@ class Juego {
     this.ancho = this.anchoDelMapa;
     this.alto = this.altoDelMapa;
     this.grid = new Grid(this, this.tamanoCelda);
+    this.iniciarControles();
+
   }
+
+
   async cargarTexturas() {
     await PIXI.Assets.load(["assets/bg.jpg"]);
   }
@@ -255,7 +259,7 @@ class Juego {
       unpersona.render();
     }
     // this.grid.update();
-    this.hacerQLaCamaraSigaAlProtagonista();
+   // this.hacerQLaCamaraSigaAlProtagonista();
     this.actualizarUI();
 
     for (let cohete of this.cohetes) {
@@ -264,16 +268,21 @@ class Juego {
     }
   }
 
-  hacerQLaCamaraSigaAlProtagonista() {
-    /*if (!this.protagonista) return;
-    this.containerPrincipal.x = -this.protagonista.posicion.x + this.width / 2;
-    this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;*/
-    // ESTO INTENTÉ HACERLO YO PARA MOVER LA CÁMARA Y NO ME SALIO
-      if (this.mouse.apretado){
-         this.containerPrincipal.x = this.mouse.posicion.x;
-         this.containerPrincipal.y = this.mouse.posicion.y;
-         }
-  }
+
+iniciarControles() {
+    window.addEventListener('keyup', (event) => {
+        if (event.key === 'ArrowDown') {
+            this.containerPrincipal.y -= 100;
+        }
+        if (event.key === 'ArrowUp') {
+            this.containerPrincipal.y += 100;
+        }
+    });
+}
+
+  
+
+ 
 
 
   actualizarUI() {
