@@ -15,8 +15,8 @@ class Juego {
 
   constructor() {
     this.updateDimensions();
-    this.anchoDelMapa = 1000;
-    this.altoDelMapa = 3000;
+    this.anchoDelMapa = 1920;
+    this.altoDelMapa = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
     this.initPIXI();
     this.setupResizeHandler();
@@ -28,8 +28,8 @@ class Juego {
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.ancho = this.anchoDelMapa || 1000;  // para que Grid funcione 10-4
-    this.alto = this.altoDelMapa || 3000;     // para que Grid funcione 10-4
+    this.ancho = this.anchoDelMapa || 1920;  // para que Grid funcione 10-4
+    this.alto = this.altoDelMapa || 1080;     // para que Grid funcione 10-4
   }
 
 
@@ -154,7 +154,7 @@ class Juego {
   crearEnemigos(cant, bando) {
     for (let i = 0; i < cant; i++) {
       const x = Math.random() * this.anchoDelMapa;
-      const y = 2050; //Math.random() * this.altoDelMapa + 2500;
+      const y = -100; //Math.random() * this.altoDelMapa + 2500;
       const persona = new Enemigo(x, y, this, bando);
       this.personas.push(persona);
       this.enemigos.push(persona);
@@ -231,8 +231,8 @@ class Juego {
 
 
   crearProtagonista() {
-    const x = 479;
-    const y = 3000;
+    const x = this.anchoDelMapa / 2
+    const y = 700;
     const protagonista = new Protagonista(x, y, this);
     this.personas.push(protagonista);
     this.protagonista = protagonista;
@@ -262,6 +262,13 @@ class Juego {
       this.mouse.apretado = false;
     };
   }
+
+
+
+
+
+
+  
 
 
 
