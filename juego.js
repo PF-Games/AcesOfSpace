@@ -128,9 +128,26 @@ class Juego {
     this.grid = new Grid(this, this.tamanoCelda);
     this.iniciarControles();
 
+
+        // --- Contenedor de la UI ---
+    this.uiContainer = new PIXI.Container();
+    this.pixiApp.stage.addChild(this.uiContainer);
+
+    // Dibujamos un fondo para la UI (solo para visualizar)
+    const uiFondo = new PIXI.Graphics();
+    uiFondo.beginFill(0x222222);
+    uiFondo.drawRect(
+      0,
+      this.pixiApp.renderer.height * 0.8,  // empieza al 80% de la pantalla
+      this.pixiApp.renderer.width,
+      this.pixiApp.renderer.height * 0.2   // ocupa el 20% inferior
+    );
+    uiFondo.endFill();
+    this.uiContainer.addChild(uiFondo);
+
   }
 
-
+  
   async cargarTexturas() {
     await PIXI.Assets.load(["assets/bg.jpg"]);
   }
@@ -271,17 +288,24 @@ class Juego {
 
 iniciarControles() {
     window.addEventListener('keyup', (event) => {
-        if (event.key === 'ArrowDown') {
-            this.containerPrincipal.y -= 100;
-        }
-        if (event.key === 'ArrowUp') {
-            this.containerPrincipal.y += 100;
-        }
-    });
-}
-
+      if (event.key === "ArrowDown") this.containerPrincipal.y -= 100;
+      if (event.key === "ArrowUp") this.containerPrincipal.y += 100;
+      if (event.key === "ArrowLeft") this.containerPrincipal.x += 100;
+      if (event.key === "ArrowRight") this.containerPrincipal.x -= 100;
+       });
+    }
   
-
+  //hacerQLaCamaraSigaAlProtagonista() {
+    /*if (!this.protagonista) return;
+    this.containerPrincipal.x = -this.protagonista.posicion.x + this.width / 2;
+    this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;
+  */
+    
+    /*if (this.mouse.apretado){
+         this.containerPrincipal.x = this.mouse.posicion.x;
+         this.containerPrincipal.y = this.mouse.posicion.y;
+         }
+         */
  
 
 
