@@ -227,8 +227,11 @@ class Persona extends GameObject {
     );
     this.juego.amigos = this.juego.amigos.filter((persona) => persona !== this);
 
-    // if (this.sprite) this.sprite.destroy();
-    // if (this.container) this.container.destroy();
+    // Agregar estas líneas para destruir visualmente
+    if (this.sprite) this.sprite.destroy();
+    if (this.container) this.container.destroy();
+    this.container = null;
+
 
     this.borrarmeComoTargetDeTodos();
   }
@@ -237,7 +240,7 @@ class Persona extends GameObject {
     if (
       this.enemigoMasCerca &&
       calcularDistancia(this.posicion, this.enemigoMasCerca.posicion) <
-        this.rangoDeAtaque
+      this.rangoDeAtaque
     ) {
       this.pegar(this.enemigoMasCerca);
     }
@@ -285,7 +288,7 @@ class Persona extends GameObject {
 
 
 
-    
+
 
   render() {
     /**
@@ -302,7 +305,7 @@ class Persona extends GameObject {
     if (!this.container || !this.sprite) return;
     super.render();
 
-    
+
 
     // Ordenamiento en profundidad para perspectiva isométrica
     this.container.zIndex = this.posicion.y;

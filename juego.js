@@ -9,27 +9,36 @@ class Juego {
   protagonista;
   width;
   height;
-  
-  
+
+
+
 
   constructor() {
     this.updateDimensions();
-    this.anchoDelMapa = 1000;
-    this.altoDelMapa = 3000;
+    this.anchoDelMapa = 1920;
+    this.altoDelMapa = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
+
+    // Variables para el zoom
+    this.zoom = 1;
+    this.minZoom = 0.1;
+    this.maxZoom = 2;
+    this.zoomStep = 0.1;
+
     this.initPIXI();
     this.setupResizeHandler();
     this.tamanoCelda = 100; //14-10
     this.contadorDeFrame = 0; //14-10
+    this.cohetes = [];
   }
 
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.ancho = this.anchoDelMapa || 1000;  // para que Grid funcione 10-4
-    this.alto = this.altoDelMapa || 3000;     // para que Grid funcione 10-4
-}
-  
+    this.ancho = this.anchoDelMapa || 1920;  // para que Grid funcione 10-4
+    this.alto = this.altoDelMapa || 1080;     // para que Grid funcione 10-4
+  }
+
 
   setupResizeHandler() {
     window.addEventListener("resize", () => {
@@ -42,26 +51,26 @@ class Juego {
 
 
   crearUI() {
-  this.ui = new PIXI.Container();
-  this.ui.name = "UI";
-  this.pixiApp.stage.addChild(this.ui);
-  
-  this.fpsText = new PIXI.Text({
-    text: "FPS: 60",
-    style: {
-      fontFamily: "Arial",
-      fontSize: 24,
-      fill: "#ffffff",
-      stroke: "#000000",
-      strokeThickness: 4
-    }
-  });
-  
-  this.fpsText.x = this.width - 120;
-  this.fpsText.y = 20;
-  this.ui.addChild(this.fpsText);
- // this.fpsText.text = `FPS: ${this.pixiApp.ticker.FPS.toFixed(2)}`;
-}
+    this.ui = new PIXI.Container();
+    this.ui.name = "UI";
+    this.pixiApp.stage.addChild(this.ui);
+
+    this.fpsText = new PIXI.Text({
+      text: "FPS: 60",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 4
+      }
+    });
+
+    this.fpsText.x = this.width - 120;
+    this.fpsText.y = 20;
+    this.ui.addChild(this.fpsText);
+    // this.fpsText.text = `FPS: ${this.pixiApp.ticker.FPS.toFixed(2)}`;
+  }
 
   //async indica q este metodo es asyncronico, es decir q puede usar "await"
   async initPIXI() {
@@ -91,7 +100,7 @@ class Juego {
     this.pixiApp.stage.sortableChildren = true;
     this.crearUI();
     this.crearNivel();
-        
+
   }
 
   async crearFondo() {
@@ -107,6 +116,7 @@ class Juego {
     this.pixiApp.stage.addChild(this.containerPrincipal);
     await this.cargarTexturas();
     this.crearFondo();
+    this.agregarControlDeCohetes();
     this.crearProtagonista();
     this.crearEnemigos(5, 2);
     this.crearEnemigos(5, 3);
@@ -116,21 +126,42 @@ class Juego {
     //this.crearAmigos(); ESTO NO LO USO PERO LO NECESITO PARA LOS COHETES
     this.crearArboles();
     this.crearAutos();
-     //estas 5 14-10
+    //estas 5 14-10
     this.asignarProtagonistaComoTargetATodosLospersonas()
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
     this.ancho = this.anchoDelMapa;
     this.alto = this.altoDelMapa;
     this.grid = new Grid(this, this.tamanoCelda);
+    this.iniciarControles();
+
+
+        // --- Contenedor de la UI ---
+    this.uiContainer = new PIXI.Container();
+    this.pixiApp.stage.addChild(this.uiContainer);
+
+    // Dibujamos un fondo para la UI (solo para visualizar)
+    const uiFondo = new PIXI.Graphics();
+    uiFondo.beginFill(0x222222);
+    uiFondo.drawRect(
+      0,
+      this.pixiApp.renderer.height * 0.8,  // empieza al 80% de la pantalla
+      this.pixiApp.renderer.width,
+      this.pixiApp.renderer.height * 0.2   // ocupa el 20% inferior
+    );
+    uiFondo.endFill();
+    this.uiContainer.addChild(uiFondo);
+
   }
+
+  
   async cargarTexturas() {
     await PIXI.Assets.load(["assets/bg.jpg"]);
   }
   crearEnemigos(cant, bando) {
     for (let i = 0; i < cant; i++) {
       const x = Math.random() * this.anchoDelMapa;
-      const y = 2050; //Math.random() * this.altoDelMapa + 2500;
+      const y = -100; //Math.random() * this.altoDelMapa + 2500;
       const persona = new Enemigo(x, y, this, bando);
       this.personas.push(persona);
       this.enemigos.push(persona);
@@ -158,6 +189,40 @@ class Juego {
     }
   }
 
+
+  //14-10
+
+  agregarControlDeCohetes() {
+    this.pixiApp.canvas.onclick = (event) => {
+      const x = event.x - this.containerPrincipal.x;
+      const y = event.y - this.containerPrincipal.y;
+
+      // Buscar enemigo más cercano al click
+      let enemigoMasCercano = null;
+      let distMenor = Infinity;
+      // IMPORTANTE: CREAR UNA FUNCION BUSCAR NAVE MAS CERCANA QUE MANEJE ESTO
+      for (let enemigo of this.enemigos) {
+        if (enemigo.isTargeted) continue;
+        const dist = calcularDistancia({ x, y }, enemigo.posicion);
+        if (dist < distMenor) {
+          distMenor = dist;
+          enemigoMasCercano = enemigo;
+        }
+      }
+
+      if (enemigoMasCercano) {
+        enemigoMasCercano.isTargeted = true
+        const cohete = new Cohete(
+          this.protagonista.posicion.x,
+          this.protagonista.posicion.y,
+          this,
+          enemigoMasCercano
+        );
+        this.cohetes.push(cohete);
+      }
+    };
+  }
+
   /* ESTO POR AHORA NO LO USO PERO ME VA A VENIR BIEN PARA CREAR LOS COHETES
   crearAmigos() {
     for (let i = 0; i < 30; i++) {
@@ -173,8 +238,8 @@ class Juego {
 
 
   crearProtagonista() {
-    const x = 479;
-    const y = 3000;
+    const x = this.anchoDelMapa / 2
+    const y = 700;
     const protagonista = new Protagonista(x, y, this);
     this.personas.push(protagonista);
     this.protagonista = protagonista;
@@ -203,53 +268,125 @@ class Juego {
       };
       this.mouse.apretado = false;
     };
+  
+
+      // Event listener para la rueda del mouse (zoom)
+    this.pixiApp.canvas.addEventListener("wheel", (event) => {
+      event.preventDefault(); // Prevenir el scroll de la página
+
+      const zoomDelta = event.deltaY > 0 ? -this.zoomStep : this.zoomStep;
+      const nuevoZoom = Math.max(
+        this.minZoom,
+        Math.min(this.maxZoom, this.zoom + zoomDelta)
+      );
+
+      if (nuevoZoom !== this.zoom) {
+        // Obtener la posición del mouse antes del zoom
+        const mouseX = event.x;
+        const mouseY = event.y;
+
+        // Calcular el punto en coordenadas del mundo antes del zoom
+        const worldPosX = (mouseX - this.containerPrincipal.x) / this.zoom;
+        const worldPosY = (mouseY - this.containerPrincipal.y) / this.zoom;
+
+        // Aplicar el nuevo zoom
+        this.zoom = nuevoZoom;
+        this.containerPrincipal.scale.set(this.zoom);
+
+        // Ajustar la posición del contenedor para mantener el mouse en el mismo punto del mundo
+        this.containerPrincipal.x = mouseX - worldPosX * this.zoom;
+        this.containerPrincipal.y = mouseY - worldPosY * this.zoom;
+      }
+    });
   }
 
-  
+  convertirCoordenadaDelMouse(mouseX, mouseY) {
+    // Convertir coordenadas del mouse del viewport a coordenadas del mundo
+    // teniendo en cuenta la posición y escala del containerPrincipal
+    return {
+      x: (mouseX - this.containerPrincipal.x) / this.zoom,
+      y: (mouseY - this.containerPrincipal.y) / this.zoom,
+    };
+  }
+
+
 
   gameLoop(time) {
     //iteramos por todos los personas
     //this.dibujador.clear();//14-10
     this.contadorDeFrame++;//14-10
-    
+
     for (let unpersona of this.personas) {
       //ejecutamos el metodo tick de cada persona
       unpersona.tick();
       unpersona.render();
     }
-   // this.grid.update();
-    this.hacerQLaCamaraSigaAlProtagonista();  
+    // this.grid.update();
+   // this.hacerQLaCamaraSigaAlProtagonista();
     this.actualizarUI();
+
+    for (let cohete of this.cohetes) {
+      cohete.tick();
+      cohete.render();
+    }
   }
 
-  hacerQLaCamaraSigaAlProtagonista() {
-    if (!this.protagonista) return;
+
+iniciarControles() {
+    window.addEventListener('keyup', (event) => {
+      if (event.key === "ArrowDown") this.containerPrincipal.y -= 100;
+      if (event.key === "ArrowUp") this.containerPrincipal.y += 100;
+      if (event.key === "ArrowLeft") this.containerPrincipal.x += 100;
+      if (event.key === "ArrowRight") this.containerPrincipal.x -= 100;
+       });
+    }
+  
+  //hacerQLaCamaraSigaAlProtagonista() {
+    /*if (!this.protagonista) return;
     this.containerPrincipal.x = -this.protagonista.posicion.x + this.width / 2;
     this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;
-    /* ESTO INTENTÉ HACERLO YO PARA MOVER LA CÁMARA Y NO ME SALIO
-      if (this.mouse.apretado){
-         this.containerPrincipal.x = this.mouse.x;
-         this.containerPrincipal.y = this.mouse.y;
-         }*/
-  } 
+  */
+    
+    /*if (this.mouse.apretado){
+         this.containerPrincipal.x = this.mouse.posicion.x;
+         this.containerPrincipal.y = this.mouse.posicion.y;
+         }
+         */
+ 
 
 
-   actualizarUI() {
+  actualizarUI() {
     this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); //tiempoRestante.toString();
   }
-   
+
+
+
 
   finDelJuego() {
     alert("Te moriste! fin del juego");
   }
 
+  /*
+    shootProjectile(ship, target){
+      const projectile = new PIXI.Graphics();
+      projectile.beginFill(0xffff00);
+      projectile.drawCircle(0, 0, 5);
+      projectile.endFill()
+  
+      projectile.x = this.protagonista.x;
+      projectile.y = this.protagonista.y;
+  
+      projectile.target = 
+    }
+  
+    */
 
   /*
   getPersonaRandom() {
     return this.personas[Math.floor(this.personas.length * Math.random())];
   }
 */
- 
+
   // asignarTargets() {
   //   for (let cone of this.personas) {
   //     cone.asignarTarget(this.getpersonaRandom());
@@ -257,10 +394,10 @@ class Juego {
   // }
 
   asignarProtagonistaComoTargetATodosLospersonas() {
-     for (let cone of this.enemigos) {
-       cone.asignarTarget(this.protagonista);
-     }
-   }
+    for (let cone of this.enemigos) {
+      cone.asignarTarget(this.protagonista);
+    }
+  }
 
   // asignarPerseguidorRandomATodos() {
   //   for (let cone of this.personas) {
