@@ -1,12 +1,23 @@
-class enemyShip extends Enemigo {
+class enemyShip extends Ship {
   tipoNave;
   vida;
   //valor; //un valor para poder generar niveles con un valor determinado
-  
-  
+
   constructor(texturePath, x, y, juego) {
     super(texturePath, x, y, juego);
-    
+    this.crearSprite()
+  }
+
+  tick() {
+    if (this.muerto) return;
+
+    this.cohesion();
+    this.alineacion();
+    this.separacion();
+    this.perseguir();
+    this.aplicarFisica();
+    this.verificarSiEstoyMuerto();
+    this.calcularAnguloYVelocidadLineal();
   }
 }
 
