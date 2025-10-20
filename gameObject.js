@@ -10,7 +10,7 @@ class GameObject {
   constructor(x, y, juego) {
 
     this.muerto = false;
-    
+
     // Rango de visión aleatorio entre 400-700 píxeles
     this.vision = 8000 //Math.random() * 300 + 400; pongo vision absoluta
 
@@ -157,13 +157,13 @@ class GameObject {
 
 
   borrarmeComoTargetDeTodos() {
-    this.juego.personas.forEach((persona) => {
-      persona.asignarTarget(null);
+    this.juego.ships.forEach((ship) => {
+      ship.asignarTarget(null);
     });
   }
 
   asignarTarget(quien) {
-    if (quien instanceof Persona && quien.muerto) return;
+    if (quien instanceof Ship && quien.muerto) return;
     this.target = quien;
   }
 

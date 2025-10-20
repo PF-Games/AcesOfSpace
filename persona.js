@@ -1,4 +1,4 @@
-class Persona extends GameObject {
+class Ship extends GameObject {
   constructor(x, y, juego) {
     super(x, y, juego);
     this.vida = 1;
@@ -39,7 +39,7 @@ class Persona extends GameObject {
 
   tick() {
     /**
-     * CICLO PRINCIPAL DE ACTUALIZACIÓN DE LA PERSONA
+     * CICLO PRINCIPAL DE ACTUALIZACIÓN DE LA NAVE
      *
      * Orden de ejecución optimizado para estabilidad:
      * 1. Verificar estado de vida
@@ -99,13 +99,13 @@ class Persona extends GameObject {
   alineacion() {
     let cont = 0;
     let vectorPromedioDeVelocidades = { x: 0, y: 0 };
-    for (const persona of this.amigos) {
-      if (persona !== this) {
-        const distancia = calcularDistancia(this.posicion, persona.posicion);
+    for (const ship of this.amigos) {
+      if (ship !== this) {
+        const distancia = calcularDistancia(this.posicion, ship.posicion);
         if (distancia < this.vision) {
           cont++;
-          vectorPromedioDeVelocidades.x += persona.velocidad.x;
-          vectorPromedioDeVelocidades.y += persona.velocidad.y;
+          vectorPromedioDeVelocidades.x += ship.velocidad.x;
+          vectorPromedioDeVelocidades.y += ship.velocidad.y;
         }
       }
     }
@@ -129,16 +129,16 @@ class Persona extends GameObject {
     let vectorPromedioDePosiciones = { x: 0, y: 0 };
     //iteramos por todos los amigos
     const amigosSinElLider = this.amigos.filter(
-      (persona) => persona !== this.juego.protagonista
+      (ship) => ship !== this.juego.protagonista
     );
-    for (const persona of amigosSinElLider) {
-      if (persona !== this) {
-        //si la persona ota no soy yo
-        const distancia = calcularDistancia(this.posicion, persona.posicion);
+    for (const ship of amigosSinElLider) {
+      if (ship !== this) {
+        //si la nave ota no soy yo
+        const distancia = calcularDistancia(this.posicion, ship.posicion);
         if (distancia < this.vision && distancia > this.radio * 2) {
           cont++;
-          vectorPromedioDePosiciones.x += persona.posicion.x;
-          vectorPromedioDePosiciones.y += persona.posicion.y;
+          vectorPromedioDePosiciones.x += ship.posicion.x;
+          vectorPromedioDePosiciones.y += ship.posicion.y;
         }
       }
     }
@@ -163,7 +163,7 @@ class Persona extends GameObject {
      * Objetivo: Evitar colisiones manteniendo distancia mínima entre agentes
      *
      * Proceso:
-     * 1. Detectar TODAS las personas (amigos y enemigos) muy cercanas
+     * 1. Detectar TODAS las naves (amigos y enemigos) muy cercanas
      * 2. Zona crítica: radio * 1.5 (zona de colisión inminente)
      * 3. Calcular centro de masa de los agentes cercanos
      * 4. Generar fuerza de repulsión: fuerza = posición_actual - CM_cercanos
@@ -173,20 +173,20 @@ class Persona extends GameObject {
      * - Afecta a todos los agentes sin distinción de bando
      * - Previene superposición y aglomeración excesiva
      *
-     * Resultado: Espaciado natural y realista entre personajes
+     * Resultado: Espaciado natural y realista entre NAVES
      */
     let cont = 0;
     let vectorPromedioDePosiciones = { x: 0, y: 0 };
 
     // Detectar TODOS los agentes cercanos (sin distinción de bando)
-    for (const persona of this.juego.personas) {
-      if (persona !== this) {
-        const distancia = calcularDistancia(this.posicion, persona.posicion);
+    for (const ship of this.juego.ships) {
+      if (ship !== this) {
+        const distancia = calcularDistancia(this.posicion, ship.posicion);
         // Zona crítica de separación
         if (distancia < this.radio * 1.5) {
           cont++;
-          vectorPromedioDePosiciones.x += persona.posicion.x;
-          vectorPromedioDePosiciones.y += persona.posicion.y;
+          vectorPromedioDePosiciones.x += ship.posicion.x;
+          vectorPromedioDePosiciones.y += ship.posicion.y;
         }
       }
     }
@@ -217,13 +217,13 @@ class Persona extends GameObject {
     if (this.muerto) return;
 
     this.muerto = true;
-    this.juego.personas = this.juego.personas.filter(
-      (persona) => persona !== this
+    this.juego.ships = this.juego.ships.filter(
+      (ship) => ship !== this
     );
     this.juego.enemigos = this.juego.enemigos.filter(
-      (persona) => persona !== this
+      (ship) => ship !== this
     );
-    this.juego.amigos = this.juego.amigos.filter((persona) => persona !== this);
+    this.juego.amigos = this.juego.amigos.filter((ship) => ship !== this);
 
     // Agregar estas líneas para destruir visualmente
     if (this.sprite) this.sprite.destroy();

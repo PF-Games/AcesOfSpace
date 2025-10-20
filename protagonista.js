@@ -7,7 +7,7 @@
  * - Bando 1 (diferente de los enemigos)
  * - Control por mouse en lugar de IA automática
  */
-class Protagonista extends Persona {
+class Protagonista extends Ship {
   constructor(x, y, juego) {
     super(x, y, juego);
 

@@ -1,4 +1,4 @@
-class Enemigo extends Persona {
+class Enemigo extends Ship {
   constructor(x, y, juego, bando) {
     super(x, y, juego);
     this.bando = bando || Math.floor(Math.random() * 3) + 2;

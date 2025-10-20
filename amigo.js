@@ -1,4 +1,4 @@
-class Amigo extends Persona {
+class Amigo extends Ship {
   constructor(x, y, juego) {
     super(x, y, juego);
 

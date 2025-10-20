@@ -1,6 +1,6 @@
 class Juego {
   pixiApp;
-  personas = [];
+  ships = [];
   //amigos = [];
   enemigos = [];
   arboles = [];
@@ -162,9 +162,9 @@ class Juego {
     for (let i = 0; i < cant; i++) {
       const x = Math.random() * this.anchoDelMapa;
       const y = -100; //Math.random() * this.altoDelMapa + 2500;
-      const persona = new Enemigo(x, y, this, bando);
-      this.personas.push(persona);
-      this.enemigos.push(persona);
+      const ship = new Enemigo(x, y, this, bando);
+      this.ships.push(ship);
+      this.enemigos.push(ship);
       this.target = juego.protagonista; // hice esto pero no funciono
     }
   }
@@ -241,7 +241,7 @@ class Juego {
     const x = this.anchoDelMapa / 2
     const y = 700;
     const protagonista = new Protagonista(x, y, this);
-    this.personas.push(protagonista);
+    this.ships.push(protagonista);
     this.protagonista = protagonista;
   }
 
@@ -316,10 +316,10 @@ class Juego {
     //this.dibujador.clear();//14-10
     this.contadorDeFrame++;//14-10
 
-    for (let unpersona of this.personas) {
+    for (let aShip of this.ships) {
       //ejecutamos el metodo tick de cada persona
-      unpersona.tick();
-      unpersona.render();
+      aShip.tick();
+      aShip.render();
     }
     // this.grid.update();
    // this.hacerQLaCamaraSigaAlProtagonista();
