@@ -9,7 +9,7 @@
  */
 class Protagonista extends Ship {
   constructor(x, y, juego) {
-    super(x, y, juego);
+    super("Assets2/Ships/Unity/Cruiser 3.png", x, y, juego);
 
     // Configuración especial del protagonista
     this.vida = 9287364928348; // Vida prácticamente infinita
@@ -18,6 +18,8 @@ class Protagonista extends Ship {
     this.crearSprite();
   }
 
+
+  /*
   async crearSprite() {
     this.sprite = new PIXI.Sprite(
       await PIXI.Assets.load("Assets2/Ships/Unity/Cruiser 3.png")
@@ -27,6 +29,8 @@ class Protagonista extends Ship {
 
     this.render();
   }
+
+  */
 
   morir() {
     super.morir();

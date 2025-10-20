@@ -1,7 +1,7 @@
 class Enemigo extends Ship {
-  constructor(x, y, juego, bando) {
-    super(x, y, juego);
-    this.bando = bando || Math.floor(Math.random() * 3) + 2;
+  constructor(texturePath, x, y, juego) {
+    super(texturePath, x, y, juego);
+  //  this.bando = bando || Math.floor(Math.random() * 3) + 2;
     this.crearSprite();
   }
 

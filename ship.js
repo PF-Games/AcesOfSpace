@@ -1,12 +1,13 @@
 class Ship extends GameObject {
-  constructor(x, y, juego) {
+  constructor(texturePath, x, y, juego) {
     super(x, y, juego);
+    this.texturePath = texturePath;
     this.vida = 1;
-    this.bando = 0; //bando default
+   
 
-    this.vision = 8000 //Math.random() * 300 + 400; pongo vision absoluta
+    this.vision = 8000
 
- 
+
     this.radio = 24
     this.rangoDeAtaque = this.radio * 3;
 
@@ -17,25 +18,10 @@ class Ship extends GameObject {
     this.factorAlineacion = 0.4;
 
     this.aceleracionMaxima = 0.2;
-    this.velocidadMaxima = 3;
+    this.velocidadMaxima = 1;
     this.amigos = [];
   }
 
-  /*
-
-  buscarPersonasDeMiBando() {
-    return this.juego.personas.filter(
-      (persona) => persona.bando === this.bando
-    );
-  }
-
-  buscarPersonasQueNoSonDeMiBando() {
-    return this.juego.personas.filter(
-      (persona) => persona.bando !== this.bando
-    );
-  }
-
-  */
 
   tick() {
     /**
@@ -88,11 +74,10 @@ class Ship extends GameObject {
 
   async crearSprite() {
     this.sprite = new PIXI.Sprite(
-      await PIXI.Assets.load(`assets/pixelart/${this.bando}.png`)
+      await PIXI.Assets.load(this.texturePath)
     );
     this.sprite.anchor.set(0.5, 1);
     this.container.addChild(this.sprite);
-
     this.render();
   }
 
