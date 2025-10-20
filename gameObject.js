@@ -1,16 +1,3 @@
-/**
- * CLASE BASE GAMEOBJECT
- *
- * Cálculo isométrico para colisiones:
- * Radio del collider = ancho_imagen × 0.288675
- *
- * Esta fórmula viene de la proyección isométrica donde:
- * - El ángulo de inclinación es 30°
- * - La relación altura/ancho en isometría es √3/6 ≈ 0.288675
- * - Esto nos da el radio del círculo de colisión desde el borde inferior
- *   hasta el 'horizonte' visual de la perspectiva isométrica
- */
-
 class GameObject {
   // Propiedades visuales
   sprite; // Sprite de PIXI.js para renderizado
@@ -21,6 +8,9 @@ class GameObject {
   perseguidor; // Objeto que está persiguiendo a este GameObject
 
   constructor(x, y, juego) {
+
+    this.muerto = false;
+    
     // Rango de visión aleatorio entre 400-700 píxeles
     this.vision = 8000 //Math.random() * 300 + 400; pongo vision absoluta
 
@@ -34,12 +24,17 @@ class GameObject {
     this.velocidadMaxima = 3; // Velocidad terminal del objeto
 
     // Propiedades de colisión y combate
-    this.radio = 12; // Radio de colisión en píxeles
-    this.rangoDeAtaque = 25 + Math.random() * 10; // Rango aleatorio 25-35 píxeles
+    this.radio = 24; // Radio de colisión en píxeles
+    this.rangoDeAtaque = 25
 
     // Referencias del sistema
     this.juego = juego; // Referencia al motor del juego
     this.id = Math.floor(Math.random() * 99999999); // ID único aleatorio
+
+    //establezco el punto de pivot en el medio:
+    //this.sprite.anchor.set(0.5);  ESTO ES DE ENTITY 20/10
+
+
 
     // Configuración del sistema de renderizado PIXI.js
     this.container = new PIXI.Container(); // Container para agrupar elementos visuales
@@ -143,18 +138,10 @@ class GameObject {
     this.velocidad.y *= friccionAplicada;
   }
 
+
+/* COMENTADO 20-10. NO LO NECESITO
   rebotar() {
-    /**
-     * SISTEMA DE REBOTE CON PÉRDIDA DE ENERGÍA
-     *
-     * Implementa reflexión elástica imperfecta:
-     * - Invierte la componente de velocidad perpendicular al borde
-     * - Aplica coeficiente de restitución de 0.99 (pérdida del 1% de energía)
-     *
-     * Fórmula: v_nueva = -v_vieja × coeficiente_restitución
-     *
-     * Esto simula colisiones realistas donde se pierde energía en el impacto
-     */
+ 
     if (this.posicion.x > this.juego.width || this.posicion.x < 0) {
       // Rebote horizontal: invierte velocidad X con pérdida de energía
       this.velocidad.x *= -0.99;
@@ -165,6 +152,10 @@ class GameObject {
       this.velocidad.y *= -0.99;
     }
   }
+
+  */
+
+
   borrarmeComoTargetDeTodos() {
     this.juego.personas.forEach((persona) => {
       persona.asignarTarget(null);
@@ -220,8 +211,10 @@ class GameObject {
     this.aceleracion.y += vectorNuevo.y * this.factorPerseguir;
   }
 
+  /** COMENTADO 20-10. NO LO NECESITO. CAPAZ ME SIRVE PARA EVADIR METEOROS
+
   escapar() {
-    /**
+  
      * ALGORITMO DE HUIDA
      *
      * Implementa el comportamiento opuesto a perseguir:
@@ -232,7 +225,7 @@ class GameObject {
      * Fórmula: fuerza_huida = -(posición_perseguidor - posición_actual)
      *
      * Esto crea un comportamiento de evasión realista
-     */
+    
     if (!this.perseguidor) return;
     const dist = calcularDistancia(this.posicion, this.perseguidor.posicion);
     if (dist > this.vision) return;
@@ -246,6 +239,8 @@ class GameObject {
     this.aceleracion.x += -vectorNuevo.x;
     this.aceleracion.y += -vectorNuevo.y;
   }
+
+   */
 
   asignarVelocidad(x, y) {
     this.velocidad.x = x;

@@ -1,20 +1,18 @@
 class Persona extends GameObject {
   constructor(x, y, juego) {
     super(x, y, juego);
-    this.muerto = false;
     this.vida = 1;
     this.bando = 0; //bando default
 
-    this.coraje = Math.random();
     this.vision = 8000 //Math.random() * 300 + 400; pongo vision absoluta
 
-    this.fuerzaDeAtaque = 0.01 + Math.random() * 0.01;
-    this.radio = 13 + Math.random() * 2;
+ 
+    this.radio = 24
     this.rangoDeAtaque = this.radio * 3;
 
     this.factorPerseguir = 0.15;
 
-    this.factorSeparacion = 0.5;
+    this.factorSeparacion = 20;
     this.factorCohesion = 0.3;
     this.factorAlineacion = 0.4;
 

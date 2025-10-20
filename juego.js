@@ -1,7 +1,7 @@
 class Juego {
   pixiApp;
   personas = [];
-  amigos = [];
+  //amigos = [];
   enemigos = [];
   arboles = [];
   autos = [];
