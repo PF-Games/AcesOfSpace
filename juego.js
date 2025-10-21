@@ -118,6 +118,7 @@ class Juego {
     this.crearFondo();
     this.agregarControlDeCohetes();
     this.crearProtagonista();
+    this.crearAntagonista()
     this.crearEnemigos(5, BlackShip);
     this.crearEnemigos(5, RedShip);
     this.crearEnemigos(3, ShieldShip);
@@ -253,7 +254,17 @@ crearProtagonista() {
   const protagonista = new Protagonista(x, y, this);
   this.ships.push(protagonista);
   this.protagonista = protagonista;
-}
+};
+
+
+crearAntagonista() {
+  const x = this.anchoDelMapa / 2
+  const y = 50;
+  const antagonista = new Antagonista(x, y, this);
+  this.ships.push(antagonista);
+  this.antagonista = antagonista;
+};
+
 
 agregarInteractividadDelMouse() {
   // Escuchar el evento mousemove
