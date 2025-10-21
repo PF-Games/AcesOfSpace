@@ -2,7 +2,7 @@ class Ship extends GameObject {
   constructor(texturePath, x, y, juego) {
     super(x, y, juego);
     this.texturePath = texturePath;
-    this.vida = 1;
+   // this.vida = 1;
    
 
     this.vision = 8000
@@ -230,7 +230,7 @@ class Ship extends GameObject {
   }
 
   recibirDanio(danio) {
-    this.vida -= danio;
+    this.morir();
   }
 
   buscarEnemigoMasCerca() {

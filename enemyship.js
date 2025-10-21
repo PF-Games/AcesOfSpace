@@ -40,8 +40,18 @@ class RedShip extends enemyShip {
 class ShieldShip extends enemyShip {
   constructor(x, y, juego) {
     super("assets/naves/Nairan Scout_Idle.png", x, y, juego);
-    this.velocidadMaxima = 0.8;
-    this.vida = 2;
+    this.velocidadMaxima = 1;
+    this.escudo = 1;
+  }
+
+  recibirDanio(danio) {
+    if (this.escudo > 0) {
+      this.escudo --;
+      console.log('Escudo impactado, escudo restante:', this.escudo);
+      // Opcional: efecto visual de escudo
+    } else {
+      this.morir();
+    }
   }
 }
 
@@ -49,9 +59,35 @@ class SupportShip extends enemyShip {
   constructor(x, y, juego) {
     super("assets/naves/Klaed Support_Idle.png", x, y, juego);
     this.velocidadMaxima = 2;
-    this.vida = 0.5;
+    this.cooldownRegeneracion = 0;
+    this.tiempoEntreRegeneraciones = 180; // 3 segundos a 60fps
   }
+
+  /*
+
+  tick() {
+    super.tick();
+    
+    // Regenerar escudos cercanos
+    this.cooldownRegeneracion++;
+    if (this.cooldownRegeneracion >= this.tiempoEntreRegeneraciones) {
+      this.regenerarEscudosCercanos();
+      this.cooldownRegeneracion = 0;
+    }
+  }
+
+  regenerarEscudosCercanos() {
+    for (let nave of this.juego.ships) {
+      if (nave instanceof ShieldShip && nave !== this) {
+        const dist = calcularDistancia(this.posicion, nave.posicion);
+        if (dist < 200) { // Rango de regeneración
+          nave.regenerarEscudo();
+        }
+      }
+    }
+  }*/
 }
+
 
 //flyAway()
 
