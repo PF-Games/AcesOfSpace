@@ -2,7 +2,7 @@ class Juego {
   pixiApp;
   ships = [];
   //amigos = [];
-  enemigos = [];
+  //enemigos = [];
   arboles = [];
   autos = [];
   objetosInanimados = [];
@@ -117,8 +117,8 @@ class Juego {
     await this.cargarTexturas();
     this.crearFondo();
     this.agregarControlDeCohetes();
-    this.crearProtagonista();
-    this.crearAntagonista()
+    this.crearAntagonista();
+    await this.crearProtagonista();
     this.crearEnemigos(5, BlackShip);
     this.crearEnemigos(5, RedShip);
     this.crearEnemigos(3, ShieldShip);
@@ -165,7 +165,7 @@ class Juego {
       const y = -100;
       const ship = new ClaseNave(x, y, this);
       this.ships.push(ship);
-      this.enemigos.push(ship);
+      //this.enemigos.push(ship);
     }
   }
   /*
@@ -209,25 +209,25 @@ agregarControlDeCohetes() {
     const y = event.y - this.containerPrincipal.y;
 
     // Buscar enemigo más cercano al click
-    let enemigoMasCercano = null;
+    let closestShip = null;
     let distMenor = Infinity;
     // IMPORTANTE: CREAR UNA FUNCION BUSCAR NAVE MAS CERCANA QUE MANEJE ESTO
-    for (let enemigo of this.enemigos) {
-      if (enemigo.isTargeted) continue;
-      const dist = calcularDistancia({ x, y }, enemigo.posicion);
+    for (let ship of this.ships) {
+      if (ship.isTargeted) continue;
+      const dist = calcularDistancia({ x, y }, ship.posicion);
       if (dist < distMenor) {
         distMenor = dist;
-        enemigoMasCercano = enemigo;
+        closestShip = ship;
       }
     }
 
-    if (enemigoMasCercano) {
-      enemigoMasCercano.isTargeted = true
+    if (closestShip) {
+      closestShip.isTargeted = true
       const cohete = new Cohete(
         this.protagonista.posicion.x,
         this.protagonista.posicion.y,
         this,
-        enemigoMasCercano
+        closestShip
       );
       this.cohetes.push(cohete);
     }
@@ -248,11 +248,11 @@ crearAmigos() {
 */
 
 
-crearProtagonista() {
+async crearProtagonista() {
   const x = this.anchoDelMapa / 2
   const y = 700;
   const protagonista = new Protagonista(x, y, this);
-  this.ships.push(protagonista);
+ // this.ships.push(protagonista);
   this.protagonista = protagonista;
 };
 
@@ -415,8 +415,8 @@ getPersonaRandom() {
 // }
 
 asignarProtagonistaComoTargetATodosLospersonas() {
-  for (let cone of this.enemigos) {
-    cone.asignarTarget(this.protagonista);
+  for (let ship of this.ships) {
+    ship.asignarTarget(this.protagonista);
   }
 }
 

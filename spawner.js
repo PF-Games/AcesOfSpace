@@ -79,6 +79,7 @@ class Antagonista extends Spawner {
     const ClaseAleatoria = [BlackShip, RedShip, ShieldShip, SupportShip][Math.floor(Math.random() * 4)];
     const nave = new ClaseAleatoria(this.posicion.x, this.posicion.y, this.juego);
     this.juego.ships.push(nave);
-    this.juego.enemigos.push(nave);
+   // this.juego.enemigos.push(nave);
+    this.target = Protagonista;
   }
 }
