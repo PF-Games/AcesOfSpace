@@ -261,7 +261,7 @@ crearAntagonista() {
   const x = this.anchoDelMapa / 2
   const y = 50;
   const antagonista = new Antagonista(x, y, this);
-  this.ships.push(antagonista);
+  //this.ships.push(antagonista);
   this.antagonista = antagonista;
 };
 
@@ -337,11 +337,19 @@ gameLoop(time) {
   //this.dibujador.clear();//14-10
   this.contadorDeFrame++;//14-10
 
+  // Procesar antagonista
+  if (this.antagonista) {
+    this.antagonista.tick();
+    this.antagonista.render();
+  }
+
+  // Procesar naves
   for (let aShip of this.ships) {
     //ejecutamos el metodo tick de cada persona
     aShip.tick();
     aShip.render();
   }
+
   // this.grid.update();
   // this.hacerQLaCamaraSigaAlProtagonista();
   this.actualizarUI();
