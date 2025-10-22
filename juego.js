@@ -221,6 +221,10 @@ agregarControlDeCohetes() {
       }
     }
 
+     if (this.ships.length === 0 && this.antagonista) {
+      closestShip = this.antagonista;
+    }
+
     if (closestShip) {
       closestShip.isTargeted = true
       const cohete = new Cohete(

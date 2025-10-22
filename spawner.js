@@ -5,6 +5,7 @@ class Spawner {
     this.vida = 100;
     this.muerto = false;
     this.texturePath = texturePath;
+    this.radio = 40; //Este radio me sirve para poder calcular la colision de los ataques
     
     // Configuración de renderizado (sin GameObject)
     this.container = new PIXI.Container();
@@ -23,6 +24,7 @@ class Spawner {
 
   recibirDanio(danio) {
     this.vida -= danio;
+    console.log(`Spawner recibió ${danio} daño. Vida: ${this.vida}`);
     if (this.vida <= 0) this.morir();
   }
 
@@ -62,7 +64,7 @@ class Protagonista extends Spawner {
 class Antagonista extends Spawner {
   constructor(x, y, juego) {
     super(x, y, juego, "assets/naves/mothership.png");
-    this.vida = 5000;
+    this.vida = 100;
     this.turnos = 0;
     this.turnosParaSpawn = 5;
   }
@@ -70,8 +72,18 @@ class Antagonista extends Spawner {
   tick() {
     this.turnos++;
     if (this.turnos >= this.turnosParaSpawn) {
-      this.spawnearNave();
+    //  this.spawnearNave();
       this.turnos = 0;
+    }
+  }
+
+
+  recibirDanio(danio) {
+    this.vida -= danio;
+    console.log(`Mothership recibió ${danio} daño. Vida: ${this.vida}`);
+    if (this.vida <= 0) {
+      this.morir();
+      this.juego.victoria(); // Opcional: método para ganar
     }
   }
 

@@ -7,7 +7,7 @@ class Cohete extends GameObject {
     this.aceleracionMaxima = 0.3;
     this.factorPerseguir = 0.2;
     this.radio = 5;
-    this.danio = 0.3;
+    this.danio = 1;
 
     this.crearSprite();
   }
