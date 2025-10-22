@@ -1,14 +1,14 @@
 class Cohete extends GameObject {
   constructor(x, y, juego, target) {
     super(x, y, juego);
-    
+
     this.target = target;
     this.velocidadMaxima = 5;
     this.aceleracionMaxima = 0.3;
     this.factorPerseguir = 0.2;
     this.radio = 5;
     this.danio = 0.3;
-    
+
     this.crearSprite();
   }
 
@@ -28,7 +28,7 @@ class Cohete extends GameObject {
 
     this.perseguir();
     this.aplicarFisica();
-    
+
     // Verificar colisión con target
     const dist = calcularDistancia(this.posicion, this.target.posicion);
     if (dist < this.target.radio) {
@@ -37,16 +37,22 @@ class Cohete extends GameObject {
     }
   }
 
- destruir() {
-  this.destruido = true; // Marcar como destruido
-  if (this.sprite) this.sprite.destroy();
-  if (this.container) this.container.destroy();
-  this.container = null; // Importante: setear a null
-  this.juego.cohetes = this.juego.cohetes.filter(c => c !== this);
-}
+  destruir() {
+    this.destruido = true;
+
+    // Limpiar el flag del target para que pueda ser targetado de nuevo
+    if (this.target && !this.target.muerto) {
+      this.target.isTargeted = false;
+    }
+
+    if (this.sprite) this.sprite.destroy();
+    if (this.container) this.container.destroy();
+    this.container = null; // Importante: setear a null
+    this.juego.cohetes = this.juego.cohetes.filter(c => c !== this);
+  }
   render() {
-  if (!this.container || this.destruido) return; // Agregar verificación de destruido
-  super.render();
-  this.container.zIndex = this.posicion.y;
-}
+    if (!this.container || this.destruido) return; // Agregar verificación de destruido
+    super.render();
+    this.container.zIndex = this.posicion.y;
+  }
 }
