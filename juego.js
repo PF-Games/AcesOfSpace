@@ -228,11 +228,13 @@ agregarControlDeCohetes() {
     if (closestShip) {
       closestShip.isTargeted = true
       const cohete = new Cohete(
+        "assets/rockets/rocket1.png",
         this.protagonista.posicion.x,
         this.protagonista.posicion.y,
         this,
         closestShip
       );
+      cohete.crearSprite();
       this.cohetes.push(cohete);
     }
   };

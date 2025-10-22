@@ -1,5 +1,5 @@
 class Cohete extends GameObject {
-  constructor(x, y, juego, target) {
+  constructor(texturePath, x, y, juego, target) {
     super(x, y, juego);
 
     this.target = target;
@@ -8,14 +8,16 @@ class Cohete extends GameObject {
     this.factorPerseguir = 0.2;
     this.radio = 5;
     this.danio = 1;
-
-    this.crearSprite();
+    this.texturePath = texturePath;
+    this.container = new PIXI.Container();
+    this.container.x = x;
+    this.container.y = y;
+    this.juego.containerPrincipal.addChild(this.container);
   }
 
   async crearSprite() {
-    this.sprite = new PIXI.Graphics();
-    this.sprite.circle(0, 0, 5);
-    this.sprite.fill(0xffff00);
+    this.sprite = new PIXI.Sprite(await PIXI.Assets.load(this.texturePath));
+    this.sprite.anchor.set(0.5, 1);
     this.container.addChild(this.sprite);
   }
 
