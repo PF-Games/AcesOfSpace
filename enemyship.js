@@ -3,9 +3,10 @@ class enemyShip extends Ship {
   vida;
   //valor; //un valor para poder generar niveles con un valor determinado
 
-  constructor(texturePath, x, y, juego) {
+  constructor(texturePath, x, y, juego, debugPrefix) {
     super(texturePath, x, y, juego);
-    this.crearSprite()
+    this.debugId = `${debugPrefix}${this.id}`; // Usar el id de GameObject
+    this.crearSprite();
     this.crearTextoDebug(); // ← Agregar
   }
 
@@ -17,7 +18,7 @@ class enemyShip extends Ship {
       strokeThickness: 3
     });
     this.textoDebug.anchor.set(0.5, 0.5);
-    this.textoDebug.y = -40; // Arriba de la nave
+    this.textoDebug.y = -60; // Arriba de la nave
     this.container.addChild(this.textoDebug);
   }
 
@@ -37,24 +38,24 @@ class enemyShip extends Ship {
 
 
 class BlackShip extends enemyShip {
-  constructor(x, y, juego) {
-    super("assets/naves/Nautolan Ship Fighter_Idle.png", x, y, juego);
+  constructor(x, y, juego, debugPrefix) {
+    super("assets/naves/Nautolan Ship Fighter_Idle.png", x, y, juego, "B");
     this.velocidadMaxima = 1;
     this.debugId = `B${this.id}`;
   }
 }
 
 class RedShip extends enemyShip {
-  constructor(x, y, juego) {
-    super("assets/naves/Klaed Bomber_Idle.png", x, y, juego);
+  constructor(x, y, juego, debugPrefix) {
+    super("assets/naves/Klaed Bomber_Idle.png", x, y, juego, "R");
     this.velocidadMaxima = 1.5;
     this.debugId = `R${this.id}`;
   }
 }
 
 class ShieldShip extends enemyShip {
-  constructor(x, y, juego) {
-    super("assets/naves/Nairan Scout_Idle.png", x, y, juego);
+  constructor(x, y, juego, debugPrefix) {
+    super("assets/naves/Nairan Scout_Idle.png", x, y, juego, "S");
     this.velocidadMaxima = 1;
     this.escudo = 1;
     this.debugId = `S${this.id}`;
@@ -72,8 +73,8 @@ class ShieldShip extends enemyShip {
 }
 
 class SupportShip extends enemyShip {
-  constructor(x, y, juego) {
-    super("assets/naves/Klaed Support_Idle.png", x, y, juego);
+  constructor(x, y, juego, debugPrefix) {
+    super("assets/naves/Klaed Support_Idle.png", x, y, juego, "H");
     this.velocidadMaxima = 2;
     this.cooldownRegeneracion = 0;
     this.tiempoEntreRegeneraciones = 180; // 3 segundos a 60fps
