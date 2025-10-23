@@ -55,7 +55,7 @@ class Cohete extends GameObject {
   render() {
     if (!this.container || this.destruido) return; // Agregar verificación de destruido
     super.render();
-     if (this.sprite) {
+    if (this.sprite) {
       this.sprite.rotation = Math.atan2(this.velocidad.y, this.velocidad.x) + Math.PI / 2;
     }
     this.container.zIndex = this.posicion.y;
