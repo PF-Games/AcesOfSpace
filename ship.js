@@ -283,7 +283,11 @@ class Ship extends GameObject {
      */
     if (!this.container || !this.sprite) return;
     super.render();
-
+     if (this.sprite) {
+      // atan2 devuelve el ángulo en radianes, PIXI usa radianes
+      this.sprite.rotation = Math.atan2(this.velocidad.y, this.velocidad.x) + Math.PI / 2;
+      // Sumo π/2 (90°) porque el sprite apunta hacia arriba por defecto
+    }
 
 
     // Ordenamiento en profundidad para perspectiva isométrica

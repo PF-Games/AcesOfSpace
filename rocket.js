@@ -17,7 +17,7 @@ class Cohete extends GameObject {
 
   async crearSprite() {
     this.sprite = new PIXI.Sprite(await PIXI.Assets.load(this.texturePath));
-    this.sprite.anchor.set(0.5, 1);
+    this.sprite.anchor.set(0.5, 0.5);
     this.container.addChild(this.sprite);
   }
 
@@ -55,6 +55,9 @@ class Cohete extends GameObject {
   render() {
     if (!this.container || this.destruido) return; // Agregar verificación de destruido
     super.render();
+     if (this.sprite) {
+      this.sprite.rotation = Math.atan2(this.velocidad.y, this.velocidad.x) + Math.PI / 2;
+    }
     this.container.zIndex = this.posicion.y;
   }
 }
