@@ -6,13 +6,13 @@ class Spawner {
     this.muerto = false;
     this.texturePath = texturePath;
     this.radio = 40; //Este radio me sirve para poder calcular la colision de los ataques
-    
+
     // Configuración de renderizado (sin GameObject)
     this.container = new PIXI.Container();
     this.container.x = x;
     this.container.y = y;
     this.juego.containerPrincipal.addChild(this.container);
-    
+
     this.crearSprite();
   }
 
@@ -61,6 +61,16 @@ class Protagonista extends Spawner {
   }
 }
 
+recibirDanio(danio) {
+  this.vida -= danio;
+  console.log(`Protagonista recibió ${danio} daño. Vida restante: ${this.vida}`);
+  if (this.vida <= 0) {
+    this.morir();
+    this.juego.finDelJuego();
+  }
+}
+
+
 class Antagonista extends Spawner {
   constructor(x, y, juego) {
     super(x, y, juego, "assets/naves/mothership.png");
@@ -72,7 +82,7 @@ class Antagonista extends Spawner {
   tick() {
     this.turnos++;
     if (this.turnos >= this.turnosParaSpawn) {
-    //  this.spawnearNave();
+      //  this.spawnearNave();
       this.turnos = 0;
     }
   }
@@ -91,7 +101,7 @@ class Antagonista extends Spawner {
     const ClaseAleatoria = [BlackShip, RedShip, ShieldShip, SupportShip][Math.floor(Math.random() * 4)];
     const nave = new ClaseAleatoria(this.posicion.x, this.posicion.y, this.juego);
     this.juego.ships.push(nave);
-   // this.juego.enemigos.push(nave);
+    // this.juego.enemigos.push(nave);
     this.target = Protagonista;
   }
 }
