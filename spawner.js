@@ -59,17 +59,17 @@ class Protagonista extends Spawner {
     const cohete = new Cohete(this.posicion.x, this.posicion.y, this.juego, target);
     this.juego.cohetes.push(cohete);
   }
-}
 
-recibirDanio(danio) {
-  this.vida -= danio;
-  console.log(`Protagonista recibió ${danio} daño. Vida restante: ${this.vida}`);
-  if (this.vida <= 0) {
-    this.morir();
-    this.juego.finDelJuego();
+
+  recibirDanio(danio) {
+    this.vida -= danio;
+    console.log(`Protagonista recibió ${danio} daño. Vida restante: ${this.vida}`);
+    if (this.vida <= 0) {
+      this.morir();
+      this.juego.finDelJuego();
+    }
   }
 }
-
 
 class Antagonista extends Spawner {
   constructor(x, y, juego) {

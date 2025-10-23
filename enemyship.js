@@ -35,7 +35,7 @@ class enemyShip extends Ship {
       return;
     }
 
-     this.checkPlayerAttackRange();
+    this.checkPlayerAttackRange();
 
     this.cohesion();
     this.alineacion();
@@ -45,9 +45,9 @@ class enemyShip extends Ship {
     this.verificarSiEstoyMuerto();
     this.calcularAnguloYVelocidadLineal();
   }
-}
 
-checkPlayerAttackRange(){
+
+  checkPlayerAttackRange() {
   if (!this.juego.protagonista) return;
 
     const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.tamanoCelda);
@@ -98,7 +98,8 @@ checkPlayerAttackRange(){
       console.log(`${this.debugId} salió del área, autodestruyéndose`);
       this.morir();
     }
-  } 
+  }
+}
 
 
 
