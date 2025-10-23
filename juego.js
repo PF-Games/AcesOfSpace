@@ -29,7 +29,7 @@ class Juego {
     this.setupResizeHandler();
     this.tamanoCelda = 100; //14-10
     this.contadorDeFrame = 0; //14-10
-    this.cohetes = [];
+    this.rockets = [];
   }
 
   updateDimensions() {
@@ -138,17 +138,15 @@ class Juego {
     this.containerPrincipal.addChild(this.rectanguloDebug);
 
 
-    this.agregarControlDeCohetes();
+    this.addRocketControls();
     this.crearAntagonista();
     await this.crearProtagonista();
     this.crearEnemigos(5, BlackShip);
     this.crearEnemigos(5, RedShip);
     this.crearEnemigos(3, ShieldShip);
     this.crearEnemigos(2, SupportShip);
-    //this.crearAmigos(); ESTO NO LO USO PERO LO NECESITO PARA LOS COHETES
     this.crearArboles();
     this.crearAutos();
-    //estas 5 14-10
     this.asignarProtagonistaComoTargetATodosLospersonas()
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
@@ -225,7 +223,7 @@ class Juego {
 
   //14-10
 
-  agregarControlDeCohetes() {
+  addRocketControls() {
     this.pixiApp.canvas.onclick = (event) => {
       const x = event.x - this.containerPrincipal.x;
       const y = event.y - this.containerPrincipal.y;
@@ -249,15 +247,15 @@ class Juego {
 
       if (closestShip) {
         closestShip.isTargeted = true
-        const cohete = new Cohete(
+        const rocket = new Rocket(
           "assets/rockets/rocket1.png",
           this.protagonista.posicion.x,
           this.protagonista.posicion.y,
           this,
           closestShip
         );
-        cohete.crearSprite();
-        this.cohetes.push(cohete);
+        rocket.crearSprite();
+        this.rockets.push(rocket);
       }
     };
   }
@@ -370,9 +368,9 @@ class Juego {
     // this.hacerQLaCamaraSigaAlProtagonista();
     this.actualizarUI();
 
-    for (let cohete of this.cohetes) {
-      cohete.tick();
-      cohete.render();
+    for (let rocket of this.rockets) {
+      rocket.tick();
+      rocket.render();
     }
   }
 

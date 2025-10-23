@@ -48,16 +48,16 @@ class Protagonista extends Spawner {
   constructor(x, y, juego) {
     super(x, y, juego, "Assets2/Ships/Unity/Cruiser 3.png");
     this.vida = 1000;
-    this.cooldownCohete = 0;
+    this.rocketCooldown = 0;
   }
 
   tick() {
-    // Lógica de spawn de cohetes cuando clickean
+    //Spawn logic for rockets
   }
 
-  dispararCohete(target) {
-    const cohete = new Cohete(this.posicion.x, this.posicion.y, this.juego, target);
-    this.juego.cohetes.push(cohete);
+  shootRocket(target) {
+    const rocket = new Rocket(this.posicion.x, this.posicion.y, this.juego, target);
+    this.juego.rockets.push(rocket);
   }
 
 

@@ -1,4 +1,4 @@
-class Cohete extends GameObject {
+class Rocket extends GameObject {
   constructor(texturePath, x, y, juego, target) {
     super(x, y, juego);
 
@@ -50,7 +50,7 @@ class Cohete extends GameObject {
     if (this.sprite) this.sprite.destroy();
     if (this.container) this.container.destroy();
     this.container = null; // Importante: setear a null
-    this.juego.cohetes = this.juego.cohetes.filter(c => c !== this);
+    this.juego.rockets = this.juego.rockets.filter(c => c !== this);
   }
   
   render() {
