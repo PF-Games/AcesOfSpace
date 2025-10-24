@@ -6,11 +6,28 @@ class enemyShip extends Ship {
   constructor(texturePath, x, y, juego, debugPrefix) {
     super(texturePath, x, y, juego);
     this.debugId = `${debugPrefix}${this.id}`;
-    this.playerDamage = 1; // Daño que hace al protagonista
-    this.estadoFlyAway = false; // Controla si está escapando
+    this.playerDamage = 1; 
+    //this.estadoFlyAway = false; COMMENTED ON 24/10
+    this.defaultSpeed = 1;
+    this.allyToProtect = null;
+    this.allyToRepair = null;
     this.direccionFlyAway = null; // 'izquierda' o 'derecha'
+    
+    
     this.crearSprite();
-    this.crearTextoDebug(); // ← Agregar
+    this.crearTextoDebug();
+    this.initFSM();
+  }
+
+  initFSM() {
+    this.fsm = new FSM(this, {
+      initialState: 'pursuing',
+      states: {
+        pursuing: PursuingState,
+        attacking: AttackingState,
+        flyingAway: FlyingAwayState
+      }
+    });
   }
 
   crearTextoDebug() {
@@ -21,35 +38,62 @@ class enemyShip extends Ship {
       strokeThickness: 3
     });
     this.textoDebug.anchor.set(0.5, 0.5);
-    this.textoDebug.y = -60; // Arriba de la nave
+    this.textoDebug.y = -60; 
     this.container.addChild(this.textoDebug);
   }
 
   tick() {
     if (this.muerto) return;
 
-    if (this.estadoFlyAway) {
-      this.flyAway();
+     this.fsm.update(this.juego.contadorDeFrame);
+
+   // if (this.estadoFlyAway) {
+   //   this.flyAway(); COMMENTED ON 24/10
       this.aplicarFisica();
-      this.verificarSiSalioDePantalla();
-      return;
-    }
-
-    this.checkPlayerAttackRange();
-
-    this.cohesion();
-    this.alineacion();
-    this.separacion();
-    this.perseguir();
-    this.aplicarFisica();
-    this.verificarSiEstoyMuerto();
-    this.calcularAnguloYVelocidadLineal();
+   //   this.verificarSiSalioDePantalla();
+   //   return; COMMENTED ON 24/10
+      this.calcularAnguloYVelocidadLineal();
+      this.verificarSiEstoyMuerto();
   }
 
+  
+  checkPlayerAttackRange() {
+    if (!this.juego.protagonista) return false;
+    const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.tamanoCelda);
+    const miFila = Math.floor(this.posicion.y / this.juego.tamanoCelda);
+    return miFila === filaProtagonista;
+  }
+  
 
+  isOutOfBounds() {
+    const margen = 200;
+    return this.posicion.x < this.juego.areaDeJuego.x - margen ||
+           this.posicion.x > this.juego.areaDeJuego.x + this.juego.areaDeJuego.ancho + margen ||
+           this.posicion.y > this.juego.areaDeJuego.y + this.juego.areaDeJuego.alto + margen;
+  }
+  
+  morir() {
+    if (this.fsm) this.fsm.destroy();
+    super.morir();
+  }
+}
+
+
+  //  this.checkPlayerAttackRange(); ALL COMMENTED ON 24/10
+
+  //  this.cohesion();
+  //  this.alineacion();
+  //  this.separacion();
+  //  this.perseguir();
+  //  this.aplicarFisica();
+ 
+  //  this.calcularAnguloYVelocidadLineal();
+  //}
+
+
+/* COMENTADA PORQUE ARRIBA SE IMPLEMENTA SIN EL FLYAWAY LA GUARDO DE REFERENCIA POR AHORA
   checkPlayerAttackRange() {
   if (!this.juego.protagonista) return;
-
     const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.tamanoCelda);
     const miFila = Math.floor(this.posicion.y / this.juego.tamanoCelda);
 
@@ -65,6 +109,10 @@ class enemyShip extends Ship {
     }
   }
 
+*/
+
+
+/* TODO ESTO COMENTADO EL 24/10
    iniciarFlyAway() {
     this.estadoFlyAway = true;
     
@@ -101,33 +149,68 @@ class enemyShip extends Ship {
   }
 }
 
+*/
 
 
 class BlackShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Nautolan Ship Fighter_Idle.png", x, y, juego, "B");
+    this.defaultSpeed = 1;
     this.velocidadMaxima = 1;
     this.playerDamage = 2;
-    this.debugId = `B${this.id}`;
+   // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 }
 
 class RedShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Klaed Bomber_Idle.png", x, y, juego, "R");
+    this.defaultSpeed = 1.5;
     this.velocidadMaxima = 1.5;
     this.playerDamage = 1;
-    this.debugId = `R${this.id}`;
+  //  this.debugId = `R${this.id}`; // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 }
 
 class ShieldShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Nairan Scout_Idle.png", x, y, juego, "S");
+    this.defaultSpeed = 1.5;
     this.velocidadMaxima = 1;
     this.playerDamage = 1;
     this.escudo = 1;
-    this.debugId = `S${this.id}`;
+    this.protectionRange = 150;
+  //  this.debugId = `S${this.id}`; // this.debugId = `B${this.id}`; COMENTADA 24/10
+  }
+
+
+   initFSM() {
+    this.fsm = new FSM(this, {
+      initialState: 'pursuing',
+      states: {
+        pursuing: PursuingState,
+        attacking: AttackingState,
+        flyingAway: FlyingAwayState,
+        speedingToProtect: SpeedingToProtectState,
+        protecting: ProtectingState
+      }
+    });
+  }
+
+  // Override pursuing to check for allies needing protection
+  checkForAlliesNeedingProtection() {
+    for (let ally of this.juego.ships) {
+      if (ally === this || ally.muerto) continue;
+      if (ally.isTargeted) {
+        const dist = calcularDistancia(this.posicion, ally.posicion);
+        if (dist < this.protectionRange * 3) {
+          this.allyToProtect = ally;
+          this.fsm.setState('speedingToProtect');
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   recibirDanio(danio) {
@@ -144,36 +227,38 @@ class ShieldShip extends enemyShip {
 class SupportShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Klaed Support_Idle.png", x, y, juego, "H");
+    this.defaultSpeed = 2;
     this.velocidadMaxima = 2;
     this.playerDamage = 1;
-    this.cooldownRegeneracion = 0;
-    this.tiempoEntreRegeneraciones = 180; // 3 segundos a 60fps
-    this.debugId = `S${this.id}`;
+    this.repairRange = 200;
   }
 
-  /*
-
-  tick() {
-    super.tick();
-    
-    // Regenerar escudos cercanos
-    this.cooldownRegeneracion++;
-    if (this.cooldownRegeneracion >= this.tiempoEntreRegeneraciones) {
-      this.regenerarEscudosCercanos();
-      this.cooldownRegeneracion = 0;
-    }
+  initFSM() {
+    this.fsm = new FSM(this, {
+      initialState: 'pursuing',
+      states: {
+        pursuing: PursuingState,
+        attacking: AttackingState,
+        flyingAway: FlyingAwayState,
+        speedingToRepair: SpeedingToRepairState,
+        repairing: RepairingState
+      }
+    });
   }
 
-  regenerarEscudosCercanos() {
-    for (let nave of this.juego.ships) {
-      if (nave instanceof ShieldShip && nave !== this) {
-        const dist = calcularDistancia(this.posicion, nave.posicion);
-        if (dist < 200) { // Rango de regeneración
-          nave.regenerarEscudo();
+  checkForAlliesNeedingRepair() {
+    for (let ally of this.juego.ships) {
+      if (ally === this || ally.muerto) continue;
+      if (ally instanceof ShieldShip && ally.escudo === 0) {
+        const dist = calcularDistancia(this.posicion, ally.posicion);
+        if (dist < this.repairRange * 3) {
+          this.allyToRepair = ally;
+          this.fsm.setState('speedingToRepair');
+          return true;
         }
       }
     }
-  }*/
+    return false;
+  }
 }
-
 
