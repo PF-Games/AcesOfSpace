@@ -50,10 +50,10 @@ class Juego {
   }
 
 
-  crearUI() {
-    this.ui = new PIXI.Container();
-    this.ui.name = "UI";
-    this.pixiApp.stage.addChild(this.ui);
+  createInterface() {
+    this.interface = new PIXI.Container();
+    this.interface.name = "INTERFACE";
+    this.pixiApp.stage.addChild(this.interface);
 
     this.fpsText = new PIXI.Text({
       text: "FPS: 60",
@@ -68,7 +68,7 @@ class Juego {
 
     this.fpsText.x = this.width - 120;
     this.fpsText.y = 20;
-    this.ui.addChild(this.fpsText);
+    this.interface.addChild(this.fpsText);
     // this.fpsText.text = `FPS: ${this.pixiApp.ticker.FPS.toFixed(2)}`;
   }
 
@@ -98,7 +98,7 @@ class Juego {
 
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
-    this.crearUI();
+    this.createInterface();
     this.crearNivel();
 
   }
@@ -156,21 +156,21 @@ class Juego {
     this.iniciarControles();
 
 
-    // --- Contenedor de la UI ---
-    this.uiContainer = new PIXI.Container();
-    this.pixiApp.stage.addChild(this.uiContainer);
+    
+    this.interfaceContainer = new PIXI.Container();
+    this.pixiApp.stage.addChild(this.interfaceContainer);
 
-    // Dibujamos un fondo para la UI (solo para visualizar)
-    const uiFondo = new PIXI.Graphics();
-    uiFondo.beginFill(0x222222);
-    uiFondo.drawRect(
+    
+    const interfaceBackground = new PIXI.Graphics();
+    interfaceBackground.beginFill(0x222222);
+    interfaceBackground.drawRect(
       0,
-      this.pixiApp.renderer.height * 0.8,  // empieza al 80% de la pantalla
+      this.pixiApp.renderer.height * 0.8,  
       this.pixiApp.renderer.width,
-      this.pixiApp.renderer.height * 0.2   // ocupa el 20% inferior
+      this.pixiApp.renderer.height * 0.2   
     );
-    uiFondo.endFill();
-    this.uiContainer.addChild(uiFondo);
+    interfaceBackground.endFill();
+    this.interfaceContainer.addChild(interfaceBackground);
 
   }
 
@@ -366,7 +366,7 @@ class Juego {
 
     // this.grid.update();
     // this.hacerQLaCamaraSigaAlProtagonista();
-    this.actualizarUI();
+    this.updateInterface();
 
     for (let rocket of this.rockets) {
       rocket.tick();
@@ -398,7 +398,7 @@ class Juego {
 
 
 
-  actualizarUI() {
+  updateInterface() {
     this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); //tiempoRestante.toString();
   }
 
