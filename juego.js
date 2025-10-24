@@ -157,18 +157,18 @@ class Juego {
     this.iniciarControles();
 
 
-    
+
     this.interfaceContainer = new PIXI.Container();
     this.pixiApp.stage.addChild(this.interfaceContainer);
 
-    
+
     const interfaceBackground = new PIXI.Graphics();
     interfaceBackground.beginFill(0x222222);
     interfaceBackground.drawRect(
       0,
-      this.pixiApp.renderer.height * 0.8,  
+      this.pixiApp.renderer.height * 0.8,
       this.pixiApp.renderer.width,
-      this.pixiApp.renderer.height * 0.2   
+      this.pixiApp.renderer.height * 0.2
     );
     interfaceBackground.endFill();
     this.interfaceContainer.addChild(interfaceBackground);
@@ -183,7 +183,7 @@ class Juego {
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
       const x = Math.random() * this.anchoDelMapa;
-      const y = this.areaDeJuego.y - 100; 
+      const y = this.areaDeJuego.y - 100;
       const ship = new ClaseNave(x, y, this);
       this.ships.push(ship);
       //this.enemigos.push(ship);
@@ -378,10 +378,10 @@ class Juego {
 
   iniciarControles() {
     window.addEventListener('keyup', (event) => {
-      if (event.key === "ArrowDown") this.containerPrincipal.y -= 100;
-      if (event.key === "ArrowUp") this.containerPrincipal.y += 100;
-      if (event.key === "ArrowLeft") this.containerPrincipal.x += 100;
-      if (event.key === "ArrowRight") this.containerPrincipal.x -= 100;
+      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") this.containerPrincipal.y += 100;
+      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") this.containerPrincipal.y -= 100;
+      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") this.containerPrincipal.x += 100;
+      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") this.containerPrincipal.x -= 100;
     });
   }
 
@@ -400,26 +400,26 @@ class Juego {
 
 
   updateInterface() {
-     if (!this.interfaceContainer) return;
-  
-  this.interfaceContainer.removeChildren();
-  
-  const interfaceBackground = new PIXI.Graphics();
-  interfaceBackground.beginFill(0x222222);
-  interfaceBackground.drawRect(
-    0,
-    this.pixiApp.renderer.height * 0.8,
-    this.pixiApp.renderer.width,
-    this.pixiApp.renderer.height * 0.2
-  );
-  interfaceBackground.endFill();
-  this.interfaceContainer.addChild(interfaceBackground);
-  
-  if (this.fpsText) {
-    this.fpsText.x = this.width - 120;
-    this.fpsText.y = 20;
-  }
-    this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); 
+    if (!this.interfaceContainer) return;
+
+    this.interfaceContainer.removeChildren();
+
+    const interfaceBackground = new PIXI.Graphics();
+    interfaceBackground.beginFill(0x222222);
+    interfaceBackground.drawRect(
+      0,
+      this.pixiApp.renderer.height * 0.8,
+      this.pixiApp.renderer.width,
+      this.pixiApp.renderer.height * 0.2
+    );
+    interfaceBackground.endFill();
+    this.interfaceContainer.addChild(interfaceBackground);
+
+    if (this.fpsText) {
+      this.fpsText.x = this.width - 120;
+      this.fpsText.y = 20;
+    }
+    this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2);
   }
 
 
