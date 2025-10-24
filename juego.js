@@ -45,6 +45,7 @@ class Juego {
       this.updateDimensions();
       if (this.pixiApp) {
         this.pixiApp.renderer.resize(this.width, this.height);
+        this.updateInterface();
       }
     });
   }
@@ -399,7 +400,26 @@ class Juego {
 
 
   updateInterface() {
-    this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); //tiempoRestante.toString();
+     if (!this.interfaceContainer) return;
+  
+  this.interfaceContainer.removeChildren();
+  
+  const interfaceBackground = new PIXI.Graphics();
+  interfaceBackground.beginFill(0x222222);
+  interfaceBackground.drawRect(
+    0,
+    this.pixiApp.renderer.height * 0.8,
+    this.pixiApp.renderer.width,
+    this.pixiApp.renderer.height * 0.2
+  );
+  interfaceBackground.endFill();
+  this.interfaceContainer.addChild(interfaceBackground);
+  
+  if (this.fpsText) {
+    this.fpsText.x = this.width - 120;
+    this.fpsText.y = 20;
+  }
+    this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2); 
   }
 
 
