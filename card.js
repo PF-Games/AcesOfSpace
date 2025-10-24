@@ -26,11 +26,11 @@ class Deck {
 
   pop() {
     return this.cards.shift()
-  }
+  }//sirve para manejar stacks, toma la carta de encima de la pila
 
   push(card) {
     this.cards.push(card)
-  }
+  }//sirve para manejar stacks, mete la carta debajo de la pila
 
   shuffle() {
     for (let i = this.numberOfCards - 1; i > 0; i--) {
