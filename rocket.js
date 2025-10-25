@@ -1,21 +1,23 @@
-class Cohete extends GameObject {
-  constructor(x, y, juego, target) {
+class Rocket extends GameObject {
+  constructor(texturePath, x, y, juego, target) {
     super(x, y, juego);
-    
+
     this.target = target;
     this.velocidadMaxima = 5;
     this.aceleracionMaxima = 0.3;
     this.factorPerseguir = 0.2;
     this.radio = 5;
-    this.danio = 0.3;
-    
-    this.crearSprite();
+    this.danio = 1;
+    this.texturePath = texturePath;
+    this.container = new PIXI.Container();
+    this.container.x = x;
+    this.container.y = y;
+    this.juego.containerPrincipal.addChild(this.container);
   }
 
   async crearSprite() {
-    this.sprite = new PIXI.Graphics();
-    this.sprite.circle(0, 0, 5);
-    this.sprite.fill(0xffff00);
+    this.sprite = new PIXI.Sprite(await PIXI.Assets.load(this.texturePath));
+    this.sprite.anchor.set(0.5, 0.5);
     this.container.addChild(this.sprite);
   }
 
@@ -28,7 +30,7 @@ class Cohete extends GameObject {
 
     this.perseguir();
     this.aplicarFisica();
-    
+
     // Verificar colisión con target
     const dist = calcularDistancia(this.posicion, this.target.posicion);
     if (dist < this.target.radio) {
@@ -37,16 +39,26 @@ class Cohete extends GameObject {
     }
   }
 
- destruir() {
-  this.destruido = true; // Marcar como destruido
-  if (this.sprite) this.sprite.destroy();
-  if (this.container) this.container.destroy();
-  this.container = null; // Importante: setear a null
-  this.juego.cohetes = this.juego.cohetes.filter(c => c !== this);
-}
+  destruir() {
+    this.destruido = true;
+
+    // Limpiar el flag del target para que pueda ser targetado de nuevo
+    if (this.target && !this.target.muerto) {
+      this.target.isTargeted = false;
+    }
+
+    if (this.sprite) this.sprite.destroy();
+    if (this.container) this.container.destroy();
+    this.container = null; // Importante: setear a null
+    this.juego.rockets = this.juego.rockets.filter(c => c !== this);
+  }
+  
   render() {
-  if (!this.container || this.destruido) return; // Agregar verificación de destruido
-  super.render();
-  this.container.zIndex = this.posicion.y;
-}
+    if (!this.container || this.destruido) return; // Agregar verificación de destruido
+    super.render();
+    if (this.sprite) {
+      this.sprite.rotation = Math.atan2(this.velocidad.y, this.velocidad.x) + Math.PI / 2;
+    }
+    this.container.zIndex = this.posicion.y;
+  }
 }

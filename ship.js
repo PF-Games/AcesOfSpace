@@ -2,8 +2,8 @@ class Ship extends GameObject {
   constructor(texturePath, x, y, juego) {
     super(x, y, juego);
     this.texturePath = texturePath;
-    this.vida = 1;
-   
+    // this.vida = 1;
+
 
     this.vision = 8000
 
@@ -202,13 +202,9 @@ class Ship extends GameObject {
     if (this.muerto) return;
 
     this.muerto = true;
-    this.juego.ships = this.juego.ships.filter(
-      (ship) => ship !== this
-    );
-    this.juego.enemigos = this.juego.enemigos.filter(
-      (ship) => ship !== this
-    );
-    this.juego.amigos = this.juego.amigos.filter((ship) => ship !== this);
+    this.juego.ships = this.juego.ships.filter((ship) => ship !== this);
+    //this.juego.enemigos = this.juego.enemigos.filter((ship) => ship !== this);
+    //this.juego.amigos = this.juego.amigos.filter((ship) => ship !== this);
 
     // Agregar estas líneas para destruir visualmente
     if (this.sprite) this.sprite.destroy();
@@ -234,7 +230,7 @@ class Ship extends GameObject {
   }
 
   recibirDanio(danio) {
-    this.vida -= danio;
+    this.morir();
   }
 
   buscarEnemigoMasCerca() {
@@ -287,7 +283,9 @@ class Ship extends GameObject {
      */
     if (!this.container || !this.sprite) return;
     super.render();
-
+    if (this.sprite) {
+      this.sprite.rotation = Math.atan2(this.velocidad.y, this.velocidad.x) + Math.PI / 2;
+    }
 
 
     // Ordenamiento en profundidad para perspectiva isométrica

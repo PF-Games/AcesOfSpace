@@ -29,7 +29,7 @@ class GameObject {
 
     // Referencias del sistema
     this.juego = juego; // Referencia al motor del juego
-    this.id = Math.floor(Math.random() * 99999999); // ID único aleatorio
+    this.id = Math.floor(Math.random() * 9999); // ID único aleatorio
 
     //establezco el punto de pivot en el medio:
     //this.sprite.anchor.set(0.5);  ESTO ES DE ENTITY 20/10
