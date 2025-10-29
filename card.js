@@ -73,14 +73,14 @@ function freshDeck() {
   
   /*
   
-  async crearSpritesheetAnimado(bando) {
+  async createAnimatedSpritesheet(card) {
     this.sprite = (
-      await AnimatedCharacter.CreateCharacterFromMegaSpritesheet(
-        `/assets/pixelart/personajes/${bando}.png`,
+      await AnimatedCard.CreateCardFromMegaSpritesheet(
+        `/assets/pixelart/cards/${card}.png`,
         64,
         64
       )
-    ).character;
+    ).card;
 
     */
    
