@@ -23,6 +23,7 @@ class Juego {
     this.maxZoom = 2;
     this.zoomStep = 0.1;
 
+    this.initMatterJS(); 
     this.initPIXI();
     this.setupResizeHandler();
     this.tamanoCelda = 100; //14-10
@@ -31,6 +32,80 @@ class Juego {
 
     this.initCardSystem();
   }
+
+   initMatterJS() {
+    const Engine = Matter.Engine;
+    const Runner = Matter.Runner;
+
+    // Crear motor de física
+    this.engine = Engine.create();
+    this.engine.gravity.y = 0; // Sin gravedad para las cartas
+
+    // Crear runner
+    this.matterRunner = Runner.create();
+    Runner.run(this.matterRunner, this.engine);
+    console.log('✅ Matter.js inicializado');
+  }
+
+    async initCardVisuals() {
+    console.log('=== INICIALIZANDO VISUALES DE CARTAS ===');
+    
+    // Container para las cartas en la mano (con física)
+    this.cardsContainer = new PIXI.Container();
+    this.cardsContainer.sortableChildren = true;
+    this.pixiApp.stage.addChild(this.cardsContainer);
+    
+    // Renderer de la mano
+    this.handRenderer = new HandRenderer(this);
+    
+    // Mazos principales (sin física, solo visuales)
+    this.deckRenderer = new DeckRenderer(
+      this,
+      100,
+      this.height - 150,
+      "DECK"
+    );
+    
+    this.discardRenderer = new DeckRenderer(
+      this,
+      this.width - 100,
+      this.height - 150,
+      "DISCARD"
+    );
+
+      // Esperar a que se creen los visuales
+    await this.deckRenderer.createVisuals();
+    await this.discardRenderer.createVisuals();
+    
+    // Crear visuales para cartas iniciales
+    this.syncHandVisuals();
+    this.updateDeckCounters();
+    
+    console.log('✅ Visuales de cartas listas');
+  }
+
+  syncHandVisuals() {
+    // Limpiar visuales existentes
+    this.handRenderer.clear();
+    
+    // Crear visual para cada carta en la mano
+    this.playerHand.cards.forEach((card, index) => {
+      this.handRenderer.createCardVisual(card, index);
+    });
+    
+    this.handRenderer.updatePositions();
+  }
+
+  updateDeckCounters() {
+    if (this.deckRenderer) {
+      this.deckRenderer.updateCounter(this.deck.numberOfCards);
+    }
+    if (this.discardRenderer) {
+      this.discardRenderer.updateCounter(this.discardPile.numberOfCards);
+    }
+  }
+
+
 
     initCardSystem() {
     console.log('=== INICIALIZANDO SISTEMA DE CARTAS ===');
@@ -66,17 +141,35 @@ class Juego {
   }
 
   // Método para terminar turno y robar cartas
-  endTurn() {
+ endTurn() {
     console.log('\n=== FIN DE TURNO ===');
     
-    // Si hay cartas seleccionadas, jugarlas
+    // Jugar cartas seleccionadas
     if (this.playerHand.hasSelectedCards) {
+      const cardsToRemove = [...this.playerHand.selectedCards];
       const result = this.playerHand.playSelectedCards();
       console.log(`Jugaste: ${result.handInfo.handName}`);
+      
+      // Remover visuales de cartas jugadas
+      cardsToRemove.forEach(card => {
+        this.handRenderer.removeCardVisual(card);
+      });
     }
     
     // Robar nuevas cartas
+    const previousCount = this.playerHand.numberOfCards;
     this.playerHand.drawCards();
+    const newCards = this.playerHand.numberOfCards - previousCount;
+    
+    // Crear visuales para nuevas cartas
+    for (let i = 0; i < newCards; i++) {
+      const cardIndex = previousCount + i;
+      const card = this.playerHand.cards[cardIndex];
+      this.handRenderer.createCardVisual(card, cardIndex);
+    }
+    
+    this.handRenderer.updatePositions();
+    this.updateDeckCounters();
     
     console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
     console.log(`Cartas en deck: ${this.deck.numberOfCards}`);
@@ -100,19 +193,25 @@ class Juego {
       return false;
     }
     const card = this.playerHand.cards[index];
-    return this.playerHand.selectCard(card);
+    const success = this.playerHand.selectCard(card);
+    if (success) {
+      this.handRenderer.selectCard(card);
+    }
+    return success;
   }
 
-  // Método helper para deseleccionar una carta por índice
   deselectCardByIndex(index) {
     if (index < 0 || index >= this.playerHand.cards.length) {
       console.warn(`Índice ${index} fuera de rango`);
       return false;
     }
     const card = this.playerHand.cards[index];
-    return this.playerHand.deselectCard(card);
+    const success = this.playerHand.deselectCard(card);
+    if (success && this.handRenderer) {
+      this.handRenderer.deselectCard(card);
+    }
+    return success;
   }
-
 
 
   updateDimensions() {
@@ -189,7 +288,7 @@ class Juego {
 
   async crearFondo() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
-    this.fondo.zIndex = -1;
+    this.fondo.zIndex = -2;
     this.fondo.tileScale.set(0.5);
     this.fondo.width = this.anchoDelMapa;
     this.fondo.height = this.altoDelMapa;
@@ -239,25 +338,27 @@ class Juego {
     this.grid = new Grid(this, this.tamanoCelda);
     this.iniciarControles();
 
-
-
     this.interfaceContainer = new PIXI.Container();
+    this.interfaceContainer.sortableChildren = true;
     this.pixiApp.stage.addChild(this.interfaceContainer);
 
-
-    const interfaceBackground = new PIXI.Graphics();
-    interfaceBackground.beginFill(0x222222);
-    interfaceBackground.drawRect(
+    // Crear el background una sola vez
+    this.interfaceBackground = new PIXI.Graphics();
+    this.interfaceBackground.zIndex = -1;
+    this.interfaceBackground.beginFill(0x222222);
+    this.interfaceBackground.drawRect(
       0,
       this.pixiApp.renderer.height * 0.8,
       this.pixiApp.renderer.width,
       this.pixiApp.renderer.height * 0.2
     );
-    interfaceBackground.endFill();
-    this.interfaceContainer.addChild(interfaceBackground);
+    this.interfaceBackground.endFill();
+    this.interfaceBackground.zIndex = -2; 
+    this.interfaceContainer.addChild(this.interfaceBackground);
 
+    await this.initCardVisuals(); 
   }
-
+ 
 
   async cargarTexturas() {
     await PIXI.Assets.load(["assets/bg.jpg"]);
@@ -269,7 +370,6 @@ class Juego {
       const y = this.areaDeJuego.y - 100;
       const ship = new ClaseNave(x, y, this);
       this.ships.push(ship);
-      //this.enemigos.push(ship);
     }
   }
   /*
@@ -417,6 +517,27 @@ class Juego {
         this.containerPrincipal.y = mouseY - worldPosY * this.zoom;
       }
     });
+
+    this.pixiApp.canvas.addEventListener('click', (event) => {
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+      
+      // Verificar si clickeó una carta
+      this.handRenderer.cardVisuals.forEach((cardVisual, index) => {
+        const dx = mouseX - cardVisual.body.position.x;
+        const dy = mouseY - cardVisual.body.position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        // Si está dentro del radio de la carta
+        if (dist < cardVisual.width / 2) {
+          if (cardVisual.selected) {
+            this.deselectCardByIndex(index);
+          } else {
+            this.selectCardByIndex(index);
+          }
+        }
+      });
+    });
   }
 
   convertirCoordenadaDelMouse(mouseX, mouseY) {
@@ -450,8 +571,13 @@ class Juego {
 
     // this.grid.update();
     // this.hacerQLaCamaraSigaAlProtagonista();
-    this.updateInterface();
+    if (this.handRenderer) {
+      this.handRenderer.tick();
+      this.handRenderer.render();
+    }
 
+    this.updateInterface();
+  
     for (let rocket of this.rockets) {
       rocket.tick();
       rocket.render();
@@ -485,7 +611,14 @@ class Juego {
   updateInterface() {
     if (!this.interfaceContainer) return;
 
-    this.interfaceContainer.removeChildren();
+    //this.interfaceContainer.removeChildren(); COMENTADA 29/10
+
+    if (this.interfaceBackground) {
+      this.interfaceBackground.clear();
+    } else {
+      this.interfaceBackground = new PIXI.Graphics();
+      this.interfaceContainer.addChild(this.interfaceBackground);
+    }
 
     const interfaceBackground = new PIXI.Graphics();
     interfaceBackground.beginFill(0x222222);
@@ -497,6 +630,20 @@ class Juego {
     );
     interfaceBackground.endFill();
     this.interfaceContainer.addChild(interfaceBackground);
+
+        // Actualizar posiciones de los mazos según nuevo tamaño de ventana
+    if (this.deckRenderer) {
+      this.deckRenderer.updatePosition(100, this.height - 150);
+    }
+    if (this.discardRenderer) {
+      this.discardRenderer.updatePosition(this.width - 100, this.height - 150);
+    }
+
+    // Actualizar posición Y de la mano
+    if (this.handRenderer) {
+      this.handRenderer.handY = this.height - 150;
+      this.handRenderer.updatePositions();
+    }
 
     if (this.fpsText) {
       this.fpsText.x = this.width - 120;
