@@ -1,4 +1,3 @@
-// fsm.js - Sistema de máquina de estados
 class FSM {
   constructor(owner, config) {
     this.owner = owner;

@@ -1,17 +1,15 @@
 class Juego {
   pixiApp;
   ships = [];
-  //amigos = [];
-  //enemigos = [];
   arboles = [];
   autos = [];
   objetosInanimados = [];
   protagonista;
   width;
   height;
-
-
-
+  deck;
+  discardPile;
+  playerHand;
 
   constructor() {
     this.updateDimensions();
@@ -30,7 +28,92 @@ class Juego {
     this.tamanoCelda = 100; //14-10
     this.contadorDeFrame = 0; //14-10
     this.rockets = [];
+
+    this.initCardSystem();
   }
+
+    initCardSystem() {
+    console.log('=== INICIALIZANDO SISTEMA DE CARTAS ===');
+    
+    // Crear y barajar el mazo
+    this.deck = new Deck();
+    this.deck.shuffle();
+    
+    // Crear pila de descarte
+    this.discardPile = new DiscardPile();
+    
+    // Crear mano del jugador con configuración personalizable
+    this.playerHand = new playerHand(this.deck, this.discardPile, {
+      maxCards: 12,        // Máximo de cartas acumulables
+      cardsToDraw: 5,      // Cartas a reponer por turno
+      initialCards: 7      // Cartas iniciales
+    });
+    
+    // Robar mano inicial
+    this.playerHand.drawInitialHand();
+    
+    console.log(`Deck inicializado: ${this.deck.numberOfCards} cartas`);
+    console.log(`Mano inicial: ${this.playerHand.numberOfCards} cartas`);
+    
+    // Hacer accesible desde la consola para debugging
+    window.deck = this.deck;
+    window.discardPile = this.discardPile;
+    window.playerHand = this.playerHand;
+    window.juego = this;
+
+    console.log('✅ Sistema de cartas listo');
+    console.log('💡 Usa la consola para probar: playerHand, deck, discardPile');
+  }
+
+  // Método para terminar turno y robar cartas
+  endTurn() {
+    console.log('\n=== FIN DE TURNO ===');
+    
+    // Si hay cartas seleccionadas, jugarlas
+    if (this.playerHand.hasSelectedCards) {
+      const result = this.playerHand.playSelectedCards();
+      console.log(`Jugaste: ${result.handInfo.handName}`);
+    }
+    
+    // Robar nuevas cartas
+    this.playerHand.drawCards();
+    
+    console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
+    console.log(`Cartas en deck: ${this.deck.numberOfCards}`);
+    console.log(`Cartas descartadas: ${this.discardPile.numberOfCards}`);
+  }
+
+  // Método helper para ver las cartas en la mano
+  showHand() {
+    console.log('\n=== CARTAS EN LA MANO ===');
+    this.playerHand.cards.forEach((card, index) => {
+      const estado = card.fsm ? card.fsm.currentStateName : 'sin FSM';
+      console.log(`${index}: ${card.toString()} [${estado}]`);
+    });
+    console.log(`Total: ${this.playerHand.numberOfCards} cartas`);
+  }
+
+  // Método helper para seleccionar una carta por índice
+  selectCardByIndex(index) {
+    if (index < 0 || index >= this.playerHand.cards.length) {
+      console.warn(`Índice ${index} fuera de rango`);
+      return false;
+    }
+    const card = this.playerHand.cards[index];
+    return this.playerHand.selectCard(card);
+  }
+
+  // Método helper para deseleccionar una carta por índice
+  deselectCardByIndex(index) {
+    if (index < 0 || index >= this.playerHand.cards.length) {
+      console.warn(`Índice ${index} fuera de rango`);
+      return false;
+    }
+    const card = this.playerHand.cards[index];
+    return this.playerHand.deselectCard(card);
+  }
+
+
 
   updateDimensions() {
     this.width = window.innerWidth;

@@ -158,6 +158,8 @@ class BlackShip extends enemyShip {
     this.defaultSpeed = 1;
     this.velocidadMaxima = 1;
     this.playerDamage = 2;
+    this.colorType = 'black';
+    this.weight = 5; //this will be used to create levels and allocate difficulty
    // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 }
@@ -168,6 +170,8 @@ class RedShip extends enemyShip {
     this.defaultSpeed = 1.5;
     this.velocidadMaxima = 1.5;
     this.playerDamage = 1;
+    this.colorType = 'red';
+    this.weight = 5; //this will be used to create levels and allocate difficulty
   //  this.debugId = `R${this.id}`; // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 }
@@ -180,6 +184,7 @@ class ShieldShip extends enemyShip {
     this.playerDamage = 1;
     this.escudo = 1;
     this.protectionRange = 150;
+    this.weight = 5; //this will be used to create levels and allocate difficulty
   //  this.debugId = `S${this.id}`; // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 
@@ -231,6 +236,7 @@ class SupportShip extends enemyShip {
     this.velocidadMaxima = 2;
     this.playerDamage = 1;
     this.repairRange = 200;
+    this.weight = 5; //this will be used to create levels and allocate difficulty
   }
 
   initFSM() {

@@ -1,5 +1,3 @@
-
-// shipStates.js - Estados base para las naves
 class ShipState {
   constructor(owner, fsm) {
     this.owner = owner;
@@ -11,11 +9,10 @@ class ShipState {
   onExit(nextState) {}
 }
 
-// ========== ESTADOS COMUNES ==========
 
 class PursuingState extends ShipState {
   onEnter() {
-    this.owner.velocidadMaxima = this.owner.defaultSpeed || 1;
+    this.owner.velocidadMaxima = this.owner.defaultSpeed;
   }
 
   onUpdate() {
@@ -68,7 +65,6 @@ class FlyingAwayState extends ShipState {
   }
 }
 
-// ========== ESTADOS PARA SHIELDSHIP ==========
 
 class SpeedingToProtectState extends ShipState {
   onUpdate() {
@@ -96,15 +92,14 @@ class ProtectingState extends ShipState {
       return;
     }
 
-    // Stay near ally
+    // TODO: Stay ahead of a near ally
     this.owner.target = this.owner.allyToProtect;
     this.owner.perseguir();
     
-    // TODO: Implement rocket interception
+    // TODO: protecting ship should only be ahead of another ship to protect it since rockets target nearest ships, no method to intercept is required
   }
 }
 
-// ========== ESTADOS PARA SUPPORTSHIP ==========
 
 class SpeedingToRepairState extends ShipState {
   onUpdate() {
