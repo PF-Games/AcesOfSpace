@@ -13,8 +13,8 @@ class Juego {
 
   constructor() {
     this.updateDimensions();
-    this.anchoDelMapa = 1920;
-    this.altoDelMapa = 1080;
+    this.mapWidth = 1920;
+    this.mapHeight = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
 
     // Variables para el zoom
@@ -59,18 +59,18 @@ class Juego {
     this.handRenderer = new HandRenderer(this);
     
     // Mazos principales (sin física, solo visuales)
-    this.deckRenderer = new DeckRenderer(
-      this,
-      100,
-      this.height - 150,
-      "DECK"
-    );
-    
     this.discardRenderer = new DeckRenderer(
       this,
-      this.width - 100,
-      this.height - 150,
+      100,
+      this.height - 90,
       "DISCARD"
+    );
+    
+    this.deckRenderer = new DeckRenderer(
+      this,
+      this.width - 100,
+      this.height - 90,
+      "DECK"
     );
 
       // Esperar a que se creen los visuales
@@ -217,8 +217,8 @@ class Juego {
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.ancho = this.anchoDelMapa || 1920;  // para que Grid funcione 10-4
-    this.alto = this.altoDelMapa || 1080;     // para que Grid funcione 10-4
+    this.ancho = this.mapWidth || 1920;  // para que Grid funcione 10-4
+    this.alto = this.mapHeight || 1080;     // para que Grid funcione 10-4
   }
 
 
@@ -290,8 +290,8 @@ class Juego {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
     this.fondo.zIndex = -2;
     this.fondo.tileScale.set(0.5);
-    this.fondo.width = this.anchoDelMapa;
-    this.fondo.height = this.altoDelMapa;
+    this.fondo.width = this.mapWidth;
+    this.fondo.height = this.mapHeight;
     this.containerPrincipal.addChild(this.fondo);
   }
 
@@ -333,8 +333,8 @@ class Juego {
     this.asignarProtagonistaComoTargetATodosLospersonas()
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
-    this.ancho = this.anchoDelMapa;
-    this.alto = this.altoDelMapa;
+    this.ancho = this.mapWidth;
+    this.alto = this.mapHeight;
     this.grid = new Grid(this, this.tamanoCelda);
     this.iniciarControles();
 
@@ -366,7 +366,7 @@ class Juego {
 
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
-      const x = Math.random() * this.anchoDelMapa;
+      const x = Math.random() * this.mapWidth;
       const y = this.areaDeJuego.y - 100;
       const ship = new ClaseNave(x, y, this);
       this.ships.push(ship);
@@ -374,8 +374,8 @@ class Juego {
   }
   /*
   for (let i = 0; i < cant; i++) {
-    const x = Math.random() * this.anchoDelMapa;
-    const y = -100; //Math.random() * this.altoDelMapa + 2500;
+    const x = Math.random() * this.mapWidth;
+    const y = -100; //Math.random() * this.mapHeight + 2500;
     const ship = new Enemigo(x, y, this, bando);
     this.ships.push(ship);
     this.enemigos.push(ship);
@@ -386,8 +386,8 @@ class Juego {
 
   crearAutos() {
     for (let i = 0; i < 2; i++) {
-      const x = Math.random() * this.anchoDelMapa;
-      const y = Math.random() * this.altoDelMapa;
+      const x = Math.random() * this.mapWidth;
+      const y = Math.random() * this.mapHeight;
       const auto = new Auto(x, y, this);
       this.autos.push(auto);
       this.objetosInanimados.push(auto);
@@ -396,8 +396,8 @@ class Juego {
 
   crearArboles() {
     for (let i = 0; i < 4; i++) {
-      const x = Math.random() * this.anchoDelMapa;
-      const y = Math.random() * this.altoDelMapa;
+      const x = Math.random() * this.mapWidth;
+      const y = Math.random() * this.mapHeight;
       const arbol = new Arbol(x, y, this);
       this.arboles.push(arbol);
       this.objetosInanimados.push(arbol);
@@ -447,7 +447,7 @@ class Juego {
 
 
   async crearProtagonista() {
-    const x = this.anchoDelMapa / 2
+    const x = this.mapWidth / 2
     const y = this.areaDeJuego.y + this.areaDeJuego.alto - 100;
     const protagonista = new Protagonista(x, y, this);
     // this.ships.push(protagonista);
@@ -456,7 +456,7 @@ class Juego {
 
 
   crearAntagonista() {
-    const x = this.anchoDelMapa / 2
+    const x = this.mapWidth / 2
     const y = this.areaDeJuego.y + 50;
     const antagonista = new Antagonista(x, y, this);
     //this.ships.push(antagonista);
@@ -632,16 +632,16 @@ class Juego {
     this.interfaceContainer.addChild(interfaceBackground);
 
         // Actualizar posiciones de los mazos según nuevo tamaño de ventana
-    if (this.deckRenderer) {
-      this.deckRenderer.updatePosition(100, this.height - 150);
-    }
     if (this.discardRenderer) {
-      this.discardRenderer.updatePosition(this.width - 100, this.height - 150);
+      this.discardRenderer.updatePosition(100, this.height - 90);
+    }
+    if (this.deckRenderer) {
+      this.deckRenderer.updatePosition(this.width - 100, this.height - 90);
     }
 
     // Actualizar posición Y de la mano
     if (this.handRenderer) {
-      this.handRenderer.handY = this.height - 150;
+      this.handRenderer.handY = this.height - 90;
       this.handRenderer.updatePositions();
     }
 

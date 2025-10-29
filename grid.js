@@ -6,7 +6,7 @@ class Grid {
     this.cantidadDeCeldasDeMasParaAgregarHaciaDerYAbajo = 50;
 
     this.cantidadDeCeldasALoAncho =
-      Math.floor(this.juego.anchoDelMapa / this.tamanoCelda) + 1;
+      Math.floor(this.juego.mapWidth / this.tamanoCelda) + 1;
 
     this.cantidadDeCeldasALoAlto =
       Math.floor(this.juego.altoDelMapa / this.tamanoCelda) + 1;
