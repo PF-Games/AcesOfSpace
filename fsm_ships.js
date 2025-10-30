@@ -4,9 +4,9 @@ class ShipState {
     this.fsm = fsm;
   }
 
-  onEnter(previousState) {}
-  onUpdate(frameNumber) {}
-  onExit(nextState) {}
+  onEnter(previousState) { }
+  onUpdate(frameNumber) { }
+  onExit(nextState) { }
 }
 
 
@@ -35,7 +35,7 @@ class AttackingState extends ShipState {
     // Deal damage to player
     this.owner.juego.protagonista.recibirDanio(this.owner.playerDamage);
     console.log(`${this.owner.debugId} atacó! Daño: ${this.owner.playerDamage}`);
-    
+
     // Immediately transition to flying away
     this.fsm.setState('flyingAway');
   }
@@ -95,7 +95,7 @@ class ProtectingState extends ShipState {
     // TODO: Stay ahead of a near ally
     this.owner.target = this.owner.allyToProtect;
     this.owner.perseguir();
-    
+
     // TODO: protecting ship should only be ahead of another ship to protect it since rockets target nearest ships, no method to intercept is required
   }
 }

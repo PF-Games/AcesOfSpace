@@ -104,8 +104,6 @@ class Juego {
     }
   }
 
-
-
     initCardSystem() {
     console.log('=== INICIALIZANDO SISTEMA DE CARTAS ===');
     
@@ -405,8 +403,6 @@ class Juego {
     };
   }
 
-
-
   async crearProtagonista() {
     const x = this.mapWidth / 2
     const y = this.gameArea.y + this.gameArea.height - 100;
@@ -414,7 +410,6 @@ class Juego {
     // this.ships.push(protagonista);
     this.protagonista = protagonista;
   };
-
 
   crearAntagonista() {
     const x = this.mapWidth / 2
@@ -510,8 +505,6 @@ class Juego {
     };
   }
 
-
-
   gameLoop(time) {
     //iteramos por todos los personas
     //this.dibujador.clear();//14-10
@@ -568,12 +561,8 @@ class Juego {
        */
 
 
-
   updateInterface() {
     if (!this.interfaceContainer) return;
-
-    //this.interfaceContainer.removeChildren(); COMENTADA 29/10
-
     if (this.interfaceBackground) {
       this.interfaceBackground.clear();
     } else {
@@ -614,32 +603,13 @@ class Juego {
   }
 
 
-
-
   finDelJuego() {
     alert("Te moriste! fin del juego");
   }
-
-  // asignarTargets() {
-  //   for (let cone of this.personas) {
-  //     cone.asignarTarget(this.getpersonaRandom());
-  //   }
-  // }
 
   asignarProtagonistaComoTargetATodosLospersonas() {
     for (let ship of this.ships) {
       ship.asignarTarget(this.protagonista);
     }
   }
-
-  // asignarPerseguidorRandomATodos() {
-  //   for (let cone of this.personas) {
-  //     cone.perseguidor = this.getpersonaRandom();
-  //   }
-  // }
-  // asignarElMouseComoPerseguidorATodosLospersonas() {
-  //   for (let cone of this.personas) {
-  //     cone.perseguidor = this.mouse;
-  //   }
-  // }
 }

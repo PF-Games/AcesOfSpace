@@ -6,7 +6,7 @@ class FSM {
     this.currentStateName = null;
     this.prevState = null;
     this.prevStateName = null;
-    
+
     Object.keys(config.states).forEach(
       (state) => (this.states[state] = new config.states[state](owner, this))
     );
@@ -34,17 +34,17 @@ class FSM {
     const previousState = this.currentState;
     this.prevState = this.currentState;
     this.prevStateName = this.currentStateName;
-    
+
     if (this.currentState) {
       this.currentState.onExit(state);
     }
-    
+
     this.currentState = this.states[state];
     if (!this.currentState) return;
-    
+
     this.currentState.onEnter(previousState);
     this.currentStateName = state;
-    
+
     const ownerName = this.owner.debugId || this.owner.toString?.() || "Card";
     console.log(`${this.owner.debugId}: ${this.prevStateName || 'init'} -> ${state}`);
   }
