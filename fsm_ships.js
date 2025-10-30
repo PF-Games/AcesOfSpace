@@ -47,7 +47,7 @@ class AttackingState extends ShipState {
 
 class FlyingAwayState extends ShipState {
   onEnter() {
-    const centroX = this.owner.juego.areaDeJuego.x + this.owner.juego.areaDeJuego.ancho / 2;
+    const centroX = this.owner.juego.gameArea.x + this.owner.juego.gameArea.width / 2;
     this.owner.direccionFlyAway = this.owner.posicion.x < centroX ? 'izquierda' : 'derecha';
     this.owner.velocidadMaxima = 4;
   }

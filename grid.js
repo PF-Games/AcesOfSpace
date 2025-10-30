@@ -1,15 +1,15 @@
 class Grid {
-  constructor(juego, tamanoCelda) {
-    this.tamanoCelda = tamanoCelda;
+  constructor(juego, cellSize) {
+    this.cellSize = cellSize;
     this.juego = juego;
 
     this.cantidadDeCeldasDeMasParaAgregarHaciaDerYAbajo = 50;
 
     this.cantidadDeCeldasALoAncho =
-      Math.floor(this.juego.anchoDelMapa / this.tamanoCelda) + 1;
+      Math.floor(this.juego.mapWidth / this.cellSize) + 1;
 
     this.cantidadDeCeldasALoAlto =
-      Math.floor(this.juego.altoDelMapa / this.tamanoCelda) + 1;
+      Math.floor(this.juego.mapHeight / this.cellSize) + 1;
 
     this.celdas = [];
     for (
@@ -28,7 +28,7 @@ class Grid {
           this.cantidadDeCeldasDeMasParaAgregarHaciaDerYAbajo;
         j++
       ) {
-        this.celdas[i][j] = new Celda(this.juego, this.tamanoCelda, i, j);
+        this.celdas[i][j] = new Celda(this.juego, this.cellSize, i, j);
       }
     }
   }
@@ -36,8 +36,8 @@ class Grid {
   actualizarPosicionDeEntidad(entidad) {
     if (entidad.estoyEnLaMismaCeldaQueEnElFrameAnterior()) return;
     try {
-      let gridX = Math.floor(entidad.x / this.tamanoCelda);
-      let gridY = Math.floor(entidad.y / this.tamanoCelda);
+      let gridX = Math.floor(entidad.x / this.cellSize);
+      let gridY = Math.floor(entidad.y / this.cellSize);
 
       if (gridX < 0) gridX = 0;
       if (gridY < 0) gridY = 0;

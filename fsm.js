@@ -22,7 +22,7 @@ class FSM {
     if (!this.states[state]) {
       return console.warn(
         "ERROR setState",
-        this.owner.debugId,
+        this.owner.debugId || this.owner.toString?.() || "Unknown",
         state,
         "no existe este estado"
       );
@@ -45,6 +45,7 @@ class FSM {
     this.currentState.onEnter(previousState);
     this.currentStateName = state;
     
+    const ownerName = this.owner.debugId || this.owner.toString?.() || "Card";
     console.log(`${this.owner.debugId}: ${this.prevStateName || 'init'} -> ${state}`);
   }
 
