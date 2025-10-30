@@ -26,8 +26,8 @@ class Juego {
     this.initMatterJS(); 
     this.initPIXI();
     this.setupResizeHandler();
-    this.tamanoCelda = 100; //14-10
-    this.contadorDeFrame = 0; //14-10
+    this.cellSize = 100; 
+    this.contadorDeFrame = 0; 
     this.rockets = [];
 
     this.initCardSystem();
@@ -217,8 +217,8 @@ class Juego {
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.ancho = this.mapWidth || 1920;  // para que Grid funcione 10-4
-    this.alto = this.mapHeight || 1080;     // para que Grid funcione 10-4
+    this.width = this.mapWidth || 1920;
+    this.height = this.mapHeight || 1080;
   }
 
 
@@ -302,20 +302,20 @@ class Juego {
     await this.cargarTexturas();
     this.crearFondo();
 
-    this.areaDeJuego = {
+    this.gameArea = {
       x: 200,
       y: 0,
-      ancho: 1500,
-      alto: 1500
+      width: 1500,
+      height: 1500
     };
 
     // Dibujar rectángulo amarillo de debug
     this.rectanguloDebug = new PIXI.Graphics();
     this.rectanguloDebug.rect(
-      this.areaDeJuego.x,
-      this.areaDeJuego.y,
-      this.areaDeJuego.ancho,
-      this.areaDeJuego.alto
+      this.gameArea.x,
+      this.gameArea.y,
+      this.gameArea.width,
+      this.gameArea.height
     );
     this.rectanguloDebug.stroke({ width: 4, color: 0xffff00, alpha: 1 });
     this.containerPrincipal.addChild(this.rectanguloDebug);
@@ -333,9 +333,9 @@ class Juego {
     this.asignarProtagonistaComoTargetATodosLospersonas()
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
-    this.ancho = this.mapWidth;
-    this.alto = this.mapHeight;
-    this.grid = new Grid(this, this.tamanoCelda);
+    this.width = this.mapWidth;
+    this.height = this.mapHeight;
+    this.grid = new Grid(this, this.cellSize);
     this.iniciarControles();
 
     this.interfaceContainer = new PIXI.Container();
@@ -367,7 +367,7 @@ class Juego {
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
       const x = Math.random() * this.mapWidth;
-      const y = this.areaDeJuego.y - 100;
+      const y = this.gameArea.y - 100;
       const ship = new ClaseNave(x, y, this);
       this.ships.push(ship);
     }
@@ -448,7 +448,7 @@ class Juego {
 
   async crearProtagonista() {
     const x = this.mapWidth / 2
-    const y = this.areaDeJuego.y + this.areaDeJuego.alto - 100;
+    const y = this.gameArea.y + this.gameArea.height - 100;
     const protagonista = new Protagonista(x, y, this);
     // this.ships.push(protagonista);
     this.protagonista = protagonista;
@@ -457,7 +457,7 @@ class Juego {
 
   crearAntagonista() {
     const x = this.mapWidth / 2
-    const y = this.areaDeJuego.y + 50;
+    const y = this.gameArea.y + 50;
     const antagonista = new Antagonista(x, y, this);
     //this.ships.push(antagonista);
     this.antagonista = antagonista;

@@ -1,12 +1,12 @@
 class Celda {
-  constructor(juego, tamanoCelda, x, y) {
+  constructor(juego, cellSize, x, y) {
     this.juego = juego;
     this.entidadesAca = {};
     this.x = x;
     this.y = y;
-    this.tamanoCelda = tamanoCelda;
-    this.centroX = this.x * this.tamanoCelda + this.tamanoCelda / 2;
-    this.centroY = this.y * this.tamanoCelda + this.tamanoCelda / 2;
+    this.cellSize = cellSize;
+    this.centroX = this.x * this.cellSize + this.cellSize / 2;
+    this.centroY = this.y * this.cellSize + this.cellSize / 2;
 
     // Crear el texto para mostrar la posición Y
     this.textoDebug = new PIXI.Text(
@@ -33,10 +33,10 @@ class Celda {
   dibujame() {
     this.juego.dibujador
       .rect(
-        this.x * this.tamanoCelda,
-        this.y * this.tamanoCelda,
-        this.tamanoCelda,
-        this.tamanoCelda
+        this.x * this.cellSize,
+        this.y * this.cellSize,
+        this.cellSize,
+        this.cellSize
       )
       .stroke({ width: 1, color: 0x00ff00, alpha: 0.5 });
   }

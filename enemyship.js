@@ -59,17 +59,17 @@ class enemyShip extends Ship {
   
   checkPlayerAttackRange() {
     if (!this.juego.protagonista) return false;
-    const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.tamanoCelda);
-    const miFila = Math.floor(this.posicion.y / this.juego.tamanoCelda);
+    const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.cellSize);
+    const miFila = Math.floor(this.posicion.y / this.juego.cellSize);
     return miFila === filaProtagonista;
   }
   
 
   isOutOfBounds() {
     const margen = 200;
-    return this.posicion.x < this.juego.areaDeJuego.x - margen ||
-           this.posicion.x > this.juego.areaDeJuego.x + this.juego.areaDeJuego.ancho + margen ||
-           this.posicion.y > this.juego.areaDeJuego.y + this.juego.areaDeJuego.alto + margen;
+    return this.posicion.x < this.juego.gameArea.x - margen ||
+           this.posicion.x > this.juego.gameArea.x + this.juego.gameArea.width + margen ||
+           this.posicion.y > this.juego.gameArea.y + this.juego.gameArea.height + margen;
   }
   
   morir() {
@@ -94,8 +94,8 @@ class enemyShip extends Ship {
 /* COMENTADA PORQUE ARRIBA SE IMPLEMENTA SIN EL FLYAWAY LA GUARDO DE REFERENCIA POR AHORA
   checkPlayerAttackRange() {
   if (!this.juego.protagonista) return;
-    const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.tamanoCelda);
-    const miFila = Math.floor(this.posicion.y / this.juego.tamanoCelda);
+    const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.cellSize);
+    const miFila = Math.floor(this.posicion.y / this.juego.cellSize);
 
     // Si llegó a la misma fila del protagonista
     if (miFila === filaProtagonista) {
@@ -117,7 +117,7 @@ class enemyShip extends Ship {
     this.estadoFlyAway = true;
     
     // Decidir si escapa por izquierda o derecha (hacia el lado más cercano)
-    const centroX = this.juego.areaDeJuego.x + this.juego.areaDeJuego.ancho / 2;
+    const centroX = this.juego.gameArea.x + this.juego.gameArea.width / 2;
     this.direccionFlyAway = this.posicion.x < centroX ? 'izquierda' : 'derecha';
     
     // Aumentar velocidad para el escape
@@ -138,9 +138,9 @@ class enemyShip extends Ship {
   verificarSiSalioDePantalla() {
     const margen = 200;
     const fueraDeLimites = 
-      this.posicion.x < this.juego.areaDeJuego.x - margen ||
-      this.posicion.x > this.juego.areaDeJuego.x + this.juego.areaDeJuego.ancho + margen ||
-      this.posicion.y > this.juego.areaDeJuego.y + this.juego.areaDeJuego.alto + margen;
+      this.posicion.x < this.juego.gameArea.x - margen ||
+      this.posicion.x > this.juego.gameArea.x + this.juego.gameArea.width + margen ||
+      this.posicion.y > this.juego.gameArea.y + this.juego.gameArea.height + margen;
 
     if (fueraDeLimites) {
       console.log(`${this.debugId} salió del área, autodestruyéndose`);
