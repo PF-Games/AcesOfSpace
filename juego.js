@@ -26,7 +26,7 @@ class Juego {
     this.initPIXI();
     this.setupResizeHandler();
     this.cellSize = 100; 
-    this.contadorDeFrame = 0; 
+    this.frameCounter = 0; 
     this.rockets = [];
 
     this.initCardSystem();
@@ -139,7 +139,7 @@ class Juego {
     console.log('💡 Usa la consola para probar: playerHand, deck, discardPile');
   }
 
-  // Método para terminar turno y robar cartas
+  // Método para terminar turno y tomar cartas
  endTurn() {
     console.log('\n=== FIN DE TURNO ===');
     
@@ -155,7 +155,7 @@ class Juego {
       });
     }
     
-    // Robar nuevas cartas
+    // Tomar nuevas cartas
     const previousCount = this.playerHand.numberOfCards;
     this.playerHand.drawCards();
     const newCards = this.playerHand.numberOfCards - previousCount;
@@ -212,14 +212,12 @@ class Juego {
     return success;
   }
 
-
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.width = this.mapWidth || 1920;
     this.height = this.mapHeight || 1080;
   }
-
 
   setupResizeHandler() {
     window.addEventListener("resize", () => {
@@ -230,7 +228,6 @@ class Juego {
       }
     });
   }
-
 
   createInterface() {
     this.interface = new PIXI.Container();
@@ -251,7 +248,6 @@ class Juego {
     this.fpsText.x = this.width - 120;
     this.fpsText.y = 20;
     this.interface.addChild(this.fpsText);
-    // this.fpsText.text = `FPS: ${this.pixiApp.ticker.FPS.toFixed(2)}`;
   }
 
   //async indica q este metodo es asyncronico, es decir q puede usar "await"
@@ -266,26 +262,17 @@ class Juego {
       resizeTo: window,
     };
 
-    //inicializamos pixi con las opciones definidas anteriormente
-    //await indica q el codigo se frena hasta que el metodo init de la app de pixi haya terminado
-    //puede tardar 2ms, 400ms.. no lo sabemos :O
+
     await this.pixiApp.init(opcionesDePixi);
-
-    // //agregamos el elementos canvas creado por pixi en el documento html
     document.body.appendChild(this.pixiApp.canvas);
-
-    //agregamos el metodo this.gameLoop al ticker.
-    //es decir: en cada frame vamos a ejecutar el metodo this.gameLoop
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
-
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
     this.createInterface();
-    this.crearNivel();
-
+    this.createLevel();
   }
 
-  async crearFondo() {
+  async createBackground() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
     this.fondo.zIndex = -2;
     this.fondo.tileScale.set(0.5);
@@ -294,12 +281,12 @@ class Juego {
     this.containerPrincipal.addChild(this.fondo);
   }
 
-  async crearNivel() {
+  async createLevel() {
     this.containerPrincipal = new PIXI.Container();
     this.containerPrincipal.scale.set(this.zoom);
     this.pixiApp.stage.addChild(this.containerPrincipal);
-    await this.cargarTexturas();
-    this.crearFondo();
+    await this.loadTextures();
+    this.createBackground();
 
     this.gameArea = {
       x: 200,
@@ -358,7 +345,7 @@ class Juego {
   }
  
 
-  async cargarTexturas() {
+  async loadTextures() {
     await PIXI.Assets.load(["assets/bg.jpg"]);
   }
 
@@ -528,7 +515,7 @@ class Juego {
   gameLoop(time) {
     //iteramos por todos los personas
     //this.dibujador.clear();//14-10
-    this.contadorDeFrame++;//14-10
+    this.frameCounter++;
 
     // Procesar antagonista
     if (this.antagonista) {
