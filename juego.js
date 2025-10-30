@@ -8,6 +8,7 @@ class Juego {
   deck;
   discardPile;
   playerHand;
+  cardsHeight = 265;
 
   constructor() {
     this.updateDimensions();
@@ -60,14 +61,14 @@ class Juego {
     this.discardRenderer = new DeckRenderer(
       this,
       100,
-      this.height - 90,
+      this.height - this.cardsHeight,
       "DISCARD"
     );
     
     this.deckRenderer = new DeckRenderer(
       this,
       this.width - 100,
-      this.height - 90,
+      this.height - this.cardsHeight,
       "DECK"
     );
 
@@ -606,15 +607,15 @@ class Juego {
 
         // Actualizar posiciones de los mazos según nuevo tamaño de ventana
     if (this.discardRenderer) {
-      this.discardRenderer.updatePosition(100, this.height - 90);
+      this.discardRenderer.updatePosition(100, this.height - this.cardsHeight);
     }
     if (this.deckRenderer) {
-      this.deckRenderer.updatePosition(this.width - 100, this.height - 90);
+      this.deckRenderer.updatePosition(this.width - 100, this.height - this.cardsHeight);
     }
 
     // Actualizar posición Y de la mano
     if (this.handRenderer) {
-      this.handRenderer.handY = this.height - 90;
+      this.handRenderer.handY = this.height - this.cardsHeight;
       this.handRenderer.updatePositions();
     }
 
