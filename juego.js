@@ -1,9 +1,7 @@
 class Juego {
   pixiApp;
   ships = [];
-  arboles = [];
-  autos = [];
-  objetosInanimados = [];
+  asteroids = [];
   protagonista;
   width;
   height;
@@ -328,8 +326,7 @@ class Juego {
     this.crearEnemigos(5, RedShip);
     this.crearEnemigos(3, ShieldShip);
     this.crearEnemigos(2, SupportShip);
-    this.crearArboles();
-    this.crearAutos();
+    this.createAsteroids();
     this.asignarProtagonistaComoTargetATodosLospersonas()
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
@@ -372,40 +369,16 @@ class Juego {
       this.ships.push(ship);
     }
   }
-  /*
-  for (let i = 0; i < cant; i++) {
-    const x = Math.random() * this.mapWidth;
-    const y = -100; //Math.random() * this.mapHeight + 2500;
-    const ship = new Enemigo(x, y, this, bando);
-    this.ships.push(ship);
-    this.enemigos.push(ship);
-    this.target = juego.protagonista; // hice esto pero no funciono
-  }
-}
-*/
 
-  crearAutos() {
+  createAsteroids() {
     for (let i = 0; i < 2; i++) {
       const x = Math.random() * this.mapWidth;
       const y = Math.random() * this.mapHeight;
-      const auto = new Auto(x, y, this);
-      this.autos.push(auto);
-      this.objetosInanimados.push(auto);
+      const asteroid = new Asteroid(x, y, this);
+      this.asteroids.push(asteroid);
     }
   }
 
-  crearArboles() {
-    for (let i = 0; i < 4; i++) {
-      const x = Math.random() * this.mapWidth;
-      const y = Math.random() * this.mapHeight;
-      const arbol = new Arbol(x, y, this);
-      this.arboles.push(arbol);
-      this.objetosInanimados.push(arbol);
-    }
-  }
-
-
-  //14-10
 
   addRocketControls() {
     this.pixiApp.canvas.onclick = (event) => {
