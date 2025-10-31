@@ -62,3 +62,4 @@ class Rocket extends GameObject {
     this.container.zIndex = this.posicion.y;
   }
 }
+

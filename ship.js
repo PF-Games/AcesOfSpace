@@ -3,20 +3,13 @@ class Ship extends GameObject {
     super(x, y, juego);
     this.texturePath = texturePath;
     // this.vida = 1;
-
-
     this.vision = 8000
-
-
     this.radio = 24
     this.rangoDeAtaque = this.radio * 3;
-
     this.factorPerseguir = 0.15;
-
     this.factorSeparacion = 20;
     this.factorCohesion = 0.3;
     this.factorAlineacion = 0.4;
-
     this.aceleracionMaxima = 0.2;
     this.velocidadMaxima = 1;
     this.amigos = [];
@@ -40,19 +33,16 @@ class Ship extends GameObject {
     // Comportamientos de IA
     this.separacion(); // Evitar aglomeraciones
     this.aplicarFisica(); // Procesar movimiento
-
     this.verificarSiEstoyMuerto();
-
     // Actualizar contexto social y de combate
     this.enemigos = this.buscarPersonasQueNoSonDeMiBando();
     this.amigos = this.buscarPersonasDeMiBando();
     this.enemigoMasCerca = this.buscarEnemigoMasCerca();
-
     this.pegarSiEstaEnMiRango();
-
     // Datos para el sistema de animación
     this.calcularAnguloYVelocidadLineal();
   }
+
   calcularAnguloYVelocidadLineal() {
     /**
      * CÁLCULO DE PARÁMETROS DE ANIMACIÓN
@@ -265,10 +255,6 @@ class Ship extends GameObject {
     return enemigoMasCerca;
   }
 
-
-
-
-
   render() {
     /**
      * RENDERIZADO CON ORDENAMIENTO EN PROFUNDIDAD
@@ -292,3 +278,4 @@ class Ship extends GameObject {
     this.container.zIndex = this.posicion.y;
   }
 }
+

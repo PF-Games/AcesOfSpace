@@ -2,13 +2,9 @@ class playerHand {
   constructor(deck, discardPile, config = {}) {
     this.deck = deck;
     this.discardPile = discardPile;
-    
-    // Configurable properties
     this.maxCards = config.maxCards || 12;
     this.cardsToDraw = config.cardsToDraw || 5;
     this.initialCards = config.initialCards || 7;
-    
-    // Hand state
     this.cards = [];
     this.selectedCards = [];
   }
@@ -29,7 +25,6 @@ class playerHand {
     return this.selectedCards.length > 0;
   }
 
-  // Draw initial hand
   drawInitialHand() {
     const cardsToDraw = Math.min(this.initialCards, this.deck.numberOfCards);
     for (let i = 0; i < cardsToDraw; i++) {
@@ -42,7 +37,6 @@ class playerHand {
     return this.cards;
   }
 
-  // Draw cards (respecting maxCards limit)
   drawCards() {
     const spacesAvailable = this.maxCards - this.numberOfCards;
     const cardsToDraw = Math.min(this.cardsToDraw, spacesAvailable);
@@ -64,7 +58,6 @@ class playerHand {
     return drawnCount;
   }
 
-  // Reshuffle discard pile into deck
   reshuffle() {
     if (this.discardPile.isEmpty()) {
       console.warn('Cannot reshuffle: discard pile is empty');
@@ -78,7 +71,6 @@ class playerHand {
     return true;
   }
 
-  // Select a card
   selectCard(card) {
     const cardIndex = this.cards.indexOf(card);
     if (cardIndex === -1) {
@@ -96,7 +88,6 @@ class playerHand {
     return true;
   }
 
-  // Deselect a card
   deselectCard(card) {
     const selectedIndex = this.selectedCards.indexOf(card);
     if (selectedIndex === -1) {
@@ -109,12 +100,10 @@ class playerHand {
     return true;
   }
 
-  // Deselect all cards
   deselectAll() {
     [...this.selectedCards].forEach(card => this.deselectCard(card));
   }
 
-  // Play selected cards
   playSelectedCards() {
     if (!this.hasSelectedCards) {
       console.warn('No cards selected to play');
@@ -282,3 +271,4 @@ class playerHand {
     return null;
   }
 }
+
