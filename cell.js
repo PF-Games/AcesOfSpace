@@ -25,12 +25,10 @@ class Celda {
     this.textoDebug.anchor.set(0.5); // centrar el texto
 
     this.juego.containerPrincipal.addChild(this.textoDebug);
-    this.dibujame();//agregado 14-10, borrar cuando no esté en debug
+    this.drawMe();//agregado 14-10, borrar cuando no esté en debug
   }
 
-
-
-  dibujame() {
+  drawMe() {
     this.juego.dibujador
       .rect(
         this.x * this.cellSize,
@@ -50,7 +48,7 @@ class Celda {
   }
 
   update() {
-    this.dibujame(); //estaba comentado y lo saqué 14-10
+    this.drawMe();
   }
 
   obtenerCeldasVecinas() {
@@ -71,7 +69,6 @@ class Celda {
           indiceY = this.juego.grid.celdas[indiceX].length;
 
         let celda = this.juego.grid.celdas[indiceX][indiceY];
-        // debugger
         arr.push(celda);
       }
     }
@@ -99,7 +96,6 @@ class Celda {
           indiceY = this.juego.grid.celdas[indiceX].length;
 
         let celda = this.juego.grid.celdas[indiceX][indiceY];
-        // debugger
         arr.push(celda);
       }
     }

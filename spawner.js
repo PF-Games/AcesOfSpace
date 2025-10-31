@@ -7,7 +7,6 @@ class Spawner {
     this.texturePath = texturePath;
     this.radio = 40; //Este radio me sirve para poder calcular la colision de los ataques
 
-    // Configuración de renderizado (sin GameObject)
     this.container = new PIXI.Container();
     this.container.x = x;
     this.container.y = y;

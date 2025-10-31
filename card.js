@@ -1,10 +1,9 @@
-const suits = ["♠", "♣", "♥", "♦"]
+const suits = ["S", "C", "H", "D"]
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 class Deck {
   constructor(cards = freshDeck()) {
     this.cards = cards
-    // Initialize FSM for each card
     this.cards.forEach(card => card.initializeFSM(this));
   }
 
@@ -13,14 +12,14 @@ class Deck {
   }
 
   pop() {
-        const card = this.cards.shift();
+    const card = this.cards.shift();
     if (card && card.fsm) {
       card.fsm.setState('inHand');
     }
     return card;
   }//sirve para manejar stacks, toma la carta de encima de la pila
 
-   push(card) {
+  push(card) {
     this.cards.push(card);
     if (card.fsm) {
       card.fsm.setState('inDeck');
@@ -37,7 +36,7 @@ class Deck {
     console.log('Deck shuffled');
   }
 
-     isEmpty() {
+  isEmpty() {
     return this.numberOfCards === 0;
   }
 }
@@ -51,22 +50,9 @@ class Card {
   }
 
   get color() {
-    return this.suit === "♣" || this.suit === "♠" ? "black" : "red"
+    return this.suit === "C" || this.suit === "S" ? "black" : "red"
   }
-
-/*  
-  getHTML() {
-    const cardDiv = document.createElement("div")
-    cardDiv.innerText = this.suit
-    cardDiv.classList.add("card", this.color)
-    cardDiv.dataset.rank = `${this.rank} ${this.suit}`
-    return cardDiv
-  }
-*/
-
-
-  
-get rankValue() {
+  get rankValue() {
     const rankValues = {
       'A': 14, 'K': 13, 'Q': 12, 'J': 11,
       '10': 10, '9': 9, '8': 8, '7': 7,
@@ -106,29 +92,15 @@ get rankValue() {
   }
 }
 
-  function freshDeck() {
+function freshDeck() {
   return suits.flatMap(suit => {
     return ranks.map(rank => {
       return new Card(suit, rank)
     })
   })
 }
-  
-  /*
-  
-  async createAnimatedSpritesheet(card) {
-    this.sprite = (
-      await AnimatedCard.CreateCardFromMegaSpritesheet(
-        `/assets/pixelart/cards/${card}.png`,
-        64,
-        64
-      )
-    ).card;
 
-    */
-   
-
-  class DiscardPile {
+class DiscardPile {
   constructor() {
     this.cards = []; // Exposed for queries
   }

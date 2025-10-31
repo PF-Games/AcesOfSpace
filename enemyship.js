@@ -151,7 +151,6 @@ class enemyShip extends Ship {
 
 */
 
-
 class BlackShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Nautolan Ship Fighter_Idle.png", x, y, juego, "B");
@@ -160,7 +159,6 @@ class BlackShip extends enemyShip {
     this.playerDamage = 2;
     this.colorType = 'black';
     this.weight = 5; //this will be used to create levels and allocate difficulty
-   // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 }
 
@@ -172,7 +170,6 @@ class RedShip extends enemyShip {
     this.playerDamage = 1;
     this.colorType = 'red';
     this.weight = 5; //this will be used to create levels and allocate difficulty
-  //  this.debugId = `R${this.id}`; // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 }
 
@@ -185,7 +182,6 @@ class ShieldShip extends enemyShip {
     this.escudo = 1;
     this.protectionRange = 150;
     this.weight = 5; //this will be used to create levels and allocate difficulty
-  //  this.debugId = `S${this.id}`; // this.debugId = `B${this.id}`; COMENTADA 24/10
   }
 
 
@@ -202,7 +198,6 @@ class ShieldShip extends enemyShip {
     });
   }
 
-  // Override pursuing to check for allies needing protection
   checkForAlliesNeedingProtection() {
     for (let ally of this.juego.ships) {
       if (ally === this || ally.muerto) continue;
