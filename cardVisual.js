@@ -12,6 +12,8 @@ class CardVisual {
     this.container = new PIXI.Container();
     this.container.x = x;
     this.container.y = y;
+
+    this.juego.cardsContainer.addChild(this.container);
     
     // Crear cuerpo físico de Matter.js
     this.body = Matter.Bodies.rectangle(x, y, this.width, this.height, {
@@ -35,20 +37,27 @@ class CardVisual {
     this.selected = false;
   }
 
-  async crearSprite() {
-    this.sprite = new PIXI.Sprite(await PIXI.Assets.load(this.texturePath));
-    this.sprite.anchor.set(0.5, 0.5);
-    this.sprite.width = this.width;
-    this.sprite.height = this.height;
+ async crearSprite() {
+    console.log('Creating sprite for:', this.card.toString());
     
-    // Borde para cartas seleccionadas
-    this.border = new PIXI.Graphics();
-    this.updateBorder();
+    // Intentar obtener textura del atlas
+    const texture = this.getCardTexture(this.card.rank, this.card.suit);
     
-    this.container.addChild(this.border);
-    this.container.addChild(this.sprite);
-    this.juego.cardsContainer.addChild(this.container);
-  }
+    // Fallback si no se encuentra
+    const finalTexture = texture || await PIXI.Assets.load(this.texturePath);
+    
+    const sprite = new PIXI.Sprite(finalTexture);
+    sprite.anchor.set(0.5);
+    sprite.width = this.width;
+    sprite.height = this.height;
+    
+    this.sprite = sprite;
+    this.container.addChild(sprite);
+    
+    console.log(`✅ Sprite created for ${this.card.toString()}`);
+    return sprite;
+}
+
 
   updateBorder() {
     this.border.clear();
@@ -74,6 +83,36 @@ class CardVisual {
       y: dy * forceMagnitude
     });
   }
+
+getCardTexture(rank, suit) {
+    const atlas = PIXI.Assets.cache.get("deckAtlas");
+    if (!atlas) {
+        console.error("Card atlas not loaded!");
+        return null;
+    }
+
+    // Crear la key del frame (ej: "2H", "10C", "KS")
+    const frameKey = `${rank}${suit}`;
+    const texture = atlas.textures[frameKey];
+    
+    if (!texture) {
+        console.warn(`Texture not found: ${frameKey}`);
+        console.log("Available:", Object.keys(atlas.textures).slice(0, 5));
+        return null;
+    }
+    
+    return texture;
+}
+  async debugTextureLoading() {
+    console.log('=== CARD TEXTURE DEBUG ===');
+    console.log('Atlas loaded:', PIXI.Assets.get("deckAtlas"));
+    console.log('Card:', this.card);
+    console.log('Texture path:', this.texturePath);
+    const sprite = this.container.children[0];
+    console.log('Sprite:', sprite);
+    console.log('Sprite texture:', sprite?.texture);
+}
+
 
   tick() {
     // Aplicar fuerzas de resorte hacia posición objetivo

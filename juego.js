@@ -77,10 +77,24 @@ class Juego {
     await this.discardRenderer.createVisuals();
     
     // Crear visuales para cartas iniciales
+        console.log('Creating hand visuals for cards:', this.playerHand.cards);
     this.syncHandVisuals();
+    
+    // Debug first card
+    if (this.handRenderer.cardVisuals[0]) {
+        console.log('First card visual:', this.handRenderer.cardVisuals[0]);
+        await this.handRenderer.cardVisuals[0].debugTextureLoading();
+    }
+    
     this.updateDeckCounters();
     
-    console.log('✅ Visuales de cartas listas');
+     console.log('✅ Visuales de cartas listas');
+    console.log('Cards container children:', this.cardsContainer.children.length);
+    console.log('First card container:', this.handRenderer.cardVisuals[0]?.container);
+    console.log('First card position:', {
+        x: this.handRenderer.cardVisuals[0]?.container.x,
+        y: this.handRenderer.cardVisuals[0]?.container.y
+    });
   }
 
   syncHandVisuals() {
@@ -270,6 +284,8 @@ class Juego {
     this.createLevel();
   }
 
+  
+
   async createBackground() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
     this.fondo.zIndex = -2;
@@ -343,9 +359,24 @@ class Juego {
   }
  
 
-  async loadTextures() {
-    await PIXI.Assets.load(["assets/bg.jpg"]);
-  }
+async loadTextures() {
+    try {
+        // Cargar el spritesheet
+        const spritesheet = await PIXI.Assets.load('assets/cards/cards.json');
+        
+        // Guardar en cache para acceso fácil
+        PIXI.Assets.cache.set("deckAtlas", spritesheet);
+        
+        console.log("✅ Card atlas loaded");
+        console.log("Available frames:", Object.keys(spritesheet.textures));
+        
+        return true;
+    } catch (error) {
+        console.error("❌ Error loading textures:", error);
+        return false;
+    }
+}
+ 
 
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
@@ -402,6 +433,8 @@ class Juego {
       }
     };
   }
+
+  
 
   async crearProtagonista() {
     const x = this.mapWidth / 2
@@ -613,3 +646,4 @@ class Juego {
     }
   }
 }
+
