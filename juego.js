@@ -152,7 +152,7 @@ class Juego {
   }
 
   // Método para terminar turno y tomar cartas
-  endTurn() {
+  async endTurn() {
     console.log('\n=== FIN DE TURNO ===');
 
     // Jugar cartas seleccionadas

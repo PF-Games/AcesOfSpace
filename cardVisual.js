@@ -1,14 +1,12 @@
 class CardVisual {
   constructor(card, x, y, juego, texturePath = "assets/cards/backd.png") {
-    this.card = card; // Referencia a la carta lógica
+    this.card = card;
     this.juego = juego;
     this.texturePath = texturePath;
 
-    // Dimensiones de la carta
     this.width = 80;
     this.height = 120;
 
-    // Container de PIXI
     this.container = new PIXI.Container();
     this.container.x = x;
     this.container.y = y;
@@ -18,21 +16,17 @@ class CardVisual {
     this.border = new PIXI.Graphics();
     this.container.addChild(this.border);
 
-    // Crear cuerpo físico de Matter.js
     this.body = Matter.Bodies.rectangle(x, y, this.width, this.height, {
       friction: 0.3,
       restitution: 0.2,
       density: 0.001
     });
 
-    // Vincular referencia
     this.body.cardVisual = this;
     Matter.Composite.add(this.juego.engine.world, this.body);
 
-    // Crear sprite
     this.crearSprite();
 
-    // Estado visual
     this.targetX = x;
     this.targetY = y;
     this.selected = false;
@@ -41,9 +35,7 @@ class CardVisual {
   async crearSprite() {
     console.log('Creating sprite for:', this.card.toString());
 
-    // Intentar obtener textura del atlas
     const texture = this.getCardTexture(this.card.rank, this.card.suit);
-
     // Fallback si no se encuentra
     const finalTexture = texture || await PIXI.Assets.load(this.texturePath);
 
@@ -95,7 +87,6 @@ setSelected(selected) {
       return null;
     }
 
-    // Crear la key del frame (ej: "2H", "10C", "KS")
     const frameKey = `${rank}${suit}`;
     const texture = atlas.textures[frameKey];
 
@@ -156,9 +147,6 @@ setSelected(selected) {
   }
 }
 
-// ============================================
-// HAND RENDERER - Maneja visualización de la mano
-// ============================================
 class HandRenderer {
   constructor(juego) {
     this.juego = juego;
@@ -168,9 +156,10 @@ class HandRenderer {
     this.minSpacing = 40; // Espaciado mínimo cuando hay muchas
   }
 
-  createCardVisual(card, index) {
+  async createCardVisual(card, index) {
     const x = this.calculateCardX(index);
     const cardVisual = new CardVisual(card, x, this.handY, this.juego);
+    await cardVisual.crearSprite();
     this.cardVisuals.push(cardVisual);
     return cardVisual;
   }
@@ -241,9 +230,7 @@ class HandRenderer {
   }
 }
 
-// ============================================
-// DECK RENDERER - Visualiza mazos
-// ============================================
+
 class DeckRenderer {
   constructor(juego, x, y, label) {
     this.juego = juego;
@@ -261,14 +248,12 @@ class DeckRenderer {
   }
 
   async createVisuals() {
-    // Base del mazo (un rectángulo)
     this.base = new PIXI.Graphics();
     this.base.rect(-40, -60, 80, 120);
     this.base.fill(0x333333);
     this.base.stroke({ width: 2, color: 0xFFFFFF });
     this.container.addChild(this.base);
 
-    // Sprite de carta encima
     this.cardSprite = new PIXI.Sprite(
       await PIXI.Assets.load("assets/cards/backd.png")
     );
@@ -277,7 +262,6 @@ class DeckRenderer {
     this.cardSprite.height = 120;
     this.container.addChild(this.cardSprite);
 
-    // Texto con contador
     this.counterText = new PIXI.Text({
       text: "0",
       style: {
@@ -292,7 +276,6 @@ class DeckRenderer {
     this.counterText.y = 80;
     this.container.addChild(this.counterText);
 
-    // Label
     this.labelText = new PIXI.Text({
       text: this.label,
       style: {

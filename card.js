@@ -4,7 +4,6 @@ const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 class Deck {
   constructor(cards = freshDeck()) {
     this.cards = cards
-    // Initialize FSM for each card
     this.cards.forEach(card => card.initializeFSM(this));
   }
 
@@ -53,19 +52,6 @@ class Card {
   get color() {
     return this.suit === "C" || this.suit === "S" ? "black" : "red"
   }
-
-  /*  
-    getHTML() {
-      const cardDiv = document.createElement("div")
-      cardDiv.innerText = this.suit
-      cardDiv.classList.add("card", this.color)
-      cardDiv.dataset.rank = `${this.rank} ${this.suit}`
-      return cardDiv
-    }
-  */
-
-
-
   get rankValue() {
     const rankValues = {
       'A': 14, 'K': 13, 'Q': 12, 'J': 11,
@@ -113,20 +99,6 @@ function freshDeck() {
     })
   })
 }
-
-/*
- 
-async createAnimatedSpritesheet(card) {
-  this.sprite = (
-    await AnimatedCard.CreateCardFromMegaSpritesheet(
-      `/assets/pixelart/cards/${card}.png`,
-      64,
-      64
-    )
-  ).card;
-
-  */
-
 
 class DiscardPile {
   constructor() {
