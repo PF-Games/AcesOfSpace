@@ -15,6 +15,9 @@ class CardVisual {
 
     this.juego.cardsContainer.addChild(this.container);
 
+    this.border = new PIXI.Graphics();
+    this.container.addChild(this.border);
+
     // Crear cuerpo físico de Matter.js
     this.body = Matter.Bodies.rectangle(x, y, this.width, this.height, {
       friction: 0.3,
@@ -24,8 +27,6 @@ class CardVisual {
 
     // Vincular referencia
     this.body.cardVisual = this;
-
-    // Añadir al mundo de Matter.js
     Matter.Composite.add(this.juego.engine.world, this.body);
 
     // Crear sprite
@@ -59,18 +60,21 @@ class CardVisual {
   }
 
 
-  updateBorder() {
+updateBorder() {
+    if (!this.border) return; // Safety check
+    
     this.border.clear();
     if (this.selected) {
-      this.border.rect(-this.width / 2, -this.height / 2, this.width, this.height);
+      this.border.rect(-this.width/2, -this.height/2, this.width, this.height);
       this.border.stroke({ width: 3, color: 0xFFFF00 });
     }
-  }
+}
 
-  setSelected(selected) {
+setSelected(selected) {
     this.selected = selected;
+    console.log(`Card ${this.card.toString()} selected: ${selected}`); // ← Debug
     this.updateBorder();
-  }
+}
 
   // Aplicar fuerza magnética hacia posición objetivo
   applySpringForce() {
