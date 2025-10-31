@@ -22,17 +22,17 @@ class Juego {
     this.maxZoom = 2;
     this.zoomStep = 0.1;
 
-    this.initMatterJS(); 
+    this.initMatterJS();
     this.initPIXI();
     this.setupResizeHandler();
-    this.cellSize = 100; 
-    this.frameCounter = 0; 
+    this.cellSize = 100;
+    this.frameCounter = 0;
     this.rockets = [];
 
     this.initCardSystem();
   }
 
-   initMatterJS() {
+  initMatterJS() {
     const Engine = Matter.Engine;
     const Runner = Matter.Runner;
 
@@ -46,17 +46,17 @@ class Juego {
     console.log('✅ Matter.js inicializado');
   }
 
-    async initCardVisuals() {
+  async initCardVisuals() {
     console.log('=== INICIALIZANDO VISUALES DE CARTAS ===');
-    
+
     // Container para las cartas en la mano (con física)
     this.cardsContainer = new PIXI.Container();
     this.cardsContainer.sortableChildren = true;
     this.pixiApp.stage.addChild(this.cardsContainer);
-    
+
     // Renderer de la mano
     this.handRenderer = new HandRenderer(this);
-    
+
     // Mazos principales (sin física, solo visuales)
     this.discardRenderer = new DeckRenderer(
       this,
@@ -64,7 +64,7 @@ class Juego {
       this.height - this.cardsHeight,
       "DISCARD"
     );
-    
+
     this.deckRenderer = new DeckRenderer(
       this,
       this.width - 100,
@@ -72,40 +72,40 @@ class Juego {
       "DECK"
     );
 
-      // Esperar a que se creen los visuales
+    // Esperar a que se creen los visuales
     await this.deckRenderer.createVisuals();
     await this.discardRenderer.createVisuals();
-    
+
     // Crear visuales para cartas iniciales
-        console.log('Creating hand visuals for cards:', this.playerHand.cards);
+    console.log('Creating hand visuals for cards:', this.playerHand.cards);
     this.syncHandVisuals();
-    
+
     // Debug first card
     if (this.handRenderer.cardVisuals[0]) {
-        console.log('First card visual:', this.handRenderer.cardVisuals[0]);
-        await this.handRenderer.cardVisuals[0].debugTextureLoading();
+      console.log('First card visual:', this.handRenderer.cardVisuals[0]);
+      await this.handRenderer.cardVisuals[0].debugTextureLoading();
     }
-    
+
     this.updateDeckCounters();
-    
-     console.log('✅ Visuales de cartas listas');
+
+    console.log('✅ Visuales de cartas listas');
     console.log('Cards container children:', this.cardsContainer.children.length);
     console.log('First card container:', this.handRenderer.cardVisuals[0]?.container);
     console.log('First card position:', {
-        x: this.handRenderer.cardVisuals[0]?.container.x,
-        y: this.handRenderer.cardVisuals[0]?.container.y
+      x: this.handRenderer.cardVisuals[0]?.container.x,
+      y: this.handRenderer.cardVisuals[0]?.container.y
     });
   }
 
   syncHandVisuals() {
     // Limpiar visuales existentes
     this.handRenderer.clear();
-    
+
     // Crear visual para cada carta en la mano
     this.playerHand.cards.forEach((card, index) => {
       this.handRenderer.createCardVisual(card, index);
     });
-    
+
     this.handRenderer.updatePositions();
   }
 
@@ -118,29 +118,29 @@ class Juego {
     }
   }
 
-    initCardSystem() {
+  initCardSystem() {
     console.log('=== INICIALIZANDO SISTEMA DE CARTAS ===');
-    
+
     // Crear y barajar el mazo
     this.deck = new Deck();
     this.deck.shuffle();
-    
+
     // Crear pila de descarte
     this.discardPile = new DiscardPile();
-    
+
     // Crear mano del jugador con configuración personalizable
     this.playerHand = new playerHand(this.deck, this.discardPile, {
       maxCards: 12,        // Máximo de cartas acumulables
       cardsToDraw: 5,      // Cartas a reponer por turno
       initialCards: 7      // Cartas iniciales
     });
-    
+
     // Robar mano inicial
     this.playerHand.drawInitialHand();
-    
+
     console.log(`Deck inicializado: ${this.deck.numberOfCards} cartas`);
     console.log(`Mano inicial: ${this.playerHand.numberOfCards} cartas`);
-    
+
     // Hacer accesible desde la consola para debugging
     window.deck = this.deck;
     window.discardPile = this.discardPile;
@@ -152,36 +152,36 @@ class Juego {
   }
 
   // Método para terminar turno y tomar cartas
- endTurn() {
+  endTurn() {
     console.log('\n=== FIN DE TURNO ===');
-    
+
     // Jugar cartas seleccionadas
     if (this.playerHand.hasSelectedCards) {
       const cardsToRemove = [...this.playerHand.selectedCards];
       const result = this.playerHand.playSelectedCards();
       console.log(`Jugaste: ${result.handInfo.handName}`);
-      
+
       // Remover visuales de cartas jugadas
       cardsToRemove.forEach(card => {
         this.handRenderer.removeCardVisual(card);
       });
     }
-    
+
     // Tomar nuevas cartas
     const previousCount = this.playerHand.numberOfCards;
     this.playerHand.drawCards();
     const newCards = this.playerHand.numberOfCards - previousCount;
-    
+
     // Crear visuales para nuevas cartas
     for (let i = 0; i < newCards; i++) {
       const cardIndex = previousCount + i;
       const card = this.playerHand.cards[cardIndex];
       this.handRenderer.createCardVisual(card, cardIndex);
     }
-    
+
     this.handRenderer.updatePositions();
     this.updateDeckCounters();
-    
+
     console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
     console.log(`Cartas en deck: ${this.deck.numberOfCards}`);
     console.log(`Cartas descartadas: ${this.discardPile.numberOfCards}`);
@@ -284,7 +284,7 @@ class Juego {
     this.createLevel();
   }
 
-  
+
 
   async createBackground() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
@@ -352,31 +352,31 @@ class Juego {
       this.pixiApp.renderer.height * 0.2
     );
     this.interfaceBackground.endFill();
-    this.interfaceBackground.zIndex = -2; 
+    this.interfaceBackground.zIndex = -2;
     this.interfaceContainer.addChild(this.interfaceBackground);
 
-    await this.initCardVisuals(); 
+    await this.initCardVisuals();
   }
- 
 
-async loadTextures() {
+
+  async loadTextures() {
     try {
-        // Cargar el spritesheet
-        const spritesheet = await PIXI.Assets.load('assets/cards/cards.json');
-        
-        // Guardar en cache para acceso fácil
-        PIXI.Assets.cache.set("deckAtlas", spritesheet);
-        
-        console.log("✅ Card atlas loaded");
-        console.log("Available frames:", Object.keys(spritesheet.textures));
-        
-        return true;
+      // Cargar el spritesheet
+      const spritesheet = await PIXI.Assets.load('assets/cards/cards.json');
+
+      // Guardar en cache para acceso fácil
+      PIXI.Assets.cache.set("deckAtlas", spritesheet);
+
+      console.log("✅ Card atlas loaded");
+      console.log("Available frames:", Object.keys(spritesheet.textures));
+
+      return true;
     } catch (error) {
-        console.error("❌ Error loading textures:", error);
-        return false;
+      console.error("❌ Error loading textures:", error);
+      return false;
     }
-}
- 
+  }
+
 
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
@@ -434,7 +434,7 @@ async loadTextures() {
     };
   }
 
-  
+
 
   async crearProtagonista() {
     const x = this.mapWidth / 2
@@ -510,13 +510,13 @@ async loadTextures() {
     this.pixiApp.canvas.addEventListener('click', (event) => {
       const mouseX = event.clientX;
       const mouseY = event.clientY;
-      
+
       // Verificar si clickeó una carta
       this.handRenderer.cardVisuals.forEach((cardVisual, index) => {
         const dx = mouseX - cardVisual.body.position.x;
         const dy = mouseY - cardVisual.body.position.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
+
         // Si está dentro del radio de la carta
         if (dist < cardVisual.width / 2) {
           if (cardVisual.selected) {
@@ -564,7 +564,7 @@ async loadTextures() {
     }
 
     this.updateInterface();
-  
+
     for (let rocket of this.rockets) {
       rocket.tick();
       rocket.render();
@@ -614,7 +614,7 @@ async loadTextures() {
     interfaceBackground.endFill();
     this.interfaceContainer.addChild(interfaceBackground);
 
-        // Actualizar posiciones de los mazos según nuevo tamaño de ventana
+    // Actualizar posiciones de los mazos según nuevo tamaño de ventana
     if (this.discardRenderer) {
       this.discardRenderer.updatePosition(100, this.height - this.cardsHeight);
     }

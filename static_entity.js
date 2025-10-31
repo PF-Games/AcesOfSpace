@@ -8,7 +8,7 @@ class staticEntity extends GameObject {
     this.render();
   }
 
-  tick() {}
+  tick() { }
 
   render() {
     if (!this.container)
@@ -42,5 +42,5 @@ class Asteroid extends staticEntity {
     this.render();
   }
 
-  tick() {}
+  tick() { }
 }

@@ -3,66 +3,66 @@ class CardVisual {
     this.card = card; // Referencia a la carta lógica
     this.juego = juego;
     this.texturePath = texturePath;
-    
+
     // Dimensiones de la carta
     this.width = 80;
     this.height = 120;
-    
+
     // Container de PIXI
     this.container = new PIXI.Container();
     this.container.x = x;
     this.container.y = y;
 
     this.juego.cardsContainer.addChild(this.container);
-    
+
     // Crear cuerpo físico de Matter.js
     this.body = Matter.Bodies.rectangle(x, y, this.width, this.height, {
       friction: 0.3,
       restitution: 0.2,
       density: 0.001
     });
-    
+
     // Vincular referencia
     this.body.cardVisual = this;
-    
+
     // Añadir al mundo de Matter.js
     Matter.Composite.add(this.juego.engine.world, this.body);
-    
+
     // Crear sprite
     this.crearSprite();
-    
+
     // Estado visual
     this.targetX = x;
     this.targetY = y;
     this.selected = false;
   }
 
- async crearSprite() {
+  async crearSprite() {
     console.log('Creating sprite for:', this.card.toString());
-    
+
     // Intentar obtener textura del atlas
     const texture = this.getCardTexture(this.card.rank, this.card.suit);
-    
+
     // Fallback si no se encuentra
     const finalTexture = texture || await PIXI.Assets.load(this.texturePath);
-    
+
     const sprite = new PIXI.Sprite(finalTexture);
     sprite.anchor.set(0.5);
     sprite.width = this.width;
     sprite.height = this.height;
-    
+
     this.sprite = sprite;
     this.container.addChild(sprite);
-    
+
     console.log(`✅ Sprite created for ${this.card.toString()}`);
     return sprite;
-}
+  }
 
 
   updateBorder() {
     this.border.clear();
     if (this.selected) {
-      this.border.rect(-this.width/2, -this.height/2, this.width, this.height);
+      this.border.rect(-this.width / 2, -this.height / 2, this.width, this.height);
       this.border.stroke({ width: 3, color: 0xFFFF00 });
     }
   }
@@ -76,7 +76,7 @@ class CardVisual {
   applySpringForce() {
     const dx = this.targetX - this.body.position.x;
     const dy = this.targetY - this.body.position.y;
-    
+
     const forceMagnitude = 0.0005;
     Matter.Body.applyForce(this.body, this.body.position, {
       x: dx * forceMagnitude,
@@ -84,25 +84,25 @@ class CardVisual {
     });
   }
 
-getCardTexture(rank, suit) {
+  getCardTexture(rank, suit) {
     const atlas = PIXI.Assets.cache.get("deckAtlas");
     if (!atlas) {
-        console.error("Card atlas not loaded!");
-        return null;
+      console.error("Card atlas not loaded!");
+      return null;
     }
 
     // Crear la key del frame (ej: "2H", "10C", "KS")
     const frameKey = `${rank}${suit}`;
     const texture = atlas.textures[frameKey];
-    
+
     if (!texture) {
-        console.warn(`Texture not found: ${frameKey}`);
-        console.log("Available:", Object.keys(atlas.textures).slice(0, 5));
-        return null;
+      console.warn(`Texture not found: ${frameKey}`);
+      console.log("Available:", Object.keys(atlas.textures).slice(0, 5));
+      return null;
     }
-    
+
     return texture;
-}
+  }
   async debugTextureLoading() {
     console.log('=== CARD TEXTURE DEBUG ===');
     console.log('Atlas loaded:', PIXI.Assets.get("deckAtlas"));
@@ -111,13 +111,13 @@ getCardTexture(rank, suit) {
     const sprite = this.container.children[0];
     console.log('Sprite:', sprite);
     console.log('Sprite texture:', sprite?.texture);
-}
+  }
 
 
   tick() {
     // Aplicar fuerzas de resorte hacia posición objetivo
     this.applySpringForce();
-    
+
     // Limitar velocidad
     const maxSpeed = 10;
     const speed = Math.sqrt(
@@ -133,12 +133,12 @@ getCardTexture(rank, suit) {
 
   render() {
     if (!this.container || !this.sprite) return;
-    
+
     // Sincronizar PIXI con Matter.js
     this.container.x = this.body.position.x;
     this.container.y = this.body.position.y;
     this.container.rotation = this.body.angle;
-    
+
     // Z-index para que cartas seleccionadas aparezcan encima
     this.container.zIndex = this.selected ? 1000 : this.body.position.y;
   }
@@ -174,17 +174,17 @@ class HandRenderer {
   calculateCardX(index) {
     const totalCards = this.juego.playerHand.numberOfCards;
     const availableWidth = this.juego.width - 200; // Margen de 100px a cada lado
-    
+
     // Calcular espaciado dinámico
     const idealSpacing = Math.min(
       this.spacing,
       Math.max(this.minSpacing, availableWidth / totalCards)
     );
-    
+
     // Centrar las cartas
     const totalWidth = (totalCards - 1) * idealSpacing;
     const startX = (this.juego.width - totalWidth) / 2;
-    
+
     return startX + (index * idealSpacing);
   }
 
@@ -252,7 +252,7 @@ class DeckRenderer {
     this.container.y = y;
     this.container.zIndex = 1000;
     this.juego.interfaceContainer.addChild(this.container);
-    
+
     this.createVisuals();
   }
 
@@ -263,7 +263,7 @@ class DeckRenderer {
     this.base.fill(0x333333);
     this.base.stroke({ width: 2, color: 0xFFFFFF });
     this.container.addChild(this.base);
-    
+
     // Sprite de carta encima
     this.cardSprite = new PIXI.Sprite(
       await PIXI.Assets.load("assets/cards/backd.png")
@@ -272,7 +272,7 @@ class DeckRenderer {
     this.cardSprite.width = 80;
     this.cardSprite.height = 120;
     this.container.addChild(this.cardSprite);
-    
+
     // Texto con contador
     this.counterText = new PIXI.Text({
       text: "0",
@@ -287,7 +287,7 @@ class DeckRenderer {
     this.counterText.anchor.set(0.5, 0.5);
     this.counterText.y = 80;
     this.container.addChild(this.counterText);
-    
+
     // Label
     this.labelText = new PIXI.Text({
       text: this.label,
