@@ -1,4 +1,5 @@
 class Juego {
+  teclado = {};
   pixiApp;
   ships = [];
   asteroids = [];
@@ -30,6 +31,8 @@ class Juego {
     this.rockets = [];
 
     this.initCardSystem();
+
+    this.turnoDeljugador = true;
   }
 
   initMatterJS() {
@@ -43,11 +46,11 @@ class Juego {
     // Crear runner
     this.matterRunner = Runner.create();
     Runner.run(this.matterRunner, this.engine);
-    console.log('✅ Matter.js inicializado');
+    console.log("✅ Matter.js inicializado");
   }
 
   async initCardVisuals() {
-    console.log('=== INICIALIZANDO VISUALES DE CARTAS ===');
+    console.log("=== INICIALIZANDO VISUALES DE CARTAS ===");
 
     // Container para las cartas en la mano (con física)
     this.cardsContainer = new PIXI.Container();
@@ -77,23 +80,29 @@ class Juego {
     await this.discardRenderer.createVisuals();
 
     // Crear visuales para cartas iniciales
-    console.log('Creating hand visuals for cards:', this.playerHand.cards);
+    console.log("Creating hand visuals for cards:", this.playerHand.cards);
     this.syncHandVisuals();
 
     // Debug first card
     if (this.handRenderer.cardVisuals[0]) {
-      console.log('First card visual:', this.handRenderer.cardVisuals[0]);
+      console.log("First card visual:", this.handRenderer.cardVisuals[0]);
       await this.handRenderer.cardVisuals[0].debugTextureLoading();
     }
 
     this.updateDeckCounters();
 
-    console.log('✅ Visuales de cartas listas');
-    console.log('Cards container children:', this.cardsContainer.children.length);
-    console.log('First card container:', this.handRenderer.cardVisuals[0]?.container);
-    console.log('First card position:', {
+    console.log("✅ Visuales de cartas listas");
+    console.log(
+      "Cards container children:",
+      this.cardsContainer.children.length
+    );
+    console.log(
+      "First card container:",
+      this.handRenderer.cardVisuals[0]?.container
+    );
+    console.log("First card position:", {
       x: this.handRenderer.cardVisuals[0]?.container.x,
-      y: this.handRenderer.cardVisuals[0]?.container.y
+      y: this.handRenderer.cardVisuals[0]?.container.y,
     });
   }
 
@@ -119,7 +128,7 @@ class Juego {
   }
 
   initCardSystem() {
-    console.log('=== INICIALIZANDO SISTEMA DE CARTAS ===');
+    console.log("=== INICIALIZANDO SISTEMA DE CARTAS ===");
 
     // Crear y barajar el mazo
     this.deck = new Deck();
@@ -130,9 +139,9 @@ class Juego {
 
     // Crear mano del jugador con configuración personalizable
     this.playerHand = new playerHand(this.deck, this.discardPile, {
-      maxCards: 12,        // Máximo de cartas acumulables
-      cardsToDraw: 5,      // Cartas a reponer por turno
-      initialCards: 7      // Cartas iniciales
+      maxCards: 12, // Máximo de cartas acumulables
+      cardsToDraw: 5, // Cartas a reponer por turno
+      initialCards: 7, // Cartas iniciales
     });
 
     // Robar mano inicial
@@ -147,13 +156,13 @@ class Juego {
     window.playerHand = this.playerHand;
     window.juego = this;
 
-    console.log('✅ Sistema de cartas listo');
-    console.log('💡 Usa la consola para probar: playerHand, deck, discardPile');
+    console.log("✅ Sistema de cartas listo");
+    console.log("💡 Usa la consola para probar: playerHand, deck, discardPile");
   }
 
   // Método para terminar turno y tomar cartas
   async endTurn() {
-    console.log('\n=== FIN DE TURNO ===');
+    console.log("\n=== FIN DE TURNO ===");
 
     // Jugar cartas seleccionadas
     if (this.playerHand.hasSelectedCards) {
@@ -162,7 +171,7 @@ class Juego {
       console.log(`Jugaste: ${result.handInfo.handName}`);
 
       // Remover visuales de cartas jugadas
-      cardsToRemove.forEach(card => {
+      cardsToRemove.forEach((card) => {
         this.handRenderer.removeCardVisual(card);
       });
     }
@@ -182,16 +191,18 @@ class Juego {
     this.handRenderer.updatePositions();
     this.updateDeckCounters();
 
-    console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
+    console.log(
+      `Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`
+    );
     console.log(`Cartas en deck: ${this.deck.numberOfCards}`);
     console.log(`Cartas descartadas: ${this.discardPile.numberOfCards}`);
   }
 
   // Método helper para ver las cartas en la mano
   showHand() {
-    console.log('\n=== CARTAS EN LA MANO ===');
+    console.log("\n=== CARTAS EN LA MANO ===");
     this.playerHand.cards.forEach((card, index) => {
-      const estado = card.fsm ? card.fsm.currentStateName : 'sin FSM';
+      const estado = card.fsm ? card.fsm.currentStateName : "sin FSM";
       console.log(`${index}: ${card.toString()} [${estado}]`);
     });
     console.log(`Total: ${this.playerHand.numberOfCards} cartas`);
@@ -253,8 +264,8 @@ class Juego {
         fontSize: 24,
         fill: "#ffffff",
         stroke: "#000000",
-        strokeThickness: 4
-      }
+        strokeThickness: 4,
+      },
     });
 
     this.fpsText.x = this.width - 120;
@@ -274,7 +285,6 @@ class Juego {
       resizeTo: window,
     };
 
-
     await this.pixiApp.init(opcionesDePixi);
     document.body.appendChild(this.pixiApp.canvas);
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
@@ -283,8 +293,6 @@ class Juego {
     this.createInterface();
     this.createLevel();
   }
-
-
 
   async createBackground() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
@@ -306,7 +314,7 @@ class Juego {
       x: 200,
       y: 0,
       width: 1500,
-      height: 1500
+      height: 1500,
     };
 
     // Dibujar rectángulo amarillo de debug
@@ -320,7 +328,6 @@ class Juego {
     this.rectanguloDebug.stroke({ width: 4, color: 0xffff00, alpha: 1 });
     this.containerPrincipal.addChild(this.rectanguloDebug);
 
-
     this.addRocketControls();
     this.crearAntagonista();
     await this.crearProtagonista();
@@ -329,7 +336,7 @@ class Juego {
     this.crearEnemigos(3, ShieldShip);
     this.crearEnemigos(2, SupportShip);
     this.createAsteroids();
-    this.asignarProtagonistaComoTargetATodosLospersonas()
+    this.asignarProtagonistaComoTargetATodosLospersonas();
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
     this.width = this.mapWidth;
@@ -358,11 +365,10 @@ class Juego {
     await this.initCardVisuals();
   }
 
-
   async loadTextures() {
     try {
       // Cargar el spritesheet
-      const spritesheet = await PIXI.Assets.load('assets/cards/cards.json');
+      const spritesheet = await PIXI.Assets.load("assets/cards/cards.json");
 
       // Guardar en cache para acceso fácil
       PIXI.Assets.cache.set("deckAtlas", spritesheet);
@@ -376,7 +382,6 @@ class Juego {
       return false;
     }
   }
-
 
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
@@ -395,7 +400,6 @@ class Juego {
       this.asteroids.push(asteroid);
     }
   }
-
 
   addRocketControls() {
     this.pixiApp.canvas.onclick = (event) => {
@@ -420,7 +424,7 @@ class Juego {
       }
 
       if (closestShip) {
-        closestShip.isTargeted = true
+        closestShip.isTargeted = true;
         const rocket = new Rocket(
           "assets/rockets/rocket1.png",
           this.protagonista.posicion.x,
@@ -434,24 +438,21 @@ class Juego {
     };
   }
 
-
-
   async crearProtagonista() {
-    const x = this.mapWidth / 2
+    const x = this.mapWidth / 2;
     const y = this.gameArea.y + this.gameArea.height - 100;
     const protagonista = new Protagonista(x, y, this);
     // this.ships.push(protagonista);
     this.protagonista = protagonista;
-  };
+  }
 
   crearAntagonista() {
-    const x = this.mapWidth / 2
+    const x = this.mapWidth / 2;
     const y = this.gameArea.y + 50;
     const antagonista = new Antagonista(x, y, this);
     //this.ships.push(antagonista);
     this.antagonista = antagonista;
-  };
-
+  }
 
   agregarInteractividadDelMouse() {
     // Escuchar el evento mousemove
@@ -476,7 +477,6 @@ class Juego {
       };
       this.mouse.apretado = false;
     };
-
 
     // Event listener para la rueda del mouse (zoom)
     this.pixiApp.canvas.addEventListener("wheel", (event) => {
@@ -507,7 +507,7 @@ class Juego {
       }
     });
 
-    this.pixiApp.canvas.addEventListener('click', (event) => {
+    this.pixiApp.canvas.addEventListener("click", (event) => {
       const mouseX = event.clientX;
       const mouseY = event.clientY;
 
@@ -539,6 +539,18 @@ class Juego {
   }
 
   gameLoop(time) {
+    if (this.teclado["w"]) {
+      this.containerPrincipal.y += 10;
+    }
+    if (this.teclado["s"]) {
+      this.containerPrincipal.y -= 10;
+    }
+    if (this.teclado["a"]) {
+      this.containerPrincipal.x += 10;
+    }
+    if (this.teclado["d"]) {
+      this.containerPrincipal.x -= 10;
+    }
     //iteramos por todos los personas
     //this.dibujador.clear();//14-10
     this.frameCounter++;
@@ -550,6 +562,7 @@ class Juego {
     }
 
     // Procesar naves
+
     for (let aShip of this.ships) {
       //ejecutamos el metodo tick de cada persona
       aShip.tick();
@@ -571,13 +584,13 @@ class Juego {
     }
   }
 
-
   iniciarControles() {
-    window.addEventListener('keyup', (event) => {
-      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") this.containerPrincipal.y += 100;
-      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") this.containerPrincipal.y -= 100;
-      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") this.containerPrincipal.x += 100;
-      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") this.containerPrincipal.x -= 100;
+    window.addEventListener("keydown", (event) => {
+      this.teclado[event.key.toLowerCase()] = true;
+    });
+
+    window.addEventListener("keyup", (event) => {
+      this.teclado[event.key.toLowerCase()] = false;
     });
   }
 
@@ -592,7 +605,6 @@ class Juego {
        this.containerPrincipal.y = this.mouse.posicion.y;
        }
        */
-
 
   updateInterface() {
     if (!this.interfaceContainer) return;
@@ -619,7 +631,10 @@ class Juego {
       this.discardRenderer.updatePosition(100, this.height - this.cardsHeight);
     }
     if (this.deckRenderer) {
-      this.deckRenderer.updatePosition(this.width - 100, this.height - this.cardsHeight);
+      this.deckRenderer.updatePosition(
+        this.width - 100,
+        this.height - this.cardsHeight
+      );
     }
 
     // Actualizar posición Y de la mano
@@ -635,7 +650,6 @@ class Juego {
     this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2);
   }
 
-
   finDelJuego() {
     alert("Te moriste! fin del juego");
   }
@@ -646,4 +660,3 @@ class Juego {
     }
   }
 }
-

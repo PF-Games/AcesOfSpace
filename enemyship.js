@@ -6,14 +6,13 @@ class enemyShip extends Ship {
   constructor(texturePath, x, y, juego, debugPrefix) {
     super(texturePath, x, y, juego);
     this.debugId = `${debugPrefix}${this.id}`;
-    this.playerDamage = 1; 
+    this.playerDamage = 1;
     //this.estadoFlyAway = false; COMMENTED ON 24/10
     this.defaultSpeed = 1;
     this.allyToProtect = null;
     this.allyToRepair = null;
     this.direccionFlyAway = null; // 'izquierda' o 'derecha'
-    
-    
+
     this.crearSprite();
     this.crearTextoDebug();
     this.initFSM();
@@ -21,75 +20,77 @@ class enemyShip extends Ship {
 
   initFSM() {
     this.fsm = new FSM(this, {
-      initialState: 'pursuing',
+      initialState: "pursuing",
       states: {
         pursuing: PursuingState,
         attacking: AttackingState,
-        flyingAway: FlyingAwayState
-      }
+        flyingAway: FlyingAwayState,
+      },
     });
   }
 
   crearTextoDebug() {
     this.textoDebug = new PIXI.Text(this.debugId, {
       fontSize: 16,
-      fill: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 3
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 3,
     });
     this.textoDebug.anchor.set(0.5, 0.5);
-    this.textoDebug.y = -60; 
+    this.textoDebug.y = -60;
     this.container.addChild(this.textoDebug);
   }
 
   tick() {
     if (this.muerto) return;
+    if (!this.juego.turnoDeljugador) return;
+    this.fsm.update(this.juego.contadorDeFrame);
 
-     this.fsm.update(this.juego.contadorDeFrame);
-
-   // if (this.estadoFlyAway) {
-   //   this.flyAway(); COMMENTED ON 24/10
-      this.aplicarFisica();
-   //   this.verificarSiSalioDePantalla();
-   //   return; COMMENTED ON 24/10
-      this.calcularAnguloYVelocidadLineal();
-      this.verificarSiEstoyMuerto();
+    // if (this.estadoFlyAway) {
+    //   this.flyAway(); COMMENTED ON 24/10
+    this.aplicarFisica();
+    //   this.verificarSiSalioDePantalla();
+    //   return; COMMENTED ON 24/10
+    this.calcularAnguloYVelocidadLineal();
+    this.verificarSiEstoyMuerto();
   }
 
-  
   checkPlayerAttackRange() {
     if (!this.juego.protagonista) return false;
-    const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.cellSize);
+    const filaProtagonista = Math.floor(
+      this.juego.protagonista.posicion.y / this.juego.cellSize
+    );
     const miFila = Math.floor(this.posicion.y / this.juego.cellSize);
     return miFila === filaProtagonista;
   }
-  
 
   isOutOfBounds() {
     const margen = 200;
-    return this.posicion.x < this.juego.gameArea.x - margen ||
-           this.posicion.x > this.juego.gameArea.x + this.juego.gameArea.width + margen ||
-           this.posicion.y > this.juego.gameArea.y + this.juego.gameArea.height + margen;
+    return (
+      this.posicion.x < this.juego.gameArea.x - margen ||
+      this.posicion.x >
+        this.juego.gameArea.x + this.juego.gameArea.width + margen ||
+      this.posicion.y >
+        this.juego.gameArea.y + this.juego.gameArea.height + margen
+    );
   }
-  
+
   morir() {
     if (this.fsm) this.fsm.destroy();
     super.morir();
   }
 }
 
+//  this.checkPlayerAttackRange(); ALL COMMENTED ON 24/10
 
-  //  this.checkPlayerAttackRange(); ALL COMMENTED ON 24/10
+//  this.cohesion();
+//  this.alineacion();
+//  this.separacion();
+//  this.perseguir();
+//  this.aplicarFisica();
 
-  //  this.cohesion();
-  //  this.alineacion();
-  //  this.separacion();
-  //  this.perseguir();
-  //  this.aplicarFisica();
- 
-  //  this.calcularAnguloYVelocidadLineal();
-  //}
-
+//  this.calcularAnguloYVelocidadLineal();
+//}
 
 /* COMENTADA PORQUE ARRIBA SE IMPLEMENTA SIN EL FLYAWAY LA GUARDO DE REFERENCIA POR AHORA
   checkPlayerAttackRange() {
@@ -110,7 +111,6 @@ class enemyShip extends Ship {
   }
 
 */
-
 
 /* TODO ESTO COMENTADO EL 24/10
    iniciarFlyAway() {
@@ -157,7 +157,7 @@ class BlackShip extends enemyShip {
     this.defaultSpeed = 1;
     this.velocidadMaxima = 1;
     this.playerDamage = 2;
-    this.colorType = 'black';
+    this.colorType = "black";
     this.weight = 5; //this will be used to create levels and allocate difficulty
   }
 }
@@ -168,7 +168,7 @@ class RedShip extends enemyShip {
     this.defaultSpeed = 1.5;
     this.velocidadMaxima = 1.5;
     this.playerDamage = 1;
-    this.colorType = 'red';
+    this.colorType = "red";
     this.weight = 5; //this will be used to create levels and allocate difficulty
   }
 }
@@ -184,17 +184,16 @@ class ShieldShip extends enemyShip {
     this.weight = 5; //this will be used to create levels and allocate difficulty
   }
 
-
-   initFSM() {
+  initFSM() {
     this.fsm = new FSM(this, {
-      initialState: 'pursuing',
+      initialState: "pursuing",
       states: {
         pursuing: PursuingState,
         attacking: AttackingState,
         flyingAway: FlyingAwayState,
         speedingToProtect: SpeedingToProtectState,
-        protecting: ProtectingState
-      }
+        protecting: ProtectingState,
+      },
     });
   }
 
@@ -205,7 +204,7 @@ class ShieldShip extends enemyShip {
         const dist = calcularDistancia(this.posicion, ally.posicion);
         if (dist < this.protectionRange * 3) {
           this.allyToProtect = ally;
-          this.fsm.setState('speedingToProtect');
+          this.fsm.setState("speedingToProtect");
           return true;
         }
       }
@@ -215,8 +214,8 @@ class ShieldShip extends enemyShip {
 
   recibirDanio(danio) {
     if (this.escudo > 0) {
-      this.escudo --;
-      console.log('Escudo impactado, escudo restante:', this.escudo);
+      this.escudo--;
+      console.log("Escudo impactado, escudo restante:", this.escudo);
       // Opcional: efecto visual de escudo
     } else {
       this.morir();
@@ -236,14 +235,14 @@ class SupportShip extends enemyShip {
 
   initFSM() {
     this.fsm = new FSM(this, {
-      initialState: 'pursuing',
+      initialState: "pursuing",
       states: {
         pursuing: PursuingState,
         attacking: AttackingState,
         flyingAway: FlyingAwayState,
         speedingToRepair: SpeedingToRepairState,
-        repairing: RepairingState
-      }
+        repairing: RepairingState,
+      },
     });
   }
 
@@ -254,7 +253,7 @@ class SupportShip extends enemyShip {
         const dist = calcularDistancia(this.posicion, ally.posicion);
         if (dist < this.repairRange * 3) {
           this.allyToRepair = ally;
-          this.fsm.setState('speedingToRepair');
+          this.fsm.setState("speedingToRepair");
           return true;
         }
       }
@@ -262,4 +261,3 @@ class SupportShip extends enemyShip {
     return false;
   }
 }
-

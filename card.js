@@ -1,39 +1,53 @@
-const suits = ["S", "C", "H", "D"]
-const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const suits = ["S", "C", "H", "D"];
+const ranks = [
+  "A",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K",
+];
 
 class Deck {
   constructor(cards = freshDeck()) {
-    this.cards = cards
-    this.cards.forEach(card => card.initializeFSM(this));
+    this.cards = cards;
+    this.cards.forEach((card) => card.initializeFSM(this));
   }
 
   get numberOfCards() {
-    return this.cards.length
+    return this.cards.length;
   }
 
   pop() {
     const card = this.cards.shift();
     if (card && card.fsm) {
-      card.fsm.setState('inHand');
+      card.fsm.setState("inHand");
     }
     return card;
-  }//sirve para manejar stacks, toma la carta de encima de la pila
+  } //sirve para manejar stacks, toma la carta de encima de la pila
 
   push(card) {
     this.cards.push(card);
     if (card.fsm) {
-      card.fsm.setState('inDeck');
+      card.fsm.setState("inDeck");
     }
-  }//sirve para manejar stacks, mete la carta debajo de la pila
+  } //sirve para manejar stacks, mete la carta debajo de la pila
 
   shuffle() {
     for (let i = this.numberOfCards - 1; i > 0; i--) {
-      const newIndex = Math.floor(Math.random() * (i + 1))
-      const oldRank = this.cards[newIndex]
-      this.cards[newIndex] = this.cards[i]
-      this.cards[i] = oldRank
+      const newIndex = Math.floor(Math.random() * (i + 1));
+      const oldRank = this.cards[newIndex];
+      this.cards[newIndex] = this.cards[i];
+      this.cards[i] = oldRank;
     }
-    console.log('Deck shuffled');
+    console.log("Deck shuffled");
   }
 
   isEmpty() {
@@ -41,49 +55,58 @@ class Deck {
   }
 }
 
-
 class Card {
   constructor(suit, rank) {
-    this.suit = suit
-    this.rank = rank
+    this.suit = suit;
+    this.rank = rank;
     this.fsm = null; // Will be initialized when needed
   }
 
   get color() {
-    return this.suit === "C" || this.suit === "S" ? "black" : "red"
+    return this.suit === "C" || this.suit === "S" ? "black" : "red";
   }
   get rankValue() {
     const rankValues = {
-      'A': 14, 'K': 13, 'Q': 12, 'J': 11,
-      '10': 10, '9': 9, '8': 8, '7': 7,
-      '6': 6, '5': 5, '4': 4, '3': 3, '2': 2
+      A: 14,
+      K: 13,
+      Q: 12,
+      J: 11,
+      10: 10,
+      9: 9,
+      8: 8,
+      7: 7,
+      6: 6,
+      5: 5,
+      4: 4,
+      3: 3,
+      2: 2,
     };
     return rankValues[this.rank];
   }
 
   initializeFSM(owner) {
     this.fsm = new FSM(this, {
-      initialState: 'inDeck',
+      initialState: "inDeck",
       states: {
         inDeck: InDeckState,
         inHand: InHandState,
         selected: SelectedState,
         played: PlayedState,
-        discarded: DiscardedState
-      }
+        discarded: DiscardedState,
+      },
     });
     this.owner = owner; // Reference to CardsHeld or game manager
   }
 
   select() {
-    if (this.fsm && this.fsm.currentStateName === 'inHand') {
-      this.fsm.setState('selected');
+    if (this.fsm && this.fsm.currentStateName === "inHand") {
+      this.fsm.setState("selected");
     }
   }
 
   deselect() {
-    if (this.fsm && this.fsm.currentStateName === 'selected') {
-      this.fsm.setState('inHand');
+    if (this.fsm && this.fsm.currentStateName === "selected") {
+      this.fsm.setState("inHand");
     }
   }
 
@@ -93,11 +116,11 @@ class Card {
 }
 
 function freshDeck() {
-  return suits.flatMap(suit => {
-    return ranks.map(rank => {
-      return new Card(suit, rank)
-    })
-  })
+  return suits.flatMap((suit) => {
+    return ranks.map((rank) => {
+      return new Card(suit, rank);
+    });
+  });
 }
 
 class DiscardPile {
@@ -113,7 +136,7 @@ class DiscardPile {
   push(card) {
     this.cards.push(card);
     if (card.fsm) {
-      card.fsm.setState('discarded');
+      card.fsm.setState("discarded");
     }
   }
 
@@ -123,7 +146,7 @@ class DiscardPile {
 
   // Query methods
   contains(card) {
-    return this.cards.some(c => c.suit === card.suit && c.rank === card.rank);
+    return this.cards.some((c) => c.suit === card.suit && c.rank === card.rank);
   }
 
   getPlayedCards() {
@@ -131,11 +154,11 @@ class DiscardPile {
   }
 
   hasPlayedRank(rank) {
-    return this.cards.some(c => c.rank === rank);
+    return this.cards.some((c) => c.rank === rank);
   }
 
   hasPlayedSuit(suit) {
-    return this.cards.some(c => c.suit === suit);
+    return this.cards.some((c) => c.suit === suit);
   }
 
   clear() {
@@ -148,5 +171,3 @@ class DiscardPile {
     return this.numberOfCards === 0;
   }
 }
-
-
