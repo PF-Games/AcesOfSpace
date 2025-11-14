@@ -30,6 +30,13 @@ class Juego {
     this.rockets = [];
 
     this.initCardSystem();
+
+    this.turnoDeljugador = true;
+
+    this.currentTurn = 'player';
+    this.aiTurnDuration = 120;
+    this.aiTurnTimer = 0;
+    this.turnsPassed = 0;
   }
 
   initMatterJS() {
@@ -244,6 +251,7 @@ class Juego {
   createInterface() {
     this.interface = new PIXI.Container();
     this.interface.name = "INTERFACE";
+    this.interface.zIndex = 1000;
     this.pixiApp.stage.addChild(this.interface);
 
     this.fpsText = new PIXI.Text({
@@ -260,6 +268,184 @@ class Juego {
     this.fpsText.x = this.width - 120;
     this.fpsText.y = 20;
     this.interface.addChild(this.fpsText);
+    // Turn indicator
+    this.turnText = new PIXI.Text({
+      text: "YOUR TURN",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 32,
+        fill: "#00FF00",
+        stroke: "#000000",
+        strokeThickness: 5
+      }
+    });
+    this.turnText.anchor.set(0.5, 0);
+    this.turnText.x = this.width / 2;
+    this.turnText.y = 20;
+    this.interface.addChild(this.turnText);
+  }
+
+  createEndTurnButton() {
+    // Container del botón
+    this.endTurnButton = new PIXI.Container();
+    this.endTurnButton.x = this.width / 2;
+    this.endTurnButton.y = this.height - 70;
+    this.endTurnButton.eventMode = 'static';
+    this.endTurnButton.cursor = 'pointer';
+    this.endTurnButton.zIndex = 2000;
+    this.interface.addChild(this.endTurnButton);
+
+    // Background del botón
+    this.endTurnButtonBg = new PIXI.Graphics();
+    this.endTurnButtonBg.rect(-100, -25, 200, 50);
+    this.endTurnButtonBg.fill(0x00AA00);
+    this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+    this.pixiApp.stage.addChild(this.endTurnButton);
+
+    // Texto del botón
+    this.endTurnButtonText = new PIXI.Text({
+      text: "END TURN",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: "#ffffff",
+        fontWeight: "bold"
+      }
+    });
+    this.endTurnButtonText.anchor.set(0.5, 0.5);
+    this.endTurnButton.addChild(this.endTurnButtonText);
+
+    // Eventos del botón
+    this.endTurnButton.on('pointerdown', () => {
+      if (this.currentTurn === 'player') {
+        this.endPlayerTurn();
+      }
+    });
+
+    this.endTurnButton.on('pointerover', () => {
+      if (this.currentTurn === 'player') {
+        this.endTurnButtonBg.clear();
+        this.endTurnButtonBg.rect(-100, -25, 200, 50);
+        this.endTurnButtonBg.fill(0x00CC00);
+        this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+      }
+    });
+
+    this.endTurnButton.on('pointerout', () => {
+      if (this.currentTurn === 'player') {
+        this.endTurnButtonBg.clear();
+        this.endTurnButtonBg.rect(-100, -25, 200, 50);
+        this.endTurnButtonBg.fill(0x00AA00);
+        this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+      }
+    });
+
+    this.updateEndTurnButton();
+    console.log("✅ Botón END TURN creado en stage con zIndex 2000");
+  }
+
+  updateEndTurnButton() {
+    if (!this.endTurnButton) return;
+
+    // Deshabilitar durante turno de IA
+    if (this.currentTurn === 'ai') {
+      this.endTurnButton.eventMode = 'none';
+      this.endTurnButton.alpha = 0.5;
+      this.endTurnButtonBg.clear();
+      this.endTurnButtonBg.rect(-100, -25, 200, 50);
+      this.endTurnButtonBg.fill(0x666666);
+      this.endTurnButtonBg.stroke({ width: 3, color: 0x999999 });
+    } else {
+      this.endTurnButton.eventMode = 'static';
+      this.endTurnButton.alpha = 1;
+      this.endTurnButtonBg.clear();
+      this.endTurnButtonBg.rect(-100, -25, 200, 50);
+      this.endTurnButtonBg.fill(0x00AA00);
+      this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+    }
+  }
+
+  async endPlayerTurn() {
+    console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
+
+    // Jugar cartas seleccionadas
+    if (this.playerHand.hasSelectedCards) {
+      const cardsToRemove = [...this.playerHand.selectedCards];
+      const result = this.playerHand.playSelectedCards();
+      console.log(`Jugaste: ${result.handInfo.handName}`);
+
+      // Remover visuales de cartas jugadas
+      cardsToRemove.forEach(card => {
+        this.handRenderer.removeCardVisual(card);
+      });
+    }
+
+    // Tomar nuevas cartas
+    const previousCount = this.playerHand.numberOfCards;
+    this.playerHand.drawCards();
+    const newCards = this.playerHand.numberOfCards - previousCount;
+
+    // Crear visuales para nuevas cartas
+    for (let i = 0; i < newCards; i++) {
+      const cardIndex = previousCount + i;
+      const card = this.playerHand.cards[cardIndex];
+      await this.handRenderer.createCardVisual(card, cardIndex);
+    }
+
+    this.handRenderer.updatePositions();
+    this.updateDeckCounters();
+
+    console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
+
+    // Cambiar a turno de IA
+    this.startAITurn();
+  }
+
+  startAITurn() {
+    console.log('\n=== TURNO DE LA IA ===');
+    this.currentTurn = 'ai';
+    this.aiTurnTimer = 0;
+    this.turnsPassed++;
+
+    // Actualizar UI
+    this.updateEndTurnButton();
+    if (this.turnText) {
+      this.turnText.text = "AI TURN";
+      this.turnText.style.fill = "#FF0000";
+    }
+
+    // Spawn de naves si corresponde
+    if (this.antagonista && this.turnsPassed % this.antagonista.turnosParaSpawn === 0) {
+      this.antagonista.spawnearNave();
+    }
+  }
+
+  updateAITurn() {
+    this.aiTurnTimer++;
+
+    // Actualizar progreso en UI (opcional)
+    if (this.turnText) {
+      const progress = Math.floor((this.aiTurnTimer / this.aiTurnDuration) * 100);
+      this.turnText.text = `AI TURN (${progress}%)`;
+    }
+
+    // Fin del turno de IA
+    if (this.aiTurnTimer >= this.aiTurnDuration) {
+      this.endAITurn();
+    }
+  }
+
+  endAITurn() {
+    console.log('\n=== FIN DE TURNO DE LA IA ===');
+    this.currentTurn = 'player';
+    this.aiTurnTimer = 0;
+
+    // Actualizar UI
+    this.updateEndTurnButton();
+    if (this.turnText) {
+      this.turnText.text = "YOUR TURN";
+      this.turnText.style.fill = "#00FF00";
+    }
   }
 
   //async indica q este metodo es asyncronico, es decir q puede usar "await"
@@ -356,6 +542,7 @@ class Juego {
     this.interfaceContainer.addChild(this.interfaceBackground);
 
     await this.initCardVisuals();
+    this.createEndTurnButton();
   }
 
 
@@ -508,6 +695,9 @@ class Juego {
     });
 
     this.pixiApp.canvas.addEventListener('click', (event) => {
+      if (this.currentTurn === 'ai') {
+        return; // No permitir clicks en cartas durante turno de IA
+      }
       const mouseX = event.clientX;
       const mouseY = event.clientY;
 
@@ -539,31 +729,56 @@ class Juego {
   }
 
   gameLoop(time) {
-    //iteramos por todos los personas
-    //this.dibujador.clear();//14-10
-    this.frameCounter++;
+  if (this.teclado["w"]) {
+    this.containerPrincipal.y += 10;
+  }
+  if (this.teclado["s"]) {
+    this.containerPrincipal.y -= 10;
+  }
+  if (this.teclado["a"]) {
+    this.containerPrincipal.x += 10;
+  }
+  if (this.teclado["d"]) {
+    this.containerPrincipal.x -= 10;
+  }
+  
+  this.frameCounter++;
 
-    // Procesar antagonista
-    if (this.antagonista) {
+  // Procesar antagonista
+  if (this.antagonista) {
+    // SOLO tick durante turno de IA
+    if (this.currentTurn === 'ai') {
       this.antagonista.tick();
-      this.antagonista.render();
     }
+    this.antagonista.render();
+  }
 
-    // Procesar naves
+  // Actualizar turno de IA si corresponde
+  if (this.currentTurn === 'ai') {
+    this.updateAITurn();
+    
+    // Durante turno de IA, las naves se mueven
     for (let aShip of this.ships) {
-      //ejecutamos el metodo tick de cada persona
-      aShip.tick();
+      aShip.tick();  // Llamar tick() solo en turno IA
       aShip.render();
     }
-
-    // this.grid.update();
-    // this.hacerQLaCamaraSigaAlProtagonista();
-    if (this.handRenderer) {
-      this.handRenderer.tick();
-      this.handRenderer.render();
+  } else {
+    // Durante turno del jugador, solo renderizar sin mover
+    for (let aShip of this.ships) {
+      aShip.render(); // Solo render, sin tick()
     }
+  }
 
-    this.updateInterface();
+  // ELIMINAR TODO EL BLOQUE DUPLICADO QUE ESTABA DENTRO DE if (this.handRenderer)
+  // El código correcto es el de arriba
+
+  // Actualizar renderizador de cartas
+  if (this.handRenderer) {
+    this.handRenderer.tick();
+    this.handRenderer.render();
+  }
+
+     this.updateInterface();
 
     for (let rocket of this.rockets) {
       rocket.tick();
@@ -571,55 +786,41 @@ class Juego {
     }
   }
 
-
   iniciarControles() {
-    window.addEventListener('keyup', (event) => {
-      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") this.containerPrincipal.y += 100;
-      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") this.containerPrincipal.y -= 100;
-      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") this.containerPrincipal.x += 100;
-      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") this.containerPrincipal.x -= 100;
+    window.addEventListener("keydown", (event) => {
+      this.teclado[event.key.toLowerCase()] = true;
+    });
+
+    window.addEventListener("keyup", (event) => {
+      this.teclado[event.key.toLowerCase()] = false;
     });
   }
 
-  //hacerQLaCamaraSigaAlProtagonista() {
-  /*if (!this.protagonista) return;
-  this.containerPrincipal.x = -this.protagonista.posicion.x + this.width / 2;
-  this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;
-  */
-
-  /*if (this.mouse.apretado){
-       this.containerPrincipal.x = this.mouse.posicion.x;
-       this.containerPrincipal.y = this.mouse.posicion.y;
-       }
-       */
-
-
   updateInterface() {
     if (!this.interfaceContainer) return;
+
+    // Limpiar y redibujar el background existente
     if (this.interfaceBackground) {
       this.interfaceBackground.clear();
-    } else {
-      this.interfaceBackground = new PIXI.Graphics();
-      this.interfaceContainer.addChild(this.interfaceBackground);
+      this.interfaceBackground.beginFill(0x222222);
+      this.interfaceBackground.drawRect(
+        0,
+        this.pixiApp.renderer.height * 0.8,
+        this.pixiApp.renderer.width,
+        this.pixiApp.renderer.height * 0.2
+      );
+      this.interfaceBackground.endFill();
     }
-
-    const interfaceBackground = new PIXI.Graphics();
-    interfaceBackground.beginFill(0x222222);
-    interfaceBackground.drawRect(
-      0,
-      this.pixiApp.renderer.height * 0.8,
-      this.pixiApp.renderer.width,
-      this.pixiApp.renderer.height * 0.2
-    );
-    interfaceBackground.endFill();
-    this.interfaceContainer.addChild(interfaceBackground);
 
     // Actualizar posiciones de los mazos según nuevo tamaño de ventana
     if (this.discardRenderer) {
       this.discardRenderer.updatePosition(100, this.height - this.cardsHeight);
     }
     if (this.deckRenderer) {
-      this.deckRenderer.updatePosition(this.width - 100, this.height - this.cardsHeight);
+      this.deckRenderer.updatePosition(
+        this.width - 100,
+        this.height - this.cardsHeight
+      );
     }
 
     // Actualizar posición Y de la mano
@@ -631,8 +832,17 @@ class Juego {
     if (this.fpsText) {
       this.fpsText.x = this.width - 120;
       this.fpsText.y = 20;
+      this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2);
     }
-    this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2);
+
+    if (this.endTurnButton) {
+      this.endTurnButton.x = this.width / 2;
+      this.endTurnButton.y = this.height - 70;
+    }
+
+    if (this.turnText) {
+      this.turnText.x = this.width / 2;
+    }
   }
 
 
