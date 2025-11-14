@@ -769,9 +769,6 @@ class Juego {
     }
   }
 
-  // ELIMINAR TODO EL BLOQUE DUPLICADO QUE ESTABA DENTRO DE if (this.handRenderer)
-  // El código correcto es el de arriba
-
   // Actualizar renderizador de cartas
   if (this.handRenderer) {
     this.handRenderer.tick();
