@@ -35,7 +35,7 @@ class Juego {
     this.turnoDeljugador = true;
 
     this.currentTurn = 'player';
-    this.aiTurnDuration = 120;
+    this.aiTurnDuration = 180;
     this.aiTurnTimer = 0;
     this.turnsPassed = 0;
   }
@@ -271,11 +271,11 @@ class Juego {
     this.interface.addChild(this.fpsText);
     // Turn indicator
     this.turnText = new PIXI.Text({
-      text: "YOUR TURN",
+      text: "PLAYER TURN",
       style: {
         fontFamily: "Arial",
         fontSize: 32,
-        fill: "#00FF00",
+        fill: "#0d34e0ff",
         stroke: "#000000",
         strokeThickness: 5
       }
@@ -294,16 +294,17 @@ class Juego {
     this.endTurnButton.eventMode = 'static';
     this.endTurnButton.cursor = 'pointer';
     this.endTurnButton.zIndex = 2000;
+
     this.interface.addChild(this.endTurnButton);
 
-    // Background del botón
+    // --- Background del botón ---
     this.endTurnButtonBg = new PIXI.Graphics();
     this.endTurnButtonBg.rect(-100, -25, 200, 50);
     this.endTurnButtonBg.fill(0x00AA00);
     this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-    this.pixiApp.stage.addChild(this.endTurnButton);
 
-    // Texto del botón
+    this.endTurnButton.addChild(this.endTurnButtonBg);
+
     this.endTurnButtonText = new PIXI.Text({
       text: "END TURN",
       style: {
@@ -313,18 +314,22 @@ class Juego {
         fontWeight: "bold"
       }
     });
-    this.endTurnButtonText.anchor.set(0.5, 0.5);
+    this.endTurnButtonText.anchor.set(0.5);
     this.endTurnButton.addChild(this.endTurnButtonText);
 
-    // Eventos del botón
+    // --- CLICK EVENT ---
     this.endTurnButton.on('pointerdown', () => {
       if (this.currentTurn === 'player') {
         this.endPlayerTurn();
       }
     });
 
+    // HOVER EFFECT: SCALE + TINT COMBINED
     this.endTurnButton.on('pointerover', () => {
       if (this.currentTurn === 'player') {
+
+        this.endTurnButton.scale.set(1.08);
+
         this.endTurnButtonBg.clear();
         this.endTurnButtonBg.rect(-100, -25, 200, 50);
         this.endTurnButtonBg.fill(0x00CC00);
@@ -333,7 +338,11 @@ class Juego {
     });
 
     this.endTurnButton.on('pointerout', () => {
+      // Reset scale
+      this.endTurnButton.scale.set(1);
+
       if (this.currentTurn === 'player') {
+        // Reset tint
         this.endTurnButtonBg.clear();
         this.endTurnButtonBg.rect(-100, -25, 200, 50);
         this.endTurnButtonBg.fill(0x00AA00);
@@ -342,8 +351,9 @@ class Juego {
     });
 
     this.updateEndTurnButton();
-    console.log("✅ Botón END TURN creado en stage con zIndex 2000");
-  }
+
+    console.log("Botón END TURN creado correctamente");
+}
 
   updateEndTurnButton() {
     if (!this.endTurnButton) return;
