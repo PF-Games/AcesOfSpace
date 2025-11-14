@@ -9,7 +9,7 @@ class Juego {
   deck;
   discardPile;
   playerHand;
-  cardsHeight = 265;
+  cardsHeight = 100;
 
   constructor() {
     this.updateDimensions();
@@ -289,7 +289,7 @@ class Juego {
   createEndTurnButton() {
     // Container del botón
     this.endTurnButton = new PIXI.Container();
-    this.endTurnButton.x = this.width / 2;
+    this.endTurnButton.x = this.width / 7;
     this.endTurnButton.y = this.height - 70;
     this.endTurnButton.eventMode = 'static';
     this.endTurnButton.cursor = 'pointer';
@@ -834,7 +834,7 @@ class Juego {
     }
 
     if (this.endTurnButton) {
-      this.endTurnButton.x = this.width / 2;
+      this.endTurnButton.x = this.width / 7;
       this.endTurnButton.y = this.height - 70;
     }
 
