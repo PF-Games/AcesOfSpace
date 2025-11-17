@@ -306,6 +306,37 @@ class Juego {
     */
   }
 
+  sortHandByRank() {
+    console.log('\n=== SORTING BY RANK ===');
+
+    // Sort the cards array by rank value (high to low)
+    this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
+
+    // Recreate visuals in new order
+    this.syncHandVisuals();
+
+    console.log('Hand sorted by rank');
+  }
+
+  sortHandBySuit() {
+    console.log('\n=== SORTING BY SUIT ===');
+
+    // Define suit order: Spades, Hearts, Diamonds, Clubs
+    const suitOrder = { 'S': 0, 'H': 1, 'D': 2, 'C': 3 };
+
+    // Sort by suit first, then by rank within each suit
+    this.playerHand.cards.sort((a, b) => {
+      const suitDiff = suitOrder[a.suit] - suitOrder[b.suit];
+      if (suitDiff !== 0) return suitDiff;
+      return b.rankValue - a.rankValue; // Within same suit, sort by rank
+    });
+
+    // Recreate visuals in new order
+    this.syncHandVisuals();
+
+    console.log('Hand sorted by suit');
+  }
+
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -353,6 +384,7 @@ class Juego {
         strokeThickness: 5
       }
     });
+
     this.turnText.anchor.set(0.5, 0);
     this.turnText.x = this.width / 2;
     this.turnText.y = 20;
@@ -369,6 +401,7 @@ class Juego {
         strokeThickness: 4
       }
     });
+
     this.handValueText.anchor.set(0.5, 0);
     this.handValueText.x = this.width / 2;
     this.handValueText.y = 800
@@ -496,31 +529,31 @@ class Juego {
     */
 
     this.playHandButton.on('pointerdown', () => {
-    if (this.currentTurn === 'player' && this.playerHand.hasSelectedCards) {
-      // Get hand info from PlayerHand
-      const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
-      
-      // Play cards (uses existing PlayerHand method)
-      const cardsToRemove = [...this.playerHand.selectedCards];
-      const result = this.playerHand.playSelectedCards();
-      
-      // Remove card visuals
-      cardsToRemove.forEach(card => {
-        this.handRenderer.removeCardVisual(card);
-      });
-      
-      // Fire rockets
-      this.fireRocketsForHand(handInfo);
-      
-      // Update UI
-      this.handRenderer.updatePositions();
-      this.updateDeckCounters();
-      this.updateHandValueDisplay();
-      this.updatePlayHandButton();
-      
-      console.log(`Played ${handInfo.handName}, fired rockets`);
-    }
-  });
+      if (this.currentTurn === 'player' && this.playerHand.hasSelectedCards) {
+        // Get hand info from PlayerHand
+        const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+
+        // Play cards (uses existing PlayerHand method)
+        const cardsToRemove = [...this.playerHand.selectedCards];
+        const result = this.playerHand.playSelectedCards();
+
+        // Remove card visuals
+        cardsToRemove.forEach(card => {
+          this.handRenderer.removeCardVisual(card);
+        });
+
+        // Fire rockets
+        this.fireRocketsForHand(handInfo);
+
+        // Update UI
+        this.handRenderer.updatePositions();
+        this.updateDeckCounters();
+        this.updateHandValueDisplay();
+        this.updatePlayHandButton();
+
+        console.log(`Played ${handInfo.handName}, fired rockets`);
+      }
+    });
 
     // HOVER EFFECT: SCALE + TINT COMBINED
     this.playHandButton.on('pointerover', () => {
@@ -570,6 +603,112 @@ class Juego {
       this.playHandButtonBg.fill(0x00AA00);
       this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
     }
+  }
+
+  createSortButtons() {
+    // --- SORT BY RANK BUTTON ---
+    this.sortByRankButton = new PIXI.Container();
+    this.sortByRankButton.x = this.width - 220;
+    this.sortByRankButton.y = this.height - 100;
+    this.sortByRankButton.eventMode = 'static';
+    this.sortByRankButton.cursor = 'pointer';
+    this.sortByRankButton.zIndex = 2000;
+
+    this.interface.addChild(this.sortByRankButton);
+
+    this.sortByRankBg = new PIXI.Graphics();
+    this.sortByRankBg.rect(-60, -20, 120, 40);
+    this.sortByRankBg.fill(0x9B59B6);
+    this.sortByRankBg.stroke({ width: 2, color: 0xFFFFFF });
+
+    this.sortByRankButton.addChild(this.sortByRankBg);
+
+    this.sortByRankText = new PIXI.Text({
+      text: "BY RANK",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 16,
+        fill: "#ffffff",
+        fontWeight: "bold"
+      }
+    });
+    this.sortByRankText.anchor.set(0.5);
+    this.sortByRankButton.addChild(this.sortByRankText);
+
+    this.sortByRankButton.on('pointerdown', () => {
+      if (this.currentTurn === 'player') {
+        this.sortHandByRank();
+      }
+    });
+
+    this.sortByRankButton.on('pointerover', () => {
+      this.sortByRankButton.scale.set(1.05);
+      this.sortByRankBg.clear();
+      this.sortByRankBg.rect(-60, -20, 120, 40);
+      this.sortByRankBg.fill(0xAA6FC9);
+      this.sortByRankBg.stroke({ width: 2, color: 0xFFFFFF });
+    });
+
+    this.sortByRankButton.on('pointerout', () => {
+      this.sortByRankButton.scale.set(1);
+      this.sortByRankBg.clear();
+      this.sortByRankBg.rect(-60, -20, 120, 40);
+      this.sortByRankBg.fill(0x9B59B6);
+      this.sortByRankBg.stroke({ width: 2, color: 0xFFFFFF });
+    });
+
+    // --- SORT BY SUIT BUTTON ---
+    this.sortBySuitButton = new PIXI.Container();
+    this.sortBySuitButton.x = this.width - 220;
+    this.sortBySuitButton.y = this.height - 50;
+    this.sortBySuitButton.eventMode = 'static';
+    this.sortBySuitButton.cursor = 'pointer';
+    this.sortBySuitButton.zIndex = 2000;
+
+    this.interface.addChild(this.sortBySuitButton);
+
+    this.sortBySuitBg = new PIXI.Graphics();
+    this.sortBySuitBg.rect(-60, -20, 120, 40);
+    this.sortBySuitBg.fill(0xE67E22);
+    this.sortBySuitBg.stroke({ width: 2, color: 0xFFFFFF });
+
+    this.sortBySuitButton.addChild(this.sortBySuitBg);
+
+    this.sortBySuitText = new PIXI.Text({
+      text: "BY SUIT",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 16,
+        fill: "#ffffff",
+        fontWeight: "bold"
+      }
+    });
+    this.sortBySuitText.anchor.set(0.5);
+    this.sortBySuitButton.addChild(this.sortBySuitText);
+
+    this.sortBySuitButton.on('pointerdown', () => {
+      if (this.currentTurn === 'player') {
+        this.sortHandBySuit();
+      }
+    });
+
+    this.sortBySuitButton.on('pointerover', () => {
+      this.sortBySuitButton.scale.set(1.05);
+      this.sortBySuitBg.clear();
+      this.sortBySuitBg.rect(-60, -20, 120, 40);
+      this.sortBySuitBg.fill(0xF39C12);
+      this.sortBySuitBg.stroke({ width: 2, color: 0xFFFFFF });
+    });
+
+    this.sortBySuitButton.on('pointerout', () => {
+      this.sortBySuitButton.scale.set(1);
+      this.sortBySuitBg.clear();
+      this.sortBySuitBg.rect(-60, -20, 120, 40);
+      this.sortBySuitBg.fill(0xE67E22);
+      this.sortBySuitBg.stroke({ width: 2, color: 0xFFFFFF });
+    });
+
+    console.log("Botones de ordenamiento creados");
   }
 
   async endPlayerTurn() {
@@ -736,6 +875,7 @@ class Juego {
     await this.initCardVisuals();
     this.createEndTurnButton();
     this.createPlayButton();
+    this.createSortButtons();
   }
 
   async loadTextures() {
@@ -808,7 +948,7 @@ class Juego {
           closestShip
         );
         rocket.crearSprite();
-      //  this.rockets.push(rocket); DISABLED 17/11
+        //  this.rockets.push(rocket); DISABLED 17/11
       }
     };
   }
@@ -1054,6 +1194,16 @@ class Juego {
 
     if (this.turnText) {
       this.turnText.x = this.width / 2;
+    }
+
+    if (this.sortByRankButton) {
+      this.sortByRankButton.x = this.width - 220;
+      this.sortByRankButton.y = this.height - 100;
+    }
+
+    if (this.sortBySuitButton) {
+      this.sortBySuitButton.x = this.width - 220;
+      this.sortBySuitButton.y = this.height - 50;
     }
   }
 
