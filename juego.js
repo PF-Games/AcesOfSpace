@@ -199,7 +199,7 @@ class Juego {
     if (success) {
       this.handRenderer.selectCard(card);
       this.updateHandValueDisplay();
-      this.updatePlayHandButton();
+      this.uiManager.updatePlayHandButton();
     }
     return success;
   }
@@ -215,7 +215,7 @@ class Juego {
       this.handRenderer.deselectCard(card);
     }
     this.updateHandValueDisplay();
-    this.updatePlayHandButton();
+    this.uiManager.updatePlayHandButton();
 
     return success;
   }
@@ -231,7 +231,7 @@ class Juego {
     });
 
     this.updateHandValueDisplay();
-    this.updatePlayHandButton();
+    this.uiManager.updatePlayHandButton();
 
     console.log('All cards deselected');
   }
@@ -327,7 +327,7 @@ class Juego {
 
     this.playerHand.deselectAll();
     this.updateHandValueDisplay();
-    this.updatePlayHandButton();
+    this.uiManager.updatePlayHandButton();
 
     // Sort the cards array by rank value (high to low)
     this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
@@ -343,7 +343,7 @@ class Juego {
 
     this.playerHand.deselectAll();
     this.updateHandValueDisplay();
-    this.updatePlayHandButton();
+    this.uiManager.updatePlayHandButton();
 
     // Define suit order: Spades, Clubs, Diamonds, Hearts
     const suitOrder = { 'S': 0, 'C': 1, 'D': 2, 'H': 3 };
@@ -432,358 +432,64 @@ class Juego {
     this.interface.addChild(this.handValueText);
   }
 
-  createEndTurnButton() {
-    // Container del botón
-    this.endTurnButton = new PIXI.Container();
-    this.endTurnButton.x = this.width / 7;
-    this.endTurnButton.y = this.height - 70;
-    this.endTurnButton.eventMode = 'static';
-    this.endTurnButton.cursor = 'pointer';
-    this.endTurnButton.zIndex = 2000;
+  sortHandByRank() {
+    console.log('\n=== SORTING BY RANK ===');
+    this.playerHand.deselectAll();
+    this.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
 
-    this.interface.addChild(this.endTurnButton);
-    this.endTurnButtonBg = new PIXI.Graphics();
-    this.endTurnButtonBg.rect(-100, -25, 200, 50);
-    this.endTurnButtonBg.fill(0x00AA00);
-    this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-
-    this.endTurnButton.addChild(this.endTurnButtonBg);
-
-    this.endTurnButtonText = new PIXI.Text({
-      text: "END TURN",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: "#ffffff",
-        fontWeight: "bold"
-      }
-    });
-    this.endTurnButtonText.anchor.set(0.5);
-    this.endTurnButton.addChild(this.endTurnButtonText);
-
-    this.endTurnButton.on('pointerdown', () => {
-      if (this.currentTurn === 'player') {
-        this.endPlayerTurn();
-      }
-    });
-
-    // HOVER EFFECT: SCALE + TINT COMBINED
-    this.endTurnButton.on('pointerover', () => {
-      if (this.currentTurn === 'player') {
-
-        this.endTurnButton.scale.set(1.08);
-
-        this.endTurnButtonBg.clear();
-        this.endTurnButtonBg.rect(-100, -25, 200, 50);
-        this.endTurnButtonBg.fill(0x00CC00);
-        this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-      }
-    });
-
-    this.endTurnButton.on('pointerout', () => {
-      this.endTurnButton.scale.set(1);
-
-      if (this.currentTurn === 'player') {
-        this.endTurnButtonBg.clear();
-        this.endTurnButtonBg.rect(-100, -25, 200, 50);
-        this.endTurnButtonBg.fill(0x00AA00);
-        this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-      }
-    });
-    this.updateEndTurnButton();
-    console.log("Botón END TURN creado correctamente");
+    this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
+    this.syncHandVisuals();
+    console.log('Hand sorted by rank');
   }
 
-  updateEndTurnButton() {
-    if (!this.endTurnButton) return;
-    // Deshabilitar durante turno de IA
-    if (this.currentTurn === 'ai') {
-      this.endTurnButton.eventMode = 'none';
-      this.endTurnButton.alpha = 0.5;
-      this.endTurnButtonBg.clear();
-      this.endTurnButtonBg.rect(-100, -25, 200, 50);
-      this.endTurnButtonBg.fill(0x666666);
-      this.endTurnButtonBg.stroke({ width: 3, color: 0x999999 });
-    } else {
-      this.endTurnButton.eventMode = 'static';
-      this.endTurnButton.alpha = 1;
-      this.endTurnButtonBg.clear();
-      this.endTurnButtonBg.rect(-100, -25, 200, 50);
-      this.endTurnButtonBg.fill(0x00AA00);
-      this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-    }
+  sortHandBySuit() {
+    console.log('\n=== SORTING BY SUIT ===');
+    this.playerHand.deselectAll();
+    this.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+
+    const suitOrder = { 'S': 0, 'H': 1, 'D': 2, 'C': 3 };
+    this.playerHand.cards.sort((a, b) => {
+      const suitDiff = suitOrder[a.suit] - suitOrder[b.suit];
+      if (suitDiff !== 0) return suitDiff;
+      return b.rankValue - a.rankValue;
+    });
+
+    this.syncHandVisuals();
+    console.log('Hand sorted by suit');
   }
 
-  createPlayButton() {
-    // Container del botón
-    this.playHandButton = new PIXI.Container();
-    this.playHandButton.x = this.width / 7;
-    this.playHandButton.y = this.height - 140;
-    this.playHandButton.eventMode = 'static';
-    this.playHandButton.cursor = 'pointer';
-    this.playHandButton.zIndex = 2000;
+  deselectAllCards() {
+    console.log('\n=== DESELECTING ALL CARDS ===');
+    this.playerHand.deselectAll();
 
-    this.interface.addChild(this.playHandButton);
-
-    this.playHandButtonBg = new PIXI.Graphics();
-    this.playHandButtonBg.rect(-100, -25, 200, 50);
-    this.playHandButtonBg.fill(0x00AA00);
-    this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-
-    this.playHandButton.addChild(this.playHandButtonBg);
-
-    this.playHandButtonText = new PIXI.Text({
-      text: "FIRE",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: "#ffffff",
-        fontWeight: "bold"
-      }
-    });
-    this.playHandButtonText.anchor.set(0.5);
-    this.playHandButton.addChild(this.playHandButtonText);
-
-    /*
-    this.playHandButton.on('pointerdown', () => {
-      if (this.currentTurn === 'player') {
-        this.playSelectedCards();
-      }
-    });
-    */
-
-    this.playHandButton.on('pointerdown', () => {
-      if (this.currentTurn === 'player' && this.playerHand.hasSelectedCards) {
-        // Get hand info from PlayerHand
-        const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
-
-        // Play cards (uses existing PlayerHand method)
-        const cardsToRemove = [...this.playerHand.selectedCards];
-        const result = this.playerHand.playSelectedCards();
-
-        // Remove card visuals
-        cardsToRemove.forEach(card => {
-          this.handRenderer.removeCardVisual(card);
-        });
-
-        // Fire rockets
-        this.fireRocketsForHand(handInfo);
-
-        // Update UI
-        this.handRenderer.updatePositions();
-        this.updateDeckCounters();
-        this.updateHandValueDisplay();
-        this.updatePlayHandButton();
-
-        console.log(`Played ${handInfo.handName}, fired rockets`);
-      }
+    this.handRenderer.cardVisuals.forEach(cardVisual => {
+      cardVisual.setSelected(false);
+      cardVisual.targetY = this.handRenderer.handY;
     });
 
-    // HOVER EFFECT: SCALE + TINT COMBINED
-    this.playHandButton.on('pointerover', () => {
-      if (this.currentTurn === 'player') {
-
-        this.playHandButton.scale.set(1.08);
-
-        this.playHandButtonBg.clear();
-        this.playHandButtonBg.rect(-100, -25, 200, 50);
-        this.playHandButtonBg.fill(0x00CC00);
-        this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-      }
-    });
-
-    this.playHandButton.on('pointerout', () => {
-      this.playHandButton.scale.set(1);
-
-      if (this.currentTurn === 'player') {
-        this.playHandButtonBg.clear();
-        this.playHandButtonBg.rect(-100, -25, 200, 50);
-        this.playHandButtonBg.fill(0x00AA00);
-        this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-      }
-    });
-
-    this.updatePlayHandButton();
-
-    console.log("Botón PLAY HAND creado correctamente");
+    this.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+    console.log('All cards deselected');
   }
 
-  updatePlayHandButton() {
-    if (!this.playHandButton) return;
+  async playSelectedCards() {
+    if (!this.playerHand.hasSelectedCards) return;
 
-    // Deshabilitar durante turno de IA
-    if (this.currentTurn === 'ai') {
-      this.playHandButton.eventMode = 'none';
-      this.playHandButton.alpha = 0.5;
-      this.playHandButtonBg.clear();
-      this.playHandButtonBg.rect(-100, -25, 200, 50);
-      this.playHandButtonBg.fill(0x666666);
-      this.playHandButtonBg.stroke({ width: 3, color: 0x999999 });
-    } else {
-      this.playHandButton.eventMode = 'static';
-      this.playHandButton.alpha = 1;
-      this.playHandButtonBg.clear();
-      this.playHandButtonBg.rect(-100, -25, 200, 50);
-      this.playHandButtonBg.fill(0x00AA00);
-      this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
-    }
-  }
+    console.log('\n=== PLAYING SELECTED CARDS ===');
+    const cardsToRemove = [...this.playerHand.selectedCards];
+    const result = this.playerHand.playSelectedCards();
+    console.log(`Played: ${result.handInfo.handName}`);
 
-  createSortButtons() {
-    // --- DESELECT ALL BUTTON ---
-    this.deselectAllButton = new PIXI.Container();
-    this.deselectAllButton.x = this.width - 220;
-    this.deselectAllButton.y = this.height - 150;
-    this.deselectAllButton.eventMode = 'static';
-    this.deselectAllButton.cursor = 'pointer';
-    this.deselectAllButton.zIndex = 2000;
-
-    this.interface.addChild(this.deselectAllButton);
-
-    this.deselectAllBg = new PIXI.Graphics();
-    this.deselectAllBg.rect(-60, -20, 120, 40);
-    this.deselectAllBg.fill(0x3498DB);
-    this.deselectAllBg.stroke({ width: 2, color: 0xFFFFFF });
-
-    this.deselectAllButton.addChild(this.deselectAllBg);
-
-    this.deselectAllText = new PIXI.Text({
-      text: "DESELECT",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 16,
-        fill: "#ffffff",
-        fontWeight: "bold"
-      }
-    });
-    this.deselectAllText.anchor.set(0.5);
-    this.deselectAllButton.addChild(this.deselectAllText);
-
-    this.deselectAllButton.on('pointerdown', () => {
-      if (this.currentTurn === 'player') {
-        this.deselectAllCards();
-      }
+    cardsToRemove.forEach(card => {
+      this.handRenderer.removeCardVisual(card);
     });
 
-    this.deselectAllButton.on('pointerover', () => {
-      this.deselectAllButton.scale.set(1.05);
-      this.deselectAllBg.clear();
-      this.deselectAllBg.rect(-60, -20, 120, 40);
-      this.deselectAllBg.fill(0x5DADE2);
-      this.deselectAllBg.stroke({ width: 2, color: 0xFFFFFF });
-    });
-
-    this.deselectAllButton.on('pointerout', () => {
-      this.deselectAllButton.scale.set(1);
-      this.deselectAllBg.clear();
-      this.deselectAllBg.rect(-60, -20, 120, 40);
-      this.deselectAllBg.fill(0x3498DB);
-      this.deselectAllBg.stroke({ width: 2, color: 0xFFFFFF });
-    });
-
-    // --- SORT BY RANK BUTTON ---
-    this.sortByRankButton = new PIXI.Container();
-    this.sortByRankButton.x = this.width - 220;
-    this.sortByRankButton.y = this.height - 100;
-    this.sortByRankButton.eventMode = 'static';
-    this.sortByRankButton.cursor = 'pointer';
-    this.sortByRankButton.zIndex = 2000;
-
-    this.interface.addChild(this.sortByRankButton);
-
-    this.sortByRankBg = new PIXI.Graphics();
-    this.sortByRankBg.rect(-60, -20, 120, 40);
-    this.sortByRankBg.fill(0x9B59B6);
-    this.sortByRankBg.stroke({ width: 2, color: 0xFFFFFF });
-
-    this.sortByRankButton.addChild(this.sortByRankBg);
-
-    this.sortByRankText = new PIXI.Text({
-      text: "BY RANK",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 16,
-        fill: "#ffffff",
-        fontWeight: "bold"
-      }
-    });
-    this.sortByRankText.anchor.set(0.5);
-    this.sortByRankButton.addChild(this.sortByRankText);
-
-    this.sortByRankButton.on('pointerdown', () => {
-      if (this.currentTurn === 'player') {
-        this.sortHandByRank();
-      }
-    });
-
-    this.sortByRankButton.on('pointerover', () => {
-      this.sortByRankButton.scale.set(1.05);
-      this.sortByRankBg.clear();
-      this.sortByRankBg.rect(-60, -20, 120, 40);
-      this.sortByRankBg.fill(0xAA6FC9);
-      this.sortByRankBg.stroke({ width: 2, color: 0xFFFFFF });
-    });
-
-    this.sortByRankButton.on('pointerout', () => {
-      this.sortByRankButton.scale.set(1);
-      this.sortByRankBg.clear();
-      this.sortByRankBg.rect(-60, -20, 120, 40);
-      this.sortByRankBg.fill(0x9B59B6);
-      this.sortByRankBg.stroke({ width: 2, color: 0xFFFFFF });
-    });
-
-    // --- SORT BY SUIT BUTTON ---
-    this.sortBySuitButton = new PIXI.Container();
-    this.sortBySuitButton.x = this.width - 220;
-    this.sortBySuitButton.y = this.height - 50;
-    this.sortBySuitButton.eventMode = 'static';
-    this.sortBySuitButton.cursor = 'pointer';
-    this.sortBySuitButton.zIndex = 2000;
-
-    this.interface.addChild(this.sortBySuitButton);
-
-    this.sortBySuitBg = new PIXI.Graphics();
-    this.sortBySuitBg.rect(-60, -20, 120, 40);
-    this.sortBySuitBg.fill(0xE67E22);
-    this.sortBySuitBg.stroke({ width: 2, color: 0xFFFFFF });
-
-    this.sortBySuitButton.addChild(this.sortBySuitBg);
-
-    this.sortBySuitText = new PIXI.Text({
-      text: "BY SUIT",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 16,
-        fill: "#ffffff",
-        fontWeight: "bold"
-      }
-    });
-    this.sortBySuitText.anchor.set(0.5);
-    this.sortBySuitButton.addChild(this.sortBySuitText);
-
-    this.sortBySuitButton.on('pointerdown', () => {
-      if (this.currentTurn === 'player') {
-        this.sortHandBySuit();
-      }
-    });
-
-    this.sortBySuitButton.on('pointerover', () => {
-      this.sortBySuitButton.scale.set(1.05);
-      this.sortBySuitBg.clear();
-      this.sortBySuitBg.rect(-60, -20, 120, 40);
-      this.sortBySuitBg.fill(0xF39C12);
-      this.sortBySuitBg.stroke({ width: 2, color: 0xFFFFFF });
-    });
-
-    this.sortBySuitButton.on('pointerout', () => {
-      this.sortBySuitButton.scale.set(1);
-      this.sortBySuitBg.clear();
-      this.sortBySuitBg.rect(-60, -20, 120, 40);
-      this.sortBySuitBg.fill(0xE67E22);
-      this.sortBySuitBg.stroke({ width: 2, color: 0xFFFFFF });
-    });
-
-    console.log("Botones de ordenamiento creados");
+    this.handRenderer.updatePositions();
+    this.updateDeckCounters();
+    this.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
   }
 
   async endPlayerTurn() {
@@ -817,7 +523,7 @@ class Juego {
     this.turnsPassed++;
 
     // Actualizar UI
-    this.updateEndTurnButton();
+    this.uiManager.updateEndTurnButton();
     if (this.turnText) {
       this.turnText.text = "AI TURN";
       this.turnText.style.fill = "#FF0000";
@@ -850,7 +556,7 @@ class Juego {
     this.aiTurnTimer = 0;
 
     // Actualizar UI
-    this.updateEndTurnButton();
+    this.uiManager.updateEndTurnButton();
     if (this.turnText) {
       this.turnText.text = "YOUR TURN";
       this.turnText.style.fill = "#00FF00";
@@ -948,9 +654,8 @@ class Juego {
     this.interfaceContainer.addChild(this.interfaceBackground);
 
     await this.initCardVisuals();
-    this.createEndTurnButton();
-    this.createPlayButton();
-    this.createSortButtons();
+    this.uiManager = new UIManager(this);
+    this.uiManager.createAllButtons();
   }
 
   async loadTextures() {
@@ -1060,8 +765,8 @@ class Juego {
     // Update UI
     this.handRenderer.updatePositions();
     this.updateDeckCounters();
-    this.updateHandValueDisplay();
-    this.updatePlayHandButton();
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
 
     console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
   }
@@ -1271,19 +976,8 @@ class Juego {
       this.turnText.x = this.width / 2;
     }
 
-    if (this.sortByRankButton) {
-      this.sortByRankButton.x = this.width - 220;
-      this.sortByRankButton.y = this.height - 100;
-    }
-
-    if (this.sortBySuitButton) {
-      this.sortBySuitButton.x = this.width - 220;
-      this.sortBySuitButton.y = this.height - 50;
-    }
-
-    if (this.deselectAllButton) {
-      this.deselectAllButton.x = this.width - 220;
-      this.deselectAllButton.y = this.height - 150;
+    if (this.uiManager) {
+      this.uiManager.updatePositions();
     }
   }
 
