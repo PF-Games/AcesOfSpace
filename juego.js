@@ -243,6 +243,9 @@ class Juego {
     if (success && this.handRenderer) {
       this.handRenderer.deselectCard(card);
     }
+    this.updateHandValueDisplay();
+    this.updatePlayHandButton();
+  
     return success;
   }
 
