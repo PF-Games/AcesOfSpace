@@ -220,6 +220,22 @@ class Juego {
     return success;
   }
 
+  deselectAllCards() {
+    console.log('\n=== DESELECTING ALL CARDS ===');
+    this.playerHand.deselectAll();
+
+    // Update all visuals to show deselected state
+    this.handRenderer.cardVisuals.forEach(cardVisual => {
+      cardVisual.setSelected(false);
+      cardVisual.targetY = this.handRenderer.handY;
+    });
+
+    this.updateHandValueDisplay();
+    this.updatePlayHandButton();
+
+    console.log('All cards deselected');
+  }
+
   findClosestUntargetedShip() {
     // Find closest untargeted enemy ship
     let closestShip = null;
@@ -309,6 +325,10 @@ class Juego {
   sortHandByRank() {
     console.log('\n=== SORTING BY RANK ===');
 
+    this.playerHand.deselectAll();
+    this.updateHandValueDisplay();
+    this.updatePlayHandButton();
+
     // Sort the cards array by rank value (high to low)
     this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
 
@@ -321,8 +341,12 @@ class Juego {
   sortHandBySuit() {
     console.log('\n=== SORTING BY SUIT ===');
 
-    // Define suit order: Spades, Hearts, Diamonds, Clubs
-    const suitOrder = { 'S': 0, 'H': 1, 'D': 2, 'C': 3 };
+    this.playerHand.deselectAll();
+    this.updateHandValueDisplay();
+    this.updatePlayHandButton();
+
+    // Define suit order: Spades, Clubs, Diamonds, Hearts
+    const suitOrder = { 'S': 0, 'C': 1, 'D': 2, 'H': 3 };
 
     // Sort by suit first, then by rank within each suit
     this.playerHand.cards.sort((a, b) => {
@@ -606,6 +630,57 @@ class Juego {
   }
 
   createSortButtons() {
+    // --- DESELECT ALL BUTTON ---
+    this.deselectAllButton = new PIXI.Container();
+    this.deselectAllButton.x = this.width - 220;
+    this.deselectAllButton.y = this.height - 150;
+    this.deselectAllButton.eventMode = 'static';
+    this.deselectAllButton.cursor = 'pointer';
+    this.deselectAllButton.zIndex = 2000;
+
+    this.interface.addChild(this.deselectAllButton);
+
+    this.deselectAllBg = new PIXI.Graphics();
+    this.deselectAllBg.rect(-60, -20, 120, 40);
+    this.deselectAllBg.fill(0x3498DB);
+    this.deselectAllBg.stroke({ width: 2, color: 0xFFFFFF });
+
+    this.deselectAllButton.addChild(this.deselectAllBg);
+
+    this.deselectAllText = new PIXI.Text({
+      text: "DESELECT",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 16,
+        fill: "#ffffff",
+        fontWeight: "bold"
+      }
+    });
+    this.deselectAllText.anchor.set(0.5);
+    this.deselectAllButton.addChild(this.deselectAllText);
+
+    this.deselectAllButton.on('pointerdown', () => {
+      if (this.currentTurn === 'player') {
+        this.deselectAllCards();
+      }
+    });
+
+    this.deselectAllButton.on('pointerover', () => {
+      this.deselectAllButton.scale.set(1.05);
+      this.deselectAllBg.clear();
+      this.deselectAllBg.rect(-60, -20, 120, 40);
+      this.deselectAllBg.fill(0x5DADE2);
+      this.deselectAllBg.stroke({ width: 2, color: 0xFFFFFF });
+    });
+
+    this.deselectAllButton.on('pointerout', () => {
+      this.deselectAllButton.scale.set(1);
+      this.deselectAllBg.clear();
+      this.deselectAllBg.rect(-60, -20, 120, 40);
+      this.deselectAllBg.fill(0x3498DB);
+      this.deselectAllBg.stroke({ width: 2, color: 0xFFFFFF });
+    });
+
     // --- SORT BY RANK BUTTON ---
     this.sortByRankButton = new PIXI.Container();
     this.sortByRankButton.x = this.width - 220;
@@ -1204,6 +1279,11 @@ class Juego {
     if (this.sortBySuitButton) {
       this.sortBySuitButton.x = this.width - 220;
       this.sortBySuitButton.y = this.height - 50;
+    }
+
+    if (this.deselectAllButton) {
+      this.deselectAllButton.x = this.width - 220;
+      this.deselectAllButton.y = this.height - 150;
     }
   }
 
