@@ -1,4 +1,4 @@
-class playerHand {
+class PlayerHand {
   constructor(deck, discardPile, config = {}) {
     this.deck = deck;
     this.discardPile = discardPile;

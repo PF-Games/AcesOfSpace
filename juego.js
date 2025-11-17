@@ -122,7 +122,7 @@ class Juego {
     this.deck = new Deck();
     this.deck.shuffle();
     this.discardPile = new DiscardPile();
-    this.playerHand = new playerHand(this.deck, this.discardPile, {
+    this.playerHand = new PlayerHand(this.deck, this.discardPile, {
       maxCards: 12,
       cardsToDraw: 5,
       initialCards: 7
@@ -184,7 +184,7 @@ class Juego {
       const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
       this.handValueText.text = handInfo.handName.toUpperCase();
     } else {
-      this.handValueText.text = "dasdsadasdsd"
+      this.handValueText.text = "";
     }
   }
 
@@ -285,7 +285,7 @@ class Juego {
     });
     this.handValueText.anchor.set(0.5, 0);
     this.handValueText.x = this.width / 2;
-    this.handValueText.y = 70;
+    this.handValueText.y = 800
     this.interface.addChild(this.handValueText);
   }
 
