@@ -33,7 +33,7 @@ class Juego {
 
     this.turnoDeljugador = true;
 
-    this.currentTurn = 'player';
+    this.currentTurn = 'ai';
     this.aiTurnDuration = 180;
     this.aiTurnTimer = 0;
     this.turnsPassed = 0;
@@ -220,6 +220,92 @@ class Juego {
     return success;
   }
 
+  findClosestUntargetedShip() {
+    // Find closest untargeted enemy ship
+    let closestShip = null;
+    let distMenor = Infinity;
+
+    for (let ship of this.ships) {
+      if (ship.isTargeted) continue;
+      const dist = calcularDistancia(this.protagonista.posicion, ship.posicion);
+      if (dist < distMenor) {
+        distMenor = dist;
+        closestShip = ship;
+      }
+    }
+
+    // If all ships are targeted, target the Boss/Antagonista
+    if (!closestShip && this.antagonista && !this.antagonista.muerto) {
+      closestShip = this.antagonista;
+    }
+
+    return closestShip;
+  }
+
+  // 2. NEW method to fire a single rocket at closest target
+  fireRocket() {
+    const target = this.findClosestUntargetedShip();
+
+    if (!target) {
+      console.log('No targets available');
+      return false;
+    }
+
+    if (target !== this.antagonista) {
+      target.isTargeted = true;
+    }
+
+    const rocket = new Rocket(
+      "assets/rockets/rocket1.png",
+      this.protagonista.posicion.x,
+      this.protagonista.posicion.y,
+      this,
+      target
+    );
+    rocket.crearSprite();
+    this.rockets.push(rocket);
+
+    return true;
+  }
+
+  // 3. NEW method to fire multiple rockets based on hand
+  fireRocketsForHand(handInfo) {
+    const rocketsToFire = this.getRocketsForHand(handInfo);
+    console.log(`Firing ${rocketsToFire} rockets for ${handInfo.handName}`);
+
+    for (let i = 0; i < rocketsToFire; i++) {
+      setTimeout(() => {
+        if (this.protagonista && !this.protagonista.muerto) {
+          this.fireRocket();
+        }
+      }, i * 100); // 100ms delay between rockets
+    }
+  }
+
+  // 4. NEW method to determine rockets per hand (configurable)
+  getRocketsForHand(handInfo) {
+    // For now, return 5 for any hand
+    // Later you can use handInfo.rank or handInfo.handName
+    return 5;
+
+    // FUTURE: Use this mapping
+    /*
+    const rocketsPerHand = {
+      'Royal Flush': 10,
+      'Straight Flush': 9,
+      'Four of a Kind': 8,
+      'Full House': 7,
+      'Flush': 6,
+      'Straight': 5,
+      'Three of a Kind': 4,
+      'Two Pair': 3,
+      'Pair': 2,
+      'High Card': 1
+    };
+    return rocketsPerHand[handInfo.handName] || 1;
+    */
+  }
+
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -401,11 +487,40 @@ class Juego {
     this.playHandButtonText.anchor.set(0.5);
     this.playHandButton.addChild(this.playHandButtonText);
 
+    /*
     this.playHandButton.on('pointerdown', () => {
       if (this.currentTurn === 'player') {
         this.playSelectedCards();
       }
     });
+    */
+
+    this.playHandButton.on('pointerdown', () => {
+    if (this.currentTurn === 'player' && this.playerHand.hasSelectedCards) {
+      // Get hand info from PlayerHand
+      const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+      
+      // Play cards (uses existing PlayerHand method)
+      const cardsToRemove = [...this.playerHand.selectedCards];
+      const result = this.playerHand.playSelectedCards();
+      
+      // Remove card visuals
+      cardsToRemove.forEach(card => {
+        this.handRenderer.removeCardVisual(card);
+      });
+      
+      // Fire rockets
+      this.fireRocketsForHand(handInfo);
+      
+      // Update UI
+      this.handRenderer.updatePositions();
+      this.updateDeckCounters();
+      this.updateHandValueDisplay();
+      this.updatePlayHandButton();
+      
+      console.log(`Played ${handInfo.handName}, fired rockets`);
+    }
+  });
 
     // HOVER EFFECT: SCALE + TINT COMBINED
     this.playHandButton.on('pointerover', () => {
@@ -460,18 +575,6 @@ class Juego {
   async endPlayerTurn() {
     console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
 
-    // Jugar cartas seleccionadas
-    if (this.playerHand.hasSelectedCards) {
-      const cardsToRemove = [...this.playerHand.selectedCards];
-      const result = this.playerHand.playSelectedCards();
-      console.log(`Jugaste: ${result.handInfo.handName}`);
-
-      // Remover visuales de cartas jugadas
-      cardsToRemove.forEach(card => {
-        this.handRenderer.removeCardVisual(card);
-      });
-    }
-
     // Tomar nuevas cartas
     const previousCount = this.playerHand.numberOfCards;
     this.playerHand.drawCards();
@@ -484,7 +587,7 @@ class Juego {
       await this.handRenderer.createCardVisual(card, cardIndex);
     }
 
-    this.handRenderer.updatePositions();
+    //this.handRenderer.updatePositions();
     this.updateDeckCounters();
 
     console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
@@ -705,10 +808,52 @@ class Juego {
           closestShip
         );
         rocket.crearSprite();
-        this.rockets.push(rocket);
+      //  this.rockets.push(rocket); DISABLED 17/11
       }
     };
   }
+
+  handlePlayHand() {
+    if (!this.playerHand.hasSelectedCards) {
+      console.warn('No cards selected to play');
+      return;
+    }
+
+    if (this.currentTurn !== 'player') {
+      console.warn('Cannot play cards during AI turn');
+      return;
+    }
+
+    // Get hand info BEFORE playing cards
+    const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+    console.log(`Playing hand: ${handInfo.handName}`);
+
+    // Determine number of rockets based on hand rank
+    const rocketsToFire = this.getRocketsForHand(handInfo);
+
+    // Play the cards using the EXISTING playerHand method
+    const cardsToRemove = [...this.playerHand.selectedCards];
+    const result = this.playerHand.playSelectedCards();
+
+    // Remove card visuals
+    cardsToRemove.forEach(card => {
+      this.handRenderer.removeCardVisual(card);
+    });
+
+    this.fireRockets(rocketsToFire);
+
+    // Update UI
+    this.handRenderer.updatePositions();
+    this.updateDeckCounters();
+    this.updateHandValueDisplay();
+    this.updatePlayHandButton();
+
+    console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
+  }
+
+
+
+
 
   async crearProtagonista() {
     const x = this.mapWidth / 2
