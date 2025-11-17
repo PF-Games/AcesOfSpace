@@ -198,7 +198,7 @@ class Juego {
     const success = this.playerHand.selectCard(card);
     if (success) {
       this.handRenderer.selectCard(card);
-      this.updateHandValueDisplay();
+      this.uiManager.updateHandValueDisplay();
       this.uiManager.updatePlayHandButton();
     }
     return success;
@@ -214,7 +214,7 @@ class Juego {
     if (success && this.handRenderer) {
       this.handRenderer.deselectCard(card);
     }
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
 
     return success;
@@ -230,7 +230,7 @@ class Juego {
       cardVisual.targetY = this.handRenderer.handY;
     });
 
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
 
     console.log('All cards deselected');
@@ -326,7 +326,7 @@ class Juego {
     console.log('\n=== SORTING BY RANK ===');
 
     this.playerHand.deselectAll();
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
 
     // Sort the cards array by rank value (high to low)
@@ -342,7 +342,7 @@ class Juego {
     console.log('\n=== SORTING BY SUIT ===');
 
     this.playerHand.deselectAll();
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
 
     // Define suit order: Spades, Clubs, Diamonds, Hearts
@@ -384,58 +384,15 @@ class Juego {
     this.interface.zIndex = 1000;
     this.pixiApp.stage.addChild(this.interface);
 
-    this.fpsText = new PIXI.Text({
-      text: "FPS: 60",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 4
-      }
-    });
-
-    this.fpsText.x = this.width - 120;
-    this.fpsText.y = 20;
-    this.interface.addChild(this.fpsText);
-    this.turnText = new PIXI.Text({
-      text: "PLAYER TURN",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 32,
-        fill: "#0d34e0ff",
-        stroke: "#000000",
-        strokeThickness: 5
-      }
-    });
-
-    this.turnText.anchor.set(0.5, 0);
-    this.turnText.x = this.width / 2;
-    this.turnText.y = 20;
-    this.interface.addChild(this.turnText);
-
-    // Hand value indicator
-    this.handValueText = new PIXI.Text({
-      text: "",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 28,
-        fill: "#FFD700",
-        stroke: "#000000",
-        strokeThickness: 4
-      }
-    });
-
-    this.handValueText.anchor.set(0.5, 0);
-    this.handValueText.x = this.width / 2;
-    this.handValueText.y = 800
-    this.interface.addChild(this.handValueText);
+    // UI Manager will handle everything
+    this.uiManager = new UIManager(this);
+    this.uiManager.createAllUI();
   }
 
   sortHandByRank() {
     console.log('\n=== SORTING BY RANK ===');
     this.playerHand.deselectAll();
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
 
     this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
@@ -446,7 +403,7 @@ class Juego {
   sortHandBySuit() {
     console.log('\n=== SORTING BY SUIT ===');
     this.playerHand.deselectAll();
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
 
     const suitOrder = { 'S': 0, 'H': 1, 'D': 2, 'C': 3 };
@@ -469,7 +426,7 @@ class Juego {
       cardVisual.targetY = this.handRenderer.handY;
     });
 
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
     console.log('All cards deselected');
   }
@@ -488,7 +445,7 @@ class Juego {
 
     this.handRenderer.updatePositions();
     this.updateDeckCounters();
-    this.updateHandValueDisplay();
+    this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
   }
 
@@ -524,11 +481,7 @@ class Juego {
 
     // Actualizar UI
     this.uiManager.updateEndTurnButton();
-    if (this.turnText) {
-      this.turnText.text = "AI TURN";
-      this.turnText.style.fill = "#FF0000";
-    }
-
+    this.uiManager.updateTurnIndicator('ai');
     // Spawn de naves si corresponde
     if (this.antagonista && this.turnsPassed % this.antagonista.turnosParaSpawn === 0) {
       this.antagonista.spawnearNave();
@@ -537,13 +490,7 @@ class Juego {
 
   updateAITurn() {
     this.aiTurnTimer++;
-
-    // Actualizar progreso en UI (opcional)
-    if (this.turnText) {
-      const progress = Math.floor((this.aiTurnTimer / this.aiTurnDuration) * 100);
-      this.turnText.text = `AI TURN (${progress}%)`;
-    }
-
+    this.uiManager.updateTurnIndicator('ai-progress');
     // Fin del turno de IA
     if (this.aiTurnTimer >= this.aiTurnDuration) {
       this.endAITurn();
@@ -557,10 +504,7 @@ class Juego {
 
     // Actualizar UI
     this.uiManager.updateEndTurnButton();
-    if (this.turnText) {
-      this.turnText.text = "YOUR TURN";
-      this.turnText.style.fill = "#00FF00";
-    }
+    this.uiManager.updateTurnIndicator('player');
   }
 
   async initPIXI() {
@@ -655,7 +599,7 @@ class Juego {
 
     await this.initCardVisuals();
     this.uiManager = new UIManager(this);
-    this.uiManager.createAllButtons();
+    this.uiManager.createAllUI();
   }
 
   async loadTextures() {
@@ -961,10 +905,9 @@ class Juego {
       this.handRenderer.updatePositions();
     }
 
-    if (this.fpsText) {
-      this.fpsText.x = this.width - 120;
-      this.fpsText.y = 20;
-      this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2);
+    if (this.uiManager) {
+      this.uiManager.updateFPS(this.pixiApp.ticker.FPS);
+      this.uiManager.updatePositions();
     }
 
     if (this.endTurnButton) {

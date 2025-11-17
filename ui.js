@@ -2,12 +2,99 @@ class UIManager {
   constructor(juego) {
     this.juego = juego;
     this.buttons = {};
+    this.textElements = {};
   }
 
-  createAllButtons() {
+  createAllUI() {
+    this.createTextIndicators();
     this.createEndTurnButton();
     this.createPlayHandButton();
     this.createSortButtons();
+  }
+
+  createTextIndicators() {
+    // FPS Text
+    this.textElements.fps = new PIXI.Text({
+      text: "FPS: 60",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 4
+      }
+    });
+    this.textElements.fps.x = this.juego.width - 120;
+    this.textElements.fps.y = 20;
+    this.juego.interface.addChild(this.textElements.fps);
+
+    // Turn indicator
+    this.textElements.turn = new PIXI.Text({
+      text: "PLAYER TURN",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 32,
+        fill: "#0d34e0ff",
+        stroke: "#000000",
+        strokeThickness: 5
+      }
+    });
+    this.textElements.turn.anchor.set(0.5, 0);
+    this.textElements.turn.x = this.juego.width / 2;
+    this.textElements.turn.y = 20;
+    this.juego.interface.addChild(this.textElements.turn);
+
+    // Hand value indicator
+    this.textElements.handValue = new PIXI.Text({
+      text: "",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 28,
+        fill: "#FFD700",
+        stroke: "#000000",
+        strokeThickness: 4
+      }
+    });
+    this.textElements.handValue.anchor.set(0.5, 0);
+    this.textElements.handValue.x = this.juego.width / 2;
+    this.textElements.handValue.y = 70;
+    this.juego.interface.addChild(this.textElements.handValue);
+  }
+
+  updateFPS(fps) {
+    if (this.textElements.fps) {
+      this.textElements.fps.text = `FPS: ${fps.toFixed(0)}`;
+    }
+  }
+
+  updateTurnIndicator(turnState) {
+    if (!this.textElements.turn) return;
+
+    switch(turnState) {
+      case 'player':
+        this.textElements.turn.text = "YOUR TURN";
+        this.textElements.turn.style.fill = "#00FF00";
+        break;
+      case 'ai':
+        this.textElements.turn.text = "AI TURN";
+        this.textElements.turn.style.fill = "#FF0000";
+        break;
+      case 'ai-progress':
+        const progress = Math.floor((this.juego.aiTurnTimer / this.juego.aiTurnDuration) * 100);
+        this.textElements.turn.text = `AI TURN (${progress}%)`;
+        break;
+    }
+  }
+
+  updateHandValueDisplay() {
+    if (!this.textElements.handValue) return;
+
+    if (this.juego.playerHand.hasSelectedCards) {
+      const handInfo = this.juego.playerHand.validateHand(this.juego.playerHand.selectedCards);
+      this.textElements.handValue.text = handInfo.handName.toUpperCase();
+    } else {
+      this.textElements.handValue.text = "";
+    }
   }
 
   createEndTurnButton() {
@@ -261,6 +348,23 @@ class UIManager {
     const w = this.juego.width;
     const h = this.juego.height;
 
+    // Update text positions
+    if (this.textElements.fps) {
+      this.textElements.fps.x = w - 120;
+      this.textElements.fps.y = 20;
+    }
+
+    if (this.textElements.turn) {
+      this.textElements.turn.x = w / 2;
+      this.textElements.turn.y = 20;
+    }
+
+    if (this.textElements.handValue) {
+      this.textElements.handValue.x = w / 2;
+      this.textElements.handValue.y = 70;
+    }
+
+    // Update button positions
     if (this.buttons.endTurn) {
       this.buttons.endTurn.container.x = w / 7;
       this.buttons.endTurn.container.y = h - 70;
@@ -287,4 +391,3 @@ class UIManager {
     }
   }
 }
-
