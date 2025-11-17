@@ -103,7 +103,7 @@ class Juego {
   syncHandVisuals() {
     this.handRenderer.clear();
     this.playerHand.cards.forEach((card, index) => {
-    this.handRenderer.createCardVisual(card, index);
+      this.handRenderer.createCardVisual(card, index);
     });
 
     this.handRenderer.updatePositions();
@@ -177,16 +177,16 @@ class Juego {
   }
 
   updateHandValueDisplay() {
-  if (!this.handValueText) return;
+    if (!this.handValueText) return;
 
-  if (this.playerHand.hasSelectedCards) {
-    // Lllama a la función que YA EXISTE en playerHand
-    const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
-    this.handValueText.text = handInfo.handName.toUpperCase();
-  } else {
-    this.handValueText.text = "";
+    if (this.playerHand.hasSelectedCards) {
+      // Lllama a la función que YA EXISTE en playerHand
+      const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+      this.handValueText.text = handInfo.handName.toUpperCase();
+    } else {
+      this.handValueText.text = "dasdsadasdsd"
+    }
   }
-}
 
   // Método helper para seleccionar una carta por índice
   selectCardByIndex(index) {
@@ -216,7 +216,7 @@ class Juego {
     }
     this.updateHandValueDisplay();
     this.updatePlayHandButton();
-  
+
     return success;
   }
 
@@ -349,7 +349,7 @@ class Juego {
     });
     this.updateEndTurnButton();
     console.log("Botón END TURN creado correctamente");
-}
+  }
 
   updateEndTurnButton() {
     if (!this.endTurnButton) return;
@@ -421,7 +421,7 @@ class Juego {
     });
 
     this.playHandButton.on('pointerout', () => {
-    this.playHandButton.scale.set(1);
+      this.playHandButton.scale.set(1);
 
       if (this.currentTurn === 'player') {
         this.playHandButtonBg.clear();
@@ -434,7 +434,7 @@ class Juego {
     this.updatePlayHandButton();
 
     console.log("Botón PLAY HAND creado correctamente");
-}
+  }
 
   updatePlayHandButton() {
     if (!this.playHandButton) return;
@@ -800,52 +800,52 @@ class Juego {
 
 
   gameLoop(time) {
-  if (this.teclado["w"]) {
-    this.containerPrincipal.y += 10;
-  }
-  if (this.teclado["s"]) {
-    this.containerPrincipal.y -= 10;
-  }
-  if (this.teclado["a"]) {
-    this.containerPrincipal.x += 10;
-  }
-  if (this.teclado["d"]) {
-    this.containerPrincipal.x -= 10;
-  }
-  
-  this.frameCounter++;
+    if (this.teclado["w"]) {
+      this.containerPrincipal.y += 10;
+    }
+    if (this.teclado["s"]) {
+      this.containerPrincipal.y -= 10;
+    }
+    if (this.teclado["a"]) {
+      this.containerPrincipal.x += 10;
+    }
+    if (this.teclado["d"]) {
+      this.containerPrincipal.x -= 10;
+    }
 
-  if (this.antagonista) {
-    // SOLO tick durante turno de IA
+    this.frameCounter++;
+
+    if (this.antagonista) {
+      // SOLO tick durante turno de IA
+      if (this.currentTurn === 'ai') {
+        this.antagonista.tick();
+      }
+      this.antagonista.render();
+    }
+
+    // Actualizar turno de IA si corresponde
     if (this.currentTurn === 'ai') {
-      this.antagonista.tick();
-    }
-    this.antagonista.render();
-  }
+      this.updateAITurn();
 
-  // Actualizar turno de IA si corresponde
-  if (this.currentTurn === 'ai') {
-    this.updateAITurn();
-    
-    // Durante turno de IA, las naves se mueven
-    for (let aShip of this.ships) {
-      aShip.tick();  // Llamar tick() solo en turno IA
-      aShip.render();
+      // Durante turno de IA, las naves se mueven
+      for (let aShip of this.ships) {
+        aShip.tick();  // Llamar tick() solo en turno IA
+        aShip.render();
+      }
+    } else {
+      // Durante turno del jugador, solo renderizar sin mover
+      for (let aShip of this.ships) {
+        aShip.render(); // Solo render, sin tick()
+      }
     }
-  } else {
-    // Durante turno del jugador, solo renderizar sin mover
-    for (let aShip of this.ships) {
-      aShip.render(); // Solo render, sin tick()
+
+    // Actualizar renderizador de cartas
+    if (this.handRenderer) {
+      this.handRenderer.tick();
+      this.handRenderer.render();
     }
-  }
 
-  // Actualizar renderizador de cartas
-  if (this.handRenderer) {
-    this.handRenderer.tick();
-    this.handRenderer.render();
-  }
-
-     this.updateInterface();
+    this.updateInterface();
 
     for (let rocket of this.rockets) {
       rocket.tick();
