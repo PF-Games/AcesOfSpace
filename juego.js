@@ -407,6 +407,96 @@ class Juego {
     }
   }
 
+  createPlayButton() {
+    // Container del botón
+    this.playHandButton = new PIXI.Container();
+    this.playHandButton.x = this.width / 7;
+    this.playHandButton.y = this.height - 140;
+    this.playHandButton.eventMode = 'static';
+    this.playHandButton.cursor = 'pointer';
+    this.playHandButton.zIndex = 2000;
+
+    this.interface.addChild(this.playHandButton);
+
+    // --- Background del botón ---
+    this.playHandButtonBg = new PIXI.Graphics();
+    this.playHandButtonBg.rect(-100, -25, 200, 50);
+    this.playHandButtonBg.fill(0x00AA00);
+    this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+
+    this.playHandButton.addChild(this.playHandButtonBg);
+
+    this.playHandButtonText = new PIXI.Text({
+      text: "FIRE",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: "#ffffff",
+        fontWeight: "bold"
+      }
+    });
+    this.playHandButtonText.anchor.set(0.5);
+    this.playHandButton.addChild(this.playHandButtonText);
+
+    // --- CLICK EVENT ---
+    this.playHandButton.on('pointerdown', () => {
+      if (this.currentTurn === 'player') {
+        this.playSelectedCards();
+      }
+    });
+
+    // HOVER EFFECT: SCALE + TINT COMBINED
+    this.playHandButton.on('pointerover', () => {
+      if (this.currentTurn === 'player') {
+
+        this.playHandButton.scale.set(1.08);
+
+        this.playHandButtonBg.clear();
+        this.playHandButtonBg.rect(-100, -25, 200, 50);
+        this.playHandButtonBg.fill(0x00CC00);
+        this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+      }
+    });
+
+    this.playHandButton.on('pointerout', () => {
+      // Reset scale
+      this.playHandButton.scale.set(1);
+
+      if (this.currentTurn === 'player') {
+        // Reset tint
+        this.playHandButtonBg.clear();
+        this.playHandButtonBg.rect(-100, -25, 200, 50);
+        this.playHandButtonBg.fill(0x00AA00);
+        this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+      }
+    });
+
+    this.updatePlayHandButton();
+
+    console.log("Botón PLAY HAND creado correctamente");
+}
+
+  updatePlayHandButton() {
+    if (!this.playHandButton) return;
+
+    // Deshabilitar durante turno de IA
+    if (this.currentTurn === 'ai') {
+      this.playHandButton.eventMode = 'none';
+      this.playHandButton.alpha = 0.5;
+      this.playHandButtonBg.clear();
+      this.playHandButtonBg.rect(-100, -25, 200, 50);
+      this.playHandButtonBg.fill(0x666666);
+      this.playHandButtonBg.stroke({ width: 3, color: 0x999999 });
+    } else {
+      this.playHandButton.eventMode = 'static';
+      this.playHandButton.alpha = 1;
+      this.playHandButtonBg.clear();
+      this.playHandButtonBg.rect(-100, -25, 200, 50);
+      this.playHandButtonBg.fill(0x00AA00);
+      this.playHandButtonBg.stroke({ width: 3, color: 0xFFFFFF });
+    }
+  }
+
   async endPlayerTurn() {
     console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
 
@@ -585,6 +675,7 @@ class Juego {
 
     await this.initCardVisuals();
     this.createEndTurnButton();
+    this.createPlayButton();
   }
 
 
