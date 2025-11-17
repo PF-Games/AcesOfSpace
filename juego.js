@@ -195,6 +195,18 @@ class Juego {
     console.log(`Cartas descartadas: ${this.discardPile.numberOfCards}`);
   }
 
+  updateHandValueDisplay() {
+  if (!this.handValueText) return;
+
+  if (this.playerHand.hasSelectedCards) {
+    // Aquí llama a la función que YA EXISTE en playerHand
+    const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+    this.handValueText.text = handInfo.handName.toUpperCase();
+  } else {
+    this.handValueText.text = "";
+  }
+}
+
   // Método helper para ver las cartas en la mano
   showHand() {
     console.log('\n=== CARTAS EN LA MANO ===');
@@ -215,6 +227,8 @@ class Juego {
     const success = this.playerHand.selectCard(card);
     if (success) {
       this.handRenderer.selectCard(card);
+      this.updateHandValueDisplay(); // ← AGREGADO
+      this.updatePlayHandButton();   // ← AGREGADO
     }
     return success;
   }
@@ -284,7 +298,24 @@ class Juego {
     this.turnText.x = this.width / 2;
     this.turnText.y = 20;
     this.interface.addChild(this.turnText);
+
+    // Hand value indicator
+    this.handValueText = new PIXI.Text({
+      text: "",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 28,
+        fill: "#FFD700",
+        stroke: "#000000",
+        strokeThickness: 4
+      }
+    });
+    this.handValueText.anchor.set(0.5, 0);
+    this.handValueText.x = this.width / 2;
+    this.handValueText.y = 70;
+    this.interface.addChild(this.handValueText);
   }
+
 
   createEndTurnButton() {
     // Container del botón
