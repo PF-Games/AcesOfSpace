@@ -17,7 +17,6 @@ class Juego {
     this.mapHeight = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
 
-    // Variables para el zoom
     this.zoom = 0.9;
     this.minZoom = 0.7;
     this.maxZoom = 2;
@@ -44,7 +43,6 @@ class Juego {
     const Engine = Matter.Engine;
     const Runner = Matter.Runner;
 
-    // Crear motor de física
     this.engine = Engine.create();
     this.engine.gravity.y = 0; // Sin gravedad para las cartas
 
@@ -80,22 +78,19 @@ class Juego {
       "DECK"
     );
 
-    // Esperar a que se creen los visuales
     await this.deckRenderer.createVisuals();
     await this.discardRenderer.createVisuals();
 
-    // Crear visuales para cartas iniciales
     console.log('Creating hand visuals for cards:', this.playerHand.cards);
     this.syncHandVisuals();
 
-    // Debug first card
+    // Debug
     if (this.handRenderer.cardVisuals[0]) {
       console.log('First card visual:', this.handRenderer.cardVisuals[0]);
       await this.handRenderer.cardVisuals[0].debugTextureLoading();
     }
 
     this.updateDeckCounters();
-
     console.log('✅ Visuales de cartas listas');
     console.log('Cards container children:', this.cardsContainer.children.length);
     console.log('First card container:', this.handRenderer.cardVisuals[0]?.container);
@@ -106,12 +101,9 @@ class Juego {
   }
 
   syncHandVisuals() {
-    // Limpiar visuales existentes
     this.handRenderer.clear();
-
-    // Crear visual para cada carta en la mano
     this.playerHand.cards.forEach((card, index) => {
-      this.handRenderer.createCardVisual(card, index);
+    this.handRenderer.createCardVisual(card, index);
     });
 
     this.handRenderer.updatePositions();
@@ -127,25 +119,16 @@ class Juego {
   }
 
   initCardSystem() {
-    console.log('=== INICIALIZANDO SISTEMA DE CARTAS ===');
-
-    // Crear y barajar el mazo
     this.deck = new Deck();
     this.deck.shuffle();
-
-    // Crear pila de descarte
     this.discardPile = new DiscardPile();
-
-    // Crear mano del jugador con configuración personalizable
     this.playerHand = new playerHand(this.deck, this.discardPile, {
-      maxCards: 12,        // Máximo de cartas acumulables
-      cardsToDraw: 5,      // Cartas a reponer por turno
-      initialCards: 7      // Cartas iniciales
+      maxCards: 12,
+      cardsToDraw: 5,
+      initialCards: 7
     });
 
-    // Robar mano inicial
     this.playerHand.drawInitialHand();
-
     console.log(`Deck inicializado: ${this.deck.numberOfCards} cartas`);
     console.log(`Mano inicial: ${this.playerHand.numberOfCards} cartas`);
 
@@ -156,10 +139,8 @@ class Juego {
     window.juego = this;
 
     console.log('✅ Sistema de cartas listo');
-    console.log('💡 Usa la consola para probar: playerHand, deck, discardPile');
   }
 
-  // Método para terminar turno y tomar cartas
   async endTurn() {
     console.log('\n=== FIN DE TURNO ===');
 
@@ -199,23 +180,13 @@ class Juego {
   if (!this.handValueText) return;
 
   if (this.playerHand.hasSelectedCards) {
-    // Aquí llama a la función que YA EXISTE en playerHand
+    // Lllama a la función que YA EXISTE en playerHand
     const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
     this.handValueText.text = handInfo.handName.toUpperCase();
   } else {
     this.handValueText.text = "";
   }
 }
-
-  // Método helper para ver las cartas en la mano
-  showHand() {
-    console.log('\n=== CARTAS EN LA MANO ===');
-    this.playerHand.cards.forEach((card, index) => {
-      const estado = card.fsm ? card.fsm.currentStateName : 'sin FSM';
-      console.log(`${index}: ${card.toString()} [${estado}]`);
-    });
-    console.log(`Total: ${this.playerHand.numberOfCards} cartas`);
-  }
 
   // Método helper para seleccionar una carta por índice
   selectCardByIndex(index) {
@@ -286,7 +257,6 @@ class Juego {
     this.fpsText.x = this.width - 120;
     this.fpsText.y = 20;
     this.interface.addChild(this.fpsText);
-    // Turn indicator
     this.turnText = new PIXI.Text({
       text: "PLAYER TURN",
       style: {
@@ -319,7 +289,6 @@ class Juego {
     this.interface.addChild(this.handValueText);
   }
 
-
   createEndTurnButton() {
     // Container del botón
     this.endTurnButton = new PIXI.Container();
@@ -330,8 +299,6 @@ class Juego {
     this.endTurnButton.zIndex = 2000;
 
     this.interface.addChild(this.endTurnButton);
-
-    // --- Background del botón ---
     this.endTurnButtonBg = new PIXI.Graphics();
     this.endTurnButtonBg.rect(-100, -25, 200, 50);
     this.endTurnButtonBg.fill(0x00AA00);
@@ -351,7 +318,6 @@ class Juego {
     this.endTurnButtonText.anchor.set(0.5);
     this.endTurnButton.addChild(this.endTurnButtonText);
 
-    // --- CLICK EVENT ---
     this.endTurnButton.on('pointerdown', () => {
       if (this.currentTurn === 'player') {
         this.endPlayerTurn();
@@ -372,26 +338,21 @@ class Juego {
     });
 
     this.endTurnButton.on('pointerout', () => {
-      // Reset scale
       this.endTurnButton.scale.set(1);
 
       if (this.currentTurn === 'player') {
-        // Reset tint
         this.endTurnButtonBg.clear();
         this.endTurnButtonBg.rect(-100, -25, 200, 50);
         this.endTurnButtonBg.fill(0x00AA00);
         this.endTurnButtonBg.stroke({ width: 3, color: 0xFFFFFF });
       }
     });
-
     this.updateEndTurnButton();
-
     console.log("Botón END TURN creado correctamente");
 }
 
   updateEndTurnButton() {
     if (!this.endTurnButton) return;
-
     // Deshabilitar durante turno de IA
     if (this.currentTurn === 'ai') {
       this.endTurnButton.eventMode = 'none';
@@ -421,7 +382,6 @@ class Juego {
 
     this.interface.addChild(this.playHandButton);
 
-    // --- Background del botón ---
     this.playHandButtonBg = new PIXI.Graphics();
     this.playHandButtonBg.rect(-100, -25, 200, 50);
     this.playHandButtonBg.fill(0x00AA00);
@@ -441,7 +401,6 @@ class Juego {
     this.playHandButtonText.anchor.set(0.5);
     this.playHandButton.addChild(this.playHandButtonText);
 
-    // --- CLICK EVENT ---
     this.playHandButton.on('pointerdown', () => {
       if (this.currentTurn === 'player') {
         this.playSelectedCards();
@@ -462,11 +421,9 @@ class Juego {
     });
 
     this.playHandButton.on('pointerout', () => {
-      // Reset scale
-      this.playHandButton.scale.set(1);
+    this.playHandButton.scale.set(1);
 
       if (this.currentTurn === 'player') {
-        // Reset tint
         this.playHandButtonBg.clear();
         this.playHandButtonBg.rect(-100, -25, 200, 50);
         this.playHandButtonBg.fill(0x00AA00);
@@ -583,7 +540,6 @@ class Juego {
     }
   }
 
-  //async indica q este metodo es asyncronico, es decir q puede usar "await"
   async initPIXI() {
     //creamos la aplicacion de pixi y la guardamos en la propiedad pixiApp
     this.pixiApp = new PIXI.Application();
@@ -604,8 +560,6 @@ class Juego {
     this.createInterface();
     this.createLevel();
   }
-
-
 
   async createBackground() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
@@ -680,7 +634,6 @@ class Juego {
     this.createEndTurnButton();
     this.createPlayButton();
   }
-
 
   async loadTextures() {
     try {
@@ -757,13 +710,10 @@ class Juego {
     };
   }
 
-
-
   async crearProtagonista() {
     const x = this.mapWidth / 2
     const y = this.gameArea.y + this.gameArea.height - 100;
     const protagonista = new Protagonista(x, y, this);
-    // this.ships.push(protagonista);
     this.protagonista = protagonista;
   };
 
@@ -771,13 +721,11 @@ class Juego {
     const x = this.mapWidth / 2
     const y = this.gameArea.y + 50;
     const antagonista = new Antagonista(x, y, this);
-    //this.ships.push(antagonista);
     this.antagonista = antagonista;
   };
 
 
   agregarInteractividadDelMouse() {
-    // Escuchar el evento mousemove
     this.pixiApp.canvas.onmousemove = (event) => {
       this.mouse.posicion = {
         x: event.x - this.containerPrincipal.x,
@@ -801,7 +749,6 @@ class Juego {
     };
 
 
-    // Event listener para la rueda del mouse (zoom)
     this.pixiApp.canvas.addEventListener("wheel", (event) => {
       event.preventDefault(); // Prevenir el scroll de la página
 
@@ -812,19 +759,15 @@ class Juego {
       );
 
       if (nuevoZoom !== this.zoom) {
-        // Obtener la posición del mouse antes del zoom
         const mouseX = event.x;
         const mouseY = event.y;
 
-        // Calcular el punto en coordenadas del mundo antes del zoom
         const worldPosX = (mouseX - this.containerPrincipal.x) / this.zoom;
         const worldPosY = (mouseY - this.containerPrincipal.y) / this.zoom;
 
-        // Aplicar el nuevo zoom
         this.zoom = nuevoZoom;
         this.containerPrincipal.scale.set(this.zoom);
 
-        // Ajustar la posición del contenedor para mantener el mouse en el mismo punto del mundo
         this.containerPrincipal.x = mouseX - worldPosX * this.zoom;
         this.containerPrincipal.y = mouseY - worldPosY * this.zoom;
       }
@@ -855,14 +798,6 @@ class Juego {
     });
   }
 
-  convertirCoordenadaDelMouse(mouseX, mouseY) {
-    // Convertir coordenadas del mouse del viewport a coordenadas del mundo
-    // teniendo en cuenta la posición y escala del containerPrincipal
-    return {
-      x: (mouseX - this.containerPrincipal.x) / this.zoom,
-      y: (mouseY - this.containerPrincipal.y) / this.zoom,
-    };
-  }
 
   gameLoop(time) {
   if (this.teclado["w"]) {
@@ -880,7 +815,6 @@ class Juego {
   
   this.frameCounter++;
 
-  // Procesar antagonista
   if (this.antagonista) {
     // SOLO tick durante turno de IA
     if (this.currentTurn === 'ai') {
@@ -978,7 +912,6 @@ class Juego {
     }
   }
 
-
   finDelJuego() {
     alert("Te moriste! fin del juego");
   }
@@ -989,4 +922,3 @@ class Juego {
     }
   }
 }
-
