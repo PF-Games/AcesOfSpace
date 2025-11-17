@@ -227,8 +227,8 @@ class Juego {
     const success = this.playerHand.selectCard(card);
     if (success) {
       this.handRenderer.selectCard(card);
-      this.updateHandValueDisplay(); // ← AGREGADO
-      this.updatePlayHandButton();   // ← AGREGADO
+      this.updateHandValueDisplay();
+      this.updatePlayHandButton();
     }
     return success;
   }
