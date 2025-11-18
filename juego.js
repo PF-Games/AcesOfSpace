@@ -573,12 +573,12 @@ class Juego {
     this.crearEnemigos(3, ShieldShip);
     this.crearEnemigos(2, SupportShip);
     this.createAsteroids();
-    this.asignarProtagonistaComoTargetATodosLospersonas()
+    this.makePlayerAsGlobalTarget();
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
     this.width = this.mapWidth;
     this.height = this.mapHeight;
-    this.grid = new Grid(this, this.cellSize);
+    //this.grid = new Grid(this, this.cellSize);
     this.iniciarControles();
 
     this.interfaceContainer = new PIXI.Container();
@@ -909,7 +909,7 @@ class Juego {
     alert("Te moriste! fin del juego");
   }
 
-  asignarProtagonistaComoTargetATodosLospersonas() {
+  makePlayerAsGlobalTarget() {
     for (let ship of this.ships) {
       ship.asignarTarget(this.protagonista);
     }
