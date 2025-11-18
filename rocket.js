@@ -3,8 +3,8 @@ class Rocket extends GameObject {
     super(x, y, juego);
 
     this.target = target;
-    this.velocidadMaxima = 5;
-    this.aceleracionMaxima = 0.3;
+    this.velocidadMaxima = 120;
+    this.aceleracionMaxima = 120;
     this.factorPerseguir = 0.2;
     this.radio = 5;
     this.danio = 1;

@@ -129,6 +129,8 @@ class Juego {
     });
 
     this.playerHand.drawInitialHand();
+
+
     console.log(`Deck inicializado: ${this.deck.numberOfCards} cartas`);
     console.log(`Mano inicial: ${this.playerHand.numberOfCards} cartas`);
 
@@ -298,28 +300,21 @@ class Juego {
     }
   }
 
-  // 4. NEW method to determine rockets per hand (configurable)
-  getRocketsForHand(handInfo) {
-    // For now, return 5 for any hand
-    // Later you can use handInfo.rank or handInfo.handName
-    return 5;
 
-    // FUTURE: Use this mapping
-    /*
+  getRocketsForHand(handInfo) {
     const rocketsPerHand = {
-      'Royal Flush': 10,
-      'Straight Flush': 9,
-      'Four of a Kind': 8,
-      'Full House': 7,
-      'Flush': 6,
-      'Straight': 5,
-      'Three of a Kind': 4,
-      'Two Pair': 3,
-      'Pair': 2,
+      'Royal Flush': 100,
+      'Straight Flush': 60,
+      'Four of a Kind': 30,
+      'Full House': 25,
+      'Flush': 20,
+      'Straight': 16,
+      'Three of a Kind': 12,
+      'Two Pair': 8,
+      'Pair': 3,
       'High Card': 1
     };
     return rocketsPerHand[handInfo.handName] || 1;
-    */
   }
 
   sortHandByRank() {
@@ -383,8 +378,6 @@ class Juego {
     this.interface.name = "INTERFACE";
     this.interface.zIndex = 1000;
     this.pixiApp.stage.addChild(this.interface);
-
-    // UI Manager will handle everything
     this.uiManager = new UIManager(this);
     this.uiManager.createAllUI();
   }
@@ -435,19 +428,31 @@ class Juego {
     if (!this.playerHand.hasSelectedCards) return;
 
     console.log('\n=== PLAYING SELECTED CARDS ===');
+
+    const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+    console.log(`Played: ${handInfo.handName}`);
+
+
+    const rocketsToFire = this.getRocketsForHand(handInfo);
+
     const cardsToRemove = [...this.playerHand.selectedCards];
     const result = this.playerHand.playSelectedCards();
-    console.log(`Played: ${result.handInfo.handName}`);
 
     cardsToRemove.forEach(card => {
       this.handRenderer.removeCardVisual(card);
     });
 
+    // Fire the rockets
+    this.fireRocketsForHand(handInfo);
+
     this.handRenderer.updatePositions();
     this.updateDeckCounters();
     this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
+
+    console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
   }
+
 
   async endPlayerTurn() {
     console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
