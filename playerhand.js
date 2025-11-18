@@ -5,6 +5,7 @@ class PlayerHand {
     this.maxCards = config.maxCards || 12;
     this.cardsToDraw = config.cardsToDraw || 5;
     this.initialCards = config.initialCards || 7;
+    this.maxSelectedCards = config.maxSelectedCards || 5;
     this.cards = [];
     this.selectedCards = [];
   }
@@ -81,6 +82,11 @@ class PlayerHand {
     if (this.selectedCards.includes(card)) {
       console.warn('Card already selected');
       return false;
+    }
+
+    if (this.selectedCards.length >= this.maxSelectedCards) {
+        console.log(`Límite de selección alcanzado (${this.maxSelectedCards})`);
+        return false; // Retorna false para indicar que no se pudo seleccionar
     }
 
     card.select();
