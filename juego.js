@@ -129,7 +129,7 @@ class Juego {
     });
 
     this.playerHand.drawInitialHand();
-
+    this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
 
     console.log(`Deck inicializado: ${this.deck.numberOfCards} cartas`);
     console.log(`Mano inicial: ${this.playerHand.numberOfCards} cartas`);
@@ -469,7 +469,7 @@ class Juego {
       await this.handRenderer.createCardVisual(card, cardIndex);
     }
 
-    //this.handRenderer.updatePositions();
+    this.sortHandByRank();
     this.updateDeckCounters();
 
     console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
