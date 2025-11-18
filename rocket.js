@@ -3,9 +3,9 @@ class Rocket extends GameObject {
     super(x, y, juego);
 
     this.target = target;
-    this.velocidadMaxima = 120;
-    this.aceleracionMaxima = 120;
-    this.factorPerseguir = 0.2;
+    this.velocidadMaxima = 8; 
+    this.aceleracionMaxima = 1;
+    this.factorPerseguir = 1;
     this.radio = 5;
     this.danio = 1;
     this.texturePath = texturePath;
@@ -22,7 +22,7 @@ class Rocket extends GameObject {
   }
 
   tick() {
-    if (this.destruido) return; // Agregar esta línea
+    if (this.destruido) return;
     if (!this.target || this.target.muerto) {
       this.destruir();
       return;
@@ -31,7 +31,6 @@ class Rocket extends GameObject {
     this.perseguir();
     this.aplicarFisica();
 
-    // Verificar colisión con target
     const dist = calcularDistancia(this.posicion, this.target.posicion);
     if (dist < this.target.radio) {
       this.target.recibirDanio(this.danio);

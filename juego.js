@@ -286,7 +286,6 @@ class Juego {
     return true;
   }
 
-  // 3. NEW method to fire multiple rockets based on hand
   fireRocketsForHand(handInfo) {
     const rocketsToFire = this.getRocketsForHand(handInfo);
     console.log(`Firing ${rocketsToFire} rockets for ${handInfo.handName}`);
@@ -299,7 +298,6 @@ class Juego {
       }, i * 100); // 100ms delay between rockets
     }
   }
-
 
   getRocketsForHand(handInfo) {
     const rocketsPerHand = {
@@ -567,7 +565,6 @@ class Juego {
     this.rectanguloDebug.stroke({ width: 4, color: 0xffff00, alpha: 1 });
     this.containerPrincipal.addChild(this.rectanguloDebug);
 
-
     this.addRocketControls();
     this.crearAntagonista();
     await this.crearProtagonista();
@@ -587,7 +584,6 @@ class Juego {
     this.interfaceContainer = new PIXI.Container();
     this.interfaceContainer.sortableChildren = true;
     this.pixiApp.stage.addChild(this.interfaceContainer);
-
     // Crear el background una sola vez
     this.interfaceBackground = new PIXI.Graphics();
     this.interfaceBackground.zIndex = -1;
@@ -609,20 +605,17 @@ class Juego {
     try {
       // Cargar el spritesheet
       const spritesheet = await PIXI.Assets.load('assets/cards/cards.json');
-
       // Guardar en cache para acceso fácil
       PIXI.Assets.cache.set("deckAtlas", spritesheet);
 
       console.log("✅ Card atlas loaded");
       console.log("Available frames:", Object.keys(spritesheet.textures));
-
       return true;
     } catch (error) {
       console.error("❌ Error loading textures:", error);
       return false;
     }
   }
-
 
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
@@ -641,7 +634,6 @@ class Juego {
       this.asteroids.push(asteroid);
     }
   }
-
 
   addRocketControls() {
     this.pixiApp.canvas.onclick = (event) => {
@@ -717,10 +709,6 @@ class Juego {
 
     console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
   }
-
-
-
-
 
   async crearProtagonista() {
     const x = this.mapWidth / 2
@@ -809,7 +797,6 @@ class Juego {
       });
     });
   }
-
 
   gameLoop(time) {
     if (this.teclado["w"]) {
