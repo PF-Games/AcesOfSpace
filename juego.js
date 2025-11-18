@@ -598,8 +598,6 @@ class Juego {
     this.interfaceContainer.addChild(this.interfaceBackground);
 
     await this.initCardVisuals();
-    this.uiManager = new UIManager(this);
-    this.uiManager.createAllUI();
   }
 
   async loadTextures() {
@@ -908,15 +906,6 @@ class Juego {
     if (this.uiManager) {
       this.uiManager.updateFPS(this.pixiApp.ticker.FPS);
       this.uiManager.updatePositions();
-    }
-
-    if (this.endTurnButton) {
-      this.endTurnButton.x = this.width / 7;
-      this.endTurnButton.y = this.height - 70;
-    }
-
-    if (this.turnText) {
-      this.turnText.x = this.width / 2;
     }
 
     if (this.uiManager) {

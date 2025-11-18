@@ -57,7 +57,7 @@ class UIManager {
     });
     this.textElements.handValue.anchor.set(0.5, 0);
     this.textElements.handValue.x = this.juego.width / 2;
-    this.textElements.handValue.y = 70;
+    this.textElements.handValue.y = 870;
     this.juego.interface.addChild(this.textElements.handValue);
   }
 

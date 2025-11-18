@@ -275,34 +275,39 @@ class DeckRenderer {
     this.cardSprite.height = 120;
     this.container.addChild(this.cardSprite);
 
-    this.counterText = new PIXI.Text({
-      text: "0",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 4
-      }
-    });
-    this.counterText.anchor.set(0.5, 0.5);
-    this.counterText.y = 80;
-    this.container.addChild(this.counterText);
+     this.counterBg = new PIXI.Graphics();
+  this.counterBg.rect(-30, 65, 60, 30);
+  this.counterBg.fill(0x222222);
+  this.container.addChild(this.counterBg);
 
-    this.labelText = new PIXI.Text({
-      text: this.label,
-      style: {
-        fontFamily: "Arial",
-        fontSize: 16,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 3
-      }
-    });
-    this.labelText.anchor.set(0.5, 0.5);
-    this.labelText.y = -80;
-    this.container.addChild(this.labelText);
-  }
+  this.counterText = new PIXI.Text({
+    text: "0",
+    style: {
+      fontFamily: "Arial",
+      fontSize: 24,
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4
+    }
+  });
+  this.counterText.anchor.set(0.5, 0.5);
+  this.counterText.y = 80;
+  this.container.addChild(this.counterText);
+
+  this.labelText = new PIXI.Text({
+    text: this.label,
+    style: {
+      fontFamily: "Arial",
+      fontSize: 16,
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 3
+    }
+  });
+  this.labelText.anchor.set(0.5, 0.5);
+  this.labelText.y = -80;
+  this.container.addChild(this.labelText);
+}
 
   updateCounter(count) {
     if (this.counterText) {
