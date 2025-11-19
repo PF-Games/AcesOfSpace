@@ -467,10 +467,16 @@ class Juego {
       await this.handRenderer.createCardVisual(card, cardIndex);
     }
 
+    for (let aShip of this.ships) {
+        aShip.isTargeted = false;
+      }
+
     this.sortHandByRank();
     this.updateDeckCounters();
 
     console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
+
+    
 
     // Cambiar a turno de IA
     this.startAITurn();
