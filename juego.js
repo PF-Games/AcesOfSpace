@@ -569,7 +569,7 @@ class Juego {
     this.crearAntagonista();
     await this.crearProtagonista();
     this.crearEnemigos(5, BlackShip);
-    this.crearEnemigos(5, RedShip);
+    this.crearEnemigos(2, RedShip);
     this.crearEnemigos(3, ShieldShip);
     this.crearEnemigos(2, SupportShip);
     this.createAsteroids();

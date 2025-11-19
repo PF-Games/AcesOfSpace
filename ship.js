@@ -202,7 +202,7 @@ class Ship extends GameObject {
     this.container = null;
 
 
-    this.borrarmeComoTargetDeTodos();
+    //this.borrarmeComoTargetDeTodos();
   }
 
   pegarSiEstaEnMiRango() {

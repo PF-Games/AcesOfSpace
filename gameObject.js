@@ -153,7 +153,7 @@ class GameObject {
     }
   }
 
-  */
+  
 
 
   borrarmeComoTargetDeTodos() {
@@ -161,6 +161,7 @@ class GameObject {
       ship.asignarTarget(null);
     });
   }
+*/ 
 
   asignarTarget(quien) {
     if (quien instanceof Ship && quien.muerto) return;

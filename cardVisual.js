@@ -34,7 +34,7 @@ class CardVisual {
   }
 
   async crearSprite() {
-    console.log('Creating sprite for:', this.card.toString());
+//console.log('Creating sprite for:', this.card.toString());
 
     const texture = this.getCardTexture(this.card.rank, this.card.suit);
     // Fallback si no se encuentra
@@ -48,7 +48,7 @@ class CardVisual {
     this.sprite = sprite;
     this.container.addChild(sprite);
 
-    console.log(`✅ Sprite created for ${this.card.toString()}`);
+    //console.log(`✅ Sprite created for ${this.card.toString()}`);
     return sprite;
   }
 
