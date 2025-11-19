@@ -705,7 +705,7 @@ class Juego {
       this.handRenderer.removeCardVisual(card);
     });
 
-    this.fireRockets(rocketsToFire);
+    this.fireRocket(rocketsToFire);
 
     // Update UI
     this.handRenderer.updatePositions();
@@ -714,6 +714,10 @@ class Juego {
     this.uiManager.updatePlayHandButton();
 
     console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
+// Trying to reset the targeted state here or in EndTurn. Not working so far.
+     for (let aShip of this.ships) {
+        aShip.isTargeted = false;
+      }
   }
 
   async crearProtagonista() {
