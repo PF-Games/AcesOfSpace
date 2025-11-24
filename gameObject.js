@@ -20,8 +20,8 @@ class GameObject {
     this.aceleracion = { x: 0, y: 0 }; // Aceleración en píxeles/frame²
 
     // Límites físicos para estabilidad del sistema
-    this.aceleracionMaxima = 0.2; // Máxima aceleración aplicable
-    this.velocidadMaxima = 3; // Velocidad terminal del objeto
+    this.aceleracionMaxima = 100; // Máxima aceleración aplicable
+    this.velocidadMaxima = 100; // Velocidad terminal del objeto
 
     // Propiedades de colisión y combate
     this.radio = 24; // Radio de colisión en píxeles

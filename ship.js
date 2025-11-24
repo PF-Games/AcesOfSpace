@@ -10,8 +10,8 @@ class Ship extends GameObject {
     this.factorSeparacion = 20;
     this.factorCohesion = 0.3;
     this.factorAlineacion = 0.4;
-    this.aceleracionMaxima = 0.2;
-    this.velocidadMaxima = 1;
+    this.aceleracionMaxima = 5;
+    this.velocidadMaxima = 5;
     this.amigos = [];
   }
 

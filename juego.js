@@ -262,7 +262,7 @@ class Juego {
 
   // 2. NEW method to fire a single rocket at closest target
   fireRocket() {
-    
+
 
     if (!target) {
       console.log('No targets available');
@@ -290,36 +290,36 @@ class Juego {
     const rocketsToFire = this.getRocketsForHand(handInfo);
     console.log(`Firing ${rocketsToFire} rockets for ${handInfo.handName}`);
 
-     for (let i = 0; i < rocketsToFire; i++) {
-    setTimeout(() => {
-      if (this.protagonista && !this.protagonista.muerto) {
-        // Find target NOW (not before)
-        const target = this.findClosestUntargetedShip();
-        
-        if (!target) {
-          console.log('No targets available');
-          return;
-        }
+    for (let i = 0; i < rocketsToFire; i++) {
+      setTimeout(() => {
+        if (this.protagonista && !this.protagonista.muerto) {
+          // Find target NOW (not before)
+          const target = this.findClosestUntargetedShip();
 
-        // Mark as targeted NOW
-        if (target !== this.antagonista) {
-          target.isTargeted = true;
-        }
+          if (!target) {
+            console.log('No targets available');
+            return;
+          }
 
-        // Create rocket
-        const rocket = new Rocket(
-          "assets/rockets/rocket1.png",
-          this.protagonista.posicion.x,
-          this.protagonista.posicion.y,
-          this,
-          target
-        );
-        rocket.crearSprite();
-        this.rockets.push(rocket);
-      }
-    }, i * 100);
+          // Mark as targeted NOW
+          if (target !== this.antagonista) {
+            target.isTargeted = true;
+          }
+
+          // Create rocket
+          const rocket = new Rocket(
+            "assets/rockets/rocket1.png",
+            this.protagonista.posicion.x,
+            this.protagonista.posicion.y,
+            this,
+            target
+          );
+          rocket.crearSprite();
+          this.rockets.push(rocket);
+        }
+      }, i * 100);
+    }
   }
-}
 
   getRocketsForHand(handInfo) {
     const rocketsPerHand = {
@@ -477,7 +477,24 @@ class Juego {
   async endPlayerTurn() {
     console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
 
-    // Tomar nuevas cartas
+    
+     // Complete repairs for support ships in repairing state
+  for (let ship of this.ships) {
+    if (ship instanceof SupportShip && 
+        ship.fsm.currentStateName === 'repairing' &&
+        ship.allyToRepair && !ship.allyToRepair.muerto) {
+      
+      console.log(`✅ ${ship.debugId} completed repair of ${ship.allyToRepair.debugId}`);
+      console.log(`   ${ship.allyToRepair.debugId}.escudo before: ${ship.allyToRepair.escudo}`);
+      ship.allyToRepair.escudo = 1;
+      console.log(`   ${ship.allyToRepair.debugId}.escudo after: ${ship.allyToRepair.escudo}`);
+      
+      ship.allyToRepair = null;
+      ship.fsm.setState('pursuing');
+    }
+  }
+
+  // Draw new cards
     const previousCount = this.playerHand.numberOfCards;
     this.playerHand.drawCards();
     const newCards = this.playerHand.numberOfCards - previousCount;
@@ -490,15 +507,15 @@ class Juego {
     }
     //Clear ALL targeting flags at turn end (safety net)
     for (let aShip of this.ships) {
-        aShip.isTargeted = false;
-      }
+      aShip.isTargeted = false;
+    }
 
     this.sortHandByRank();
     this.updateDeckCounters();
 
     console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
 
-    
+
 
     // Cambiar a turno de IA
     this.startAITurn();
@@ -509,6 +526,13 @@ class Juego {
     this.currentTurn = 'ai';
     this.aiTurnTimer = 0;
     this.turnsPassed++;
+
+    // Check for support ships to respond to damaged shields
+    for (let ship of this.ships) {
+      if (ship instanceof SupportShip && ship.fsm.currentStateName === 'pursuing') {
+        ship.checkForAlliesNeedingRepair();
+      }
+    }
 
     // Actualizar UI
     this.uiManager.updateEndTurnButton();
@@ -530,6 +554,14 @@ class Juego {
 
   endAITurn() {
     console.log('\n=== FIN DE TURNO DE LA IA ===');
+
+    // Check if support ships can transition to repairing
+    for (let ship of this.ships) {
+      if (ship instanceof SupportShip) {
+        ship.checkIfReadyToRepair();
+      }
+    }
+
     this.currentTurn = 'player';
     this.aiTurnTimer = 0;
 
@@ -593,13 +625,13 @@ class Juego {
     this.rectanguloDebug.stroke({ width: 4, color: 0xffff00, alpha: 1 });
     this.containerPrincipal.addChild(this.rectanguloDebug);
 
-  
+
     this.crearAntagonista();
     await this.crearProtagonista();
     this.crearEnemigos(5, BlackShip);
     this.crearEnemigos(2, RedShip);
     this.crearEnemigos(3, ShieldShip);
-    this.crearEnemigos(2, SupportShip);
+    this.crearEnemigos(8, SupportShip);
     this.createAsteroids();
     this.makePlayerAsGlobalTarget();
     this.dibujador = new PIXI.Graphics();
@@ -700,10 +732,10 @@ class Juego {
     this.uiManager.updatePlayHandButton();
 
     console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
-/* Trying to reset the targeted state here or in EndTurn. Not working so far.
-     for (let aShip of this.ships) {
-        aShip.isTargeted = false;
-      }*/
+    /* Trying to reset the targeted state here or in EndTurn. Not working so far.
+         for (let aShip of this.ships) {
+            aShip.isTargeted = false;
+          }*/
   }
 
   async crearProtagonista() {

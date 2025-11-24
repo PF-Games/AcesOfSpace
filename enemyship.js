@@ -165,8 +165,8 @@ class BlackShip extends enemyShip {
 class RedShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Klaed Bomber_Idle.png", x, y, juego, "R");
-    this.defaultSpeed = 1.5;
-    this.velocidadMaxima = 1.5;
+    this.defaultSpeed = 2.5;
+    this.velocidadMaxima = 2.5;
     this.playerDamage = 1;
     this.colorType = 'red';
     this.weight = 5; //this will be used to create levels and allocate difficulty
@@ -176,8 +176,8 @@ class RedShip extends enemyShip {
 class ShieldShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Nairan Scout_Idle.png", x, y, juego, "S");
-    this.defaultSpeed = 1.5;
-    this.velocidadMaxima = 1;
+    this.defaultSpeed = 2;
+    this.velocidadMaxima = 2;
     this.playerDamage = 1;
     this.escudo = 1;
     this.protectionRange = 150;
@@ -251,8 +251,8 @@ render() {
 class SupportShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Klaed Support_Idle.png", x, y, juego, "H");
-    this.defaultSpeed = 2;
-    this.velocidadMaxima = 2;
+    this.defaultSpeed = 0.75;
+    this.velocidadMaxima = 100;
     this.playerDamage = 1;
     this.repairRange = 200;
     this.weight = 5; //this will be used to create levels and allocate difficulty
@@ -272,16 +272,31 @@ class SupportShip extends enemyShip {
   }
 
   checkForAlliesNeedingRepair() {
-    for (let ally of this.juego.ships) {
+for (let ally of this.juego.ships) {
       if (ally === this || ally.muerto) continue;
       if (ally instanceof ShieldShip && ally.escudo === 0) {
         const dist = calcularDistancia(this.posicion, ally.posicion);
         if (dist < this.repairRange * 3) {
           this.allyToRepair = ally;
+          console.log(`${this.debugId} found damaged ally: ${ally.debugId} (escudo: ${ally.escudo})`);
           this.fsm.setState('speedingToRepair');
           return true;
         }
       }
+    }
+    return false;
+  }
+
+  // NEW: Check if ready to transition to repairing (called at end of AI turn)
+  checkIfReadyToRepair() {
+    if (this.fsm.currentStateName !== 'speedingToRepair') return false;
+    if (!this.allyToRepair || this.allyToRepair.muerto) return false;
+    if (this.allyToRepair.escudo > 0) return false;
+
+    const dist = calcularDistancia(this.posicion, this.allyToRepair.posicion);
+    if (dist < this.repairRange) {
+      this.fsm.setState('repairing');
+      return true;
     }
     return false;
   }
