@@ -21,7 +21,7 @@ class PursuingState extends ShipState {
   }
 
   onUpdate() {
-     // Update speed if shield status changed
+    // Update speed if shield status changed
     if (this.owner instanceof ShieldShip) {
       if (this.owner.escudo === 0) {
         this.owner.velocidadMaxima = 0.5; // Keep slow
@@ -113,14 +113,13 @@ class ProtectingState extends ShipState {
   }
 }
 
-
 class SpeedingToRepairState extends ShipState {
- onEnter() {
+  onEnter() {
     console.log(`${this.owner.debugId} speeding to repair ${this.owner.allyToRepair.debugId}`);
     console.log(`   ${this.owner.allyToRepair.debugId}.escudo: ${this.owner.allyToRepair.escudo}`);
-    this.owner.velocidadMaxima = this.owner.defaultSpeed * 200; // Speed boost
+    this.owner.velocidadMaxima = this.owner.boostSpeed || 6;
   }
-  
+
   onUpdate() {
     if (!this.owner.allyToRepair || this.owner.allyToRepair.muerto) {
       console.log(`${this.owner.debugId} ally died, returning to pursuing`);
@@ -155,7 +154,7 @@ class SpeedingToRepairState extends ShipState {
 }
 
 class RepairingState extends ShipState {
- onEnter() {
+  onEnter() {
     console.log(`🔧 ${this.owner.debugId} now repairing ${this.owner.allyToRepair.debugId}`);
     console.log(`   ${this.owner.allyToRepair.debugId}.escudo: ${this.owner.allyToRepair.escudo}`);
   }
@@ -192,8 +191,8 @@ class RepairingState extends ShipState {
       };
       const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
       if (magnitude > 0) {
-        this.owner.aceleracion.x += (direction.x / magnitude) * this.owner.aceleracionMaxima * 20;
-        this.owner.aceleracion.y += (direction.y / magnitude) * this.owner.aceleracionMaxima * 20;
+        this.owner.aceleracion.x += (direction.x / magnitude) * this.owner.aceleracionMaxima * 15;
+        this.owner.aceleracion.y += (direction.y / magnitude) * this.owner.aceleracionMaxima * 15;
       }
     }
   }

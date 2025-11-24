@@ -176,8 +176,8 @@ class RedShip extends enemyShip {
 class ShieldShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Nairan Scout_Idle.png", x, y, juego, "S");
-    this.defaultSpeed = 2;
-    this.velocidadMaxima = 2;
+    this.defaultSpeed = 3;
+    this.velocidadMaxima = 3;
     this.playerDamage = 1;
     this.escudo = 1;
     this.protectionRange = 150;
@@ -252,7 +252,8 @@ class SupportShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
     super("assets/naves/Klaed Support_Idle.png", x, y, juego, "H");
     this.defaultSpeed = 0.75;
-    this.velocidadMaxima = 100;
+    this.velocidadMaxima = 0.75;
+    this.boostSpeed = 6;
     this.playerDamage = 1;
     this.repairRange = 200;
     this.weight = 5; //this will be used to create levels and allocate difficulty
