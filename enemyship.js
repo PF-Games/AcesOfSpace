@@ -6,14 +6,14 @@ class enemyShip extends Ship {
   constructor(texturePath, x, y, juego, debugPrefix) {
     super(texturePath, x, y, juego);
     this.debugId = `${debugPrefix}${this.id}`;
-    this.playerDamage = 1; 
+    this.playerDamage = 1;
     //this.estadoFlyAway = false; COMMENTED ON 24/10
     this.defaultSpeed = 1;
     this.allyToProtect = null;
     this.allyToRepair = null;
     this.direccionFlyAway = null; // 'izquierda' o 'derecha'
-    
-    
+
+
     this.crearSprite();
     this.crearTextoDebug();
     this.initFSM();
@@ -38,40 +38,40 @@ class enemyShip extends Ship {
       strokeThickness: 3
     });
     this.textoDebug.anchor.set(0.5, 0.5);
-    this.textoDebug.y = -60; 
+    this.textoDebug.y = -60;
     this.container.addChild(this.textoDebug);
   }
 
   tick() {
     if (this.muerto) return;
 
-     this.fsm.update(this.juego.contadorDeFrame);
+    this.fsm.update(this.juego.contadorDeFrame);
 
-   // if (this.estadoFlyAway) {
-   //   this.flyAway(); COMMENTED ON 24/10
-      this.aplicarFisica();
-   //   this.verificarSiSalioDePantalla();
-   //   return; COMMENTED ON 24/10
-      this.calcularAnguloYVelocidadLineal();
-      this.verificarSiEstoyMuerto();
+    // if (this.estadoFlyAway) {
+    //   this.flyAway(); COMMENTED ON 24/10
+    this.aplicarFisica();
+    //   this.verificarSiSalioDePantalla();
+    //   return; COMMENTED ON 24/10
+    this.calcularAnguloYVelocidadLineal();
+    this.verificarSiEstoyMuerto();
   }
 
-  
+
   checkPlayerAttackRange() {
     if (!this.juego.protagonista) return false;
     const filaProtagonista = Math.floor(this.juego.protagonista.posicion.y / this.juego.cellSize);
     const miFila = Math.floor(this.posicion.y / this.juego.cellSize);
     return miFila === filaProtagonista;
   }
-  
+
 
   isOutOfBounds() {
     const margen = 200;
     return this.posicion.x < this.juego.gameArea.x - margen ||
-           this.posicion.x > this.juego.gameArea.x + this.juego.gameArea.width + margen ||
-           this.posicion.y > this.juego.gameArea.y + this.juego.gameArea.height + margen;
+      this.posicion.x > this.juego.gameArea.x + this.juego.gameArea.width + margen ||
+      this.posicion.y > this.juego.gameArea.y + this.juego.gameArea.height + margen;
   }
-  
+
   morir() {
     if (this.fsm) this.fsm.destroy();
     super.morir();
@@ -79,16 +79,16 @@ class enemyShip extends Ship {
 }
 
 
-  //  this.checkPlayerAttackRange(); ALL COMMENTED ON 24/10
+//  this.checkPlayerAttackRange(); ALL COMMENTED ON 24/10
 
-  //  this.cohesion();
-  //  this.alineacion();
-  //  this.separacion();
-  //  this.perseguir();
-  //  this.aplicarFisica();
- 
-  //  this.calcularAnguloYVelocidadLineal();
-  //}
+//  this.cohesion();
+//  this.alineacion();
+//  this.separacion();
+//  this.perseguir();
+//  this.aplicarFisica();
+
+//  this.calcularAnguloYVelocidadLineal();
+//}
 
 
 /* COMENTADA PORQUE ARRIBA SE IMPLEMENTA SIN EL FLYAWAY LA GUARDO DE REFERENCIA POR AHORA
@@ -185,7 +185,7 @@ class ShieldShip extends enemyShip {
   }
 
 
-   initFSM() {
+  initFSM() {
     this.fsm = new FSM(this, {
       initialState: 'pursuing',
       states: {
@@ -215,7 +215,7 @@ class ShieldShip extends enemyShip {
 
   recibirDanio(danio) {
     if (this.escudo > 0) {
-      this.escudo --;
+      this.escudo--;
       console.log('Escudo impactado, escudo restante:', this.escudo);
       // Opcional: efecto visual de escudo
     } else {
@@ -224,28 +224,28 @@ class ShieldShip extends enemyShip {
   }
 
 
-render() {
-  super.render();
+  render() {
+    super.render();
 
-  if (!this.shieldGraphics) {
-    this.shieldGraphics = new PIXI.Graphics();
-    this.container.addChild(this.shieldGraphics);
-    // Ensure shield renders above the sprite
-    this.shieldGraphics.zIndex = 10;
+    if (!this.shieldGraphics) {
+      this.shieldGraphics = new PIXI.Graphics();
+      this.container.addChild(this.shieldGraphics);
+      // Ensure shield renders above the sprite
+      this.shieldGraphics.zIndex = 10;
+    }
+
+    this.shieldGraphics.clear();
+
+    if (this.escudo > 0) {
+
+      this.shieldGraphics.circle(0, 0, this.radio);
+      this.shieldGraphics.stroke({ width: 2, color: 0x0892D0, alpha: 0.8 });
+      this.shieldGraphics.fill({ color: 0x0892D0, alpha: 0.2 }); // Optional: semi-transparent fill
+      this.shieldGraphics.alpha = 1;
+    } else {
+      this.shieldGraphics.alpha = 0;
+    }
   }
-
-  this.shieldGraphics.clear();
-
-  if (this.escudo > 0) {
-    
-    this.shieldGraphics.circle(0, 0, this.radio);
-    this.shieldGraphics.stroke({ width: 2, color: 0x0892D0, alpha: 0.8 });
-    this.shieldGraphics.fill({ color: 0x0892D0, alpha: 0.2 }); // Optional: semi-transparent fill
-    this.shieldGraphics.alpha = 1;
-  } else {
-    this.shieldGraphics.alpha = 0;
-  }
-}
 }
 
 class SupportShip extends enemyShip {
@@ -272,20 +272,51 @@ class SupportShip extends enemyShip {
   }
 
   checkForAlliesNeedingRepair() {
-for (let ally of this.juego.ships) {
-      if (ally === this || ally.muerto) continue;
-      if (ally instanceof ShieldShip && ally.escudo === 0) {
-        const dist = calcularDistancia(this.posicion, ally.posicion);
-        if (dist < this.repairRange * 3) {
-          this.allyToRepair = ally;
-          console.log(`${this.debugId} found damaged ally: ${ally.debugId} (escudo: ${ally.escudo})`);
-          this.fsm.setState('speedingToRepair');
-          return true;
-        }
+  const ally = this.findClosestDamagedAlly();
+  
+  if (ally) {
+    this.allyToRepair = ally;
+    console.log(`${this.debugId} found damaged ally: ${ally.debugId} (escudo: ${ally.escudo})`);
+    this.fsm.setState('speedingToRepair');
+    return true;
+  }
+  
+  return false;
+}
+
+  findClosestDamagedAlly() {
+  let closestAlly = null;
+  let closestDist = Infinity;
+  
+  for (let ally of this.juego.ships) {
+    if (ally === this || ally.muerto) continue;
+    if (!(ally instanceof ShieldShip) || ally.escudo > 0) continue;
+    
+    // Check if someone is already repairing this ally
+    let someoneIsRepairing = false;
+    for (let otherShip of this.juego.ships) {
+      if (otherShip instanceof SupportShip && 
+          otherShip !== this && 
+          otherShip.allyToRepair === ally &&
+          (otherShip.fsm.currentStateName === 'repairing' || 
+           otherShip.fsm.currentStateName === 'speedingToRepair')) {
+        someoneIsRepairing = true;
+        break;
       }
     }
-    return false;
+    
+    if (!someoneIsRepairing) {
+      const dist = calcularDistancia(this.posicion, ally.posicion);
+      if (dist < closestDist && dist < this.repairRange * 3) {
+        closestDist = dist;
+        closestAlly = ally;
+      }
+    }
   }
+  
+  return closestAlly;
+}
+
 
   // NEW: Check if ready to transition to repairing (called at end of AI turn)
   checkIfReadyToRepair() {
