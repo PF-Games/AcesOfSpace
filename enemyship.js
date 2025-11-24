@@ -222,6 +222,30 @@ class ShieldShip extends enemyShip {
       this.morir();
     }
   }
+
+
+render() {
+  super.render();
+
+  if (!this.shieldGraphics) {
+    this.shieldGraphics = new PIXI.Graphics();
+    this.container.addChild(this.shieldGraphics);
+    // Ensure shield renders above the sprite
+    this.shieldGraphics.zIndex = 10;
+  }
+
+  this.shieldGraphics.clear();
+
+  if (this.escudo > 0) {
+    
+    this.shieldGraphics.circle(0, 0, this.radio + 5);
+    this.shieldGraphics.stroke({ width: 2, color: 0x00FF00, alpha: 0.8 });
+    this.shieldGraphics.fill({ color: 0x00FF00, alpha: 0.1 }); // Optional: semi-transparent fill
+    this.shieldGraphics.alpha = 1;
+  } else {
+    this.shieldGraphics.alpha = 0;
+  }
+}
 }
 
 class SupportShip extends enemyShip {

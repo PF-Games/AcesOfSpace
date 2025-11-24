@@ -138,56 +138,13 @@ class GameObject {
     this.velocidad.y *= friccionAplicada;
   }
 
-
-/* COMENTADO 20-10. NO LO NECESITO
-  rebotar() {
- 
-    if (this.posicion.x > this.juego.width || this.posicion.x < 0) {
-      // Rebote horizontal: invierte velocidad X con pérdida de energía
-      this.velocidad.x *= -0.99;
-    }
-
-    if (this.posicion.y > this.juego.height || this.posicion.y < 0) {
-      // Rebote vertical: invierte velocidad Y con pérdida de energía
-      this.velocidad.y *= -0.99;
-    }
-  }
-
-  
-
-
-  borrarmeComoTargetDeTodos() {
-    this.juego.ships.forEach((ship) => {
-      ship.asignarTarget(null);
-    });
-  }
-*/ 
-
   asignarTarget(quien) {
     if (quien instanceof Ship && quien.muerto) return;
     this.target = quien;
   }
 
   perseguir() {
-    /**
-     * ALGORITMO DE PERSECUCIÓN CON DESACELERACIÓN PROGRESIVA
-     *
-     * 1. Verificaciones de validez:
-     *    - Existe objetivo
-     *    - Objetivo dentro del rango de visión
-     *
-     * 2. Cálculo del vector de dirección:
-     *    - Vector = posición_objetivo - posición_actual
-     *    - Normalización: vector_unitario = vector / |vector|
-     *
-     * 3. Desaceleración cerca del objetivo:
-     *    - Factor = (distancia / rango_ataque)³
-     *    - La potencia cúbica crea una curva suave de desaceleración
-     *    - Cuando dist = rango_ataque → factor = 1 (velocidad normal)
-     *    - Cuando dist = 0 → factor = 0 (parada completa)
-     *
-     * 4. Aplicación de fuerza direccional
-     */
+
     if (!this.target) return;
     const dist = calcularDistancia(this.posicion, this.target.posicion);
     if (dist > this.vision) return;
@@ -249,17 +206,7 @@ class GameObject {
   }
 
   render() {
-    /**
-     * SINCRONIZACIÓN FÍSICA-VISUAL
-     *
-     * Transfiere la posición calculada por el sistema de física
-     * al sistema de renderizado de PIXI.js
-     *
-     * La separación física/visual permite:
-     * - Cálculos de física independientes del renderizado
-     * - Interpolación visual futura si es necesaria
-     * - Debugging más fácil
-     */
+
     if (!this.container || this.muerto) return;
     this.container.x = this.posicion.x;
     this.container.y = this.posicion.y;

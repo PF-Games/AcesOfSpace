@@ -66,7 +66,7 @@ class Ship extends GameObject {
     this.sprite = new PIXI.Sprite(
       await PIXI.Assets.load(this.texturePath)
     );
-    this.sprite.anchor.set(0.5, 1);
+    this.sprite.anchor.set(0.5, 0.5);
     this.container.addChild(this.sprite);
     this.render();
   }
