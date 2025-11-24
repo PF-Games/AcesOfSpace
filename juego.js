@@ -262,7 +262,7 @@ class Juego {
 
   // 2. NEW method to fire a single rocket at closest target
   fireRocket() {
-    const target = this.findClosestUntargetedShip();
+    
 
     if (!target) {
       console.log('No targets available');
@@ -290,14 +290,36 @@ class Juego {
     const rocketsToFire = this.getRocketsForHand(handInfo);
     console.log(`Firing ${rocketsToFire} rockets for ${handInfo.handName}`);
 
-    for (let i = 0; i < rocketsToFire; i++) {
-      setTimeout(() => {
-        if (this.protagonista && !this.protagonista.muerto) {
-          this.fireRocket();
+     for (let i = 0; i < rocketsToFire; i++) {
+    setTimeout(() => {
+      if (this.protagonista && !this.protagonista.muerto) {
+        // Find target NOW (not before)
+        const target = this.findClosestUntargetedShip();
+        
+        if (!target) {
+          console.log('No targets available');
+          return;
         }
-      }, i * 100); // 100ms delay between rockets
-    }
+
+        // Mark as targeted NOW
+        if (target !== this.antagonista) {
+          target.isTargeted = true;
+        }
+
+        // Create rocket
+        const rocket = new Rocket(
+          "assets/rockets/rocket1.png",
+          this.protagonista.posicion.x,
+          this.protagonista.posicion.y,
+          this,
+          target
+        );
+        rocket.crearSprite();
+        this.rockets.push(rocket);
+      }
+    }, i * 100);
   }
+}
 
   getRocketsForHand(handInfo) {
     const rocketsPerHand = {
@@ -466,7 +488,7 @@ class Juego {
       const card = this.playerHand.cards[cardIndex];
       await this.handRenderer.createCardVisual(card, cardIndex);
     }
-
+    //Clear ALL targeting flags at turn end (safety net)
     for (let aShip of this.ships) {
         aShip.isTargeted = false;
       }
@@ -571,7 +593,7 @@ class Juego {
     this.rectanguloDebug.stroke({ width: 4, color: 0xffff00, alpha: 1 });
     this.containerPrincipal.addChild(this.rectanguloDebug);
 
-    this.addRocketControls();
+  
     this.crearAntagonista();
     await this.crearProtagonista();
     this.crearEnemigos(5, BlackShip);
@@ -641,42 +663,6 @@ class Juego {
     }
   }
 
-  addRocketControls() {
-    this.pixiApp.canvas.onclick = (event) => {
-      const x = event.x - this.containerPrincipal.x;
-      const y = event.y - this.containerPrincipal.y;
-
-      // Buscar enemigo más cercano al click
-      let closestShip = null;
-      let distMenor = Infinity;
-      // IMPORTANTE: CREAR UNA FUNCION BUSCAR NAVE MAS CERCANA QUE MANEJE ESTO
-      for (let ship of this.ships) {
-        if (ship.isTargeted) continue;
-        const dist = calcularDistancia({ x, y }, ship.posicion);
-        if (dist < distMenor) {
-          distMenor = dist;
-          closestShip = ship;
-        }
-      }
-
-      if (this.ships.length === 0 && this.antagonista) {
-        closestShip = this.antagonista;
-      }
-
-      if (closestShip) {
-        closestShip.isTargeted = true
-        const rocket = new Rocket(
-          "assets/rockets/rocket1.png",
-          this.protagonista.posicion.x,
-          this.protagonista.posicion.y,
-          this,
-          closestShip
-        );
-        rocket.crearSprite();
-        //  this.rockets.push(rocket); DISABLED 17/11
-      }
-    };
-  }
 
   handlePlayHand() {
     if (!this.playerHand.hasSelectedCards) {
@@ -705,7 +691,7 @@ class Juego {
       this.handRenderer.removeCardVisual(card);
     });
 
-    this.fireRocket(rocketsToFire);
+    this.fireRocketsForHand(handInfo);
 
     // Update UI
     this.handRenderer.updatePositions();
@@ -714,10 +700,10 @@ class Juego {
     this.uiManager.updatePlayHandButton();
 
     console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
-// Trying to reset the targeted state here or in EndTurn. Not working so far.
+/* Trying to reset the targeted state here or in EndTurn. Not working so far.
      for (let aShip of this.ships) {
         aShip.isTargeted = false;
-      }
+      }*/
   }
 
   async crearProtagonista() {

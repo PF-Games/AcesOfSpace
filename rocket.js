@@ -44,6 +44,7 @@ class Rocket extends GameObject {
     // Limpiar el flag del target para que pueda ser targetado de nuevo
     if (this.target && !this.target.muerto) {
       this.target.isTargeted = false;
+      console.log("ataque una nave ver si es targeted")
     }
 
     if (this.sprite) this.sprite.destroy();
