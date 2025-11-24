@@ -238,9 +238,9 @@ render() {
 
   if (this.escudo > 0) {
     
-    this.shieldGraphics.circle(0, 0, this.radio + 5);
-    this.shieldGraphics.stroke({ width: 2, color: 0x00FF00, alpha: 0.8 });
-    this.shieldGraphics.fill({ color: 0x00FF00, alpha: 0.1 }); // Optional: semi-transparent fill
+    this.shieldGraphics.circle(0, 0, this.radio);
+    this.shieldGraphics.stroke({ width: 2, color: 0x0892D0, alpha: 0.8 });
+    this.shieldGraphics.fill({ color: 0x0892D0, alpha: 0.2 }); // Optional: semi-transparent fill
     this.shieldGraphics.alpha = 1;
   } else {
     this.shieldGraphics.alpha = 0;
