@@ -166,7 +166,7 @@ class enemyShip extends Ship {
 
 class BlackShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/Nautolan Ship Fighter_Idle.png", x, y, juego, "B");
+    super("assets/naves/black/Black_Idle.png", x, y, juego, "B");
     this.defaultSpeed = 1;
     this.velocidadMaxima = 1;
     this.playerDamage = 2;
@@ -180,7 +180,7 @@ class BlackShip extends enemyShip {
 
 class RedShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/Klaed Bomber_Idle.png", x, y, juego, "R");
+    super("assets/naves/red/Red_Idle.png", x, y, juego, "R");
     this.defaultSpeed = 2.5;
     this.velocidadMaxima = 2.5;
     this.playerDamage = 1;
@@ -194,7 +194,7 @@ class RedShip extends enemyShip {
 
 class ShieldShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/Nairan Scout_Idle.png", x, y, juego, "S");
+    super("assets/naves/shield/Shield_Idle.png", x, y, juego, "S");
     this.defaultSpeed = 3;
     this.velocidadMaxima = 3;
     this.playerDamage = 1;
@@ -269,7 +269,7 @@ class ShieldShip extends enemyShip {
 
 class SupportShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/Klaed Support_Idle.png", x, y, juego, "H");
+    super("assets/naves/support/Support_Idle.png", x, y, juego, "H");
     this.defaultSpeed = 0.75;
     this.velocidadMaxima = 0.75;
     this.boostSpeed = 6;
