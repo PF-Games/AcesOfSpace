@@ -280,10 +280,10 @@ class Juego {
           if (target !== this.antagonista) {
             target.isTargeted = true;
           }
-        
-        //search random texture for rockets 
-        const randomRocket = Math.floor(Math.random() * 3) + 1;
-        const rocketTexture = `assets/rockets/rocket${randomRocket}.png`;
+
+          //search random texture for rockets 
+          const randomRocket = Math.floor(Math.random() * 3) + 1;
+          const rocketTexture = `assets/rockets/rocket${randomRocket}.png`;
 
           // Create rocket
           const rocket = new Rocket(
@@ -431,7 +431,6 @@ class Juego {
     const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
     console.log(`Played: ${handInfo.handName}`);
 
-
     const rocketsToFire = this.getRocketsForHand(handInfo);
 
     const cardsToRemove = [...this.playerHand.selectedCards];
@@ -448,8 +447,6 @@ class Juego {
     this.updateDeckCounters();
     this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
-
-    console.log(`SDASDS ${rocketsToFire} rockets for ${handInfo.handName}`);
   }
 
   async endPlayerTurn() {
@@ -585,7 +582,7 @@ class Juego {
     this.createBackground();
 
     this.particleEmitter = new ParticleEmitter(this);
-    
+
     this.gameArea = {
       x: 200,
       y: 0,
@@ -650,21 +647,21 @@ class Juego {
       console.log("✅ Card atlas loaded");
       console.log("Available frames:", Object.keys(spritesheet.textures));
       console.log("Loading explosion frames...");
-    const explosionPromises = [];
-    for (let i = 1; i <= 29; i++) {
-      explosionPromises.push(
-        PIXI.Assets.load(`explosion/Fire Burst_${i}.png`)
-      );
-    }
-    await Promise.all(explosionPromises);
-    console.log("✅ Explosion frames loaded");
+      const explosionPromises = [];
+      for (let i = 1; i <= 29; i++) {
+        explosionPromises.push(
+          PIXI.Assets.load(`explosion/Fire Burst_${i}.png`)
+        );
+      }
+      await Promise.all(explosionPromises);
+      console.log("✅ Explosion frames loaded");
 
-    return true;
-  } catch (error) {
-    console.error("❌ Error loading textures:", error);
-    return false;
+      return true;
+    } catch (error) {
+      console.error("❌ Error loading textures:", error);
+      return false;
+    }
   }
-}
 
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
@@ -830,10 +827,10 @@ class Juego {
       rocket.render();
     }
 
-     for (let explosion of this.explosions) {
-    explosion.tick();
-    explosion.render();
-  }
+    for (let explosion of this.explosions) {
+      explosion.tick();
+      explosion.render();
+    }
   }
 
   iniciarControles() {
