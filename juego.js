@@ -731,6 +731,7 @@ class Juego {
     const antagonista = new Antagonista(x, y, this);
     this.antagonista = antagonista;
   };
+  
 
   agregarInteractividadDelMouse() {
     this.pixiApp.canvas.onmousemove = (event) => {
