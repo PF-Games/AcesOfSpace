@@ -280,6 +280,9 @@ class SupportShip extends enemyShip {
 
     this.particleColor = 0xFFFF00; // Yellow
     this.particleEmitRate = 1; // More frequent for faster ship
+
+    this.repairReadyGlowColor = 0x00CCFF; // Cyan/blue
+    this.repairReadyGlowIntensity = 0; // Will pulse
   }
 
   initFSM() {
@@ -342,6 +345,36 @@ class SupportShip extends enemyShip {
       return true;
     }
     return false;
+  }
+
+  isReadyToRepair() {
+    if (!this.allyToRepair || this.allyToRepair.muerto) return false;
+    if (this.allyToRepair.escudo > 0) return false;
+    
+    const dist = calcularDistancia(this.posicion, this.allyToRepair.posicion);
+    return dist < this.repairRange;
+  }
+
+  emitRepairGlow() {
+    if (!this.juego.particleEmitter) return;
+    
+    // Emit particles in a circle around the ship center
+    const particleCount = 2;
+    const angle = Math.random() * Math.PI * 2;
+    
+    const x = this.posicion.x + Math.cos(angle) * this.radio;
+    const y = this.posicion.y + Math.sin(angle) * this.radio;
+    
+    this.juego.particleEmitter.emit(x, y, particleCount, this.repairReadyGlowColor);
+  }
+
+  render() {
+    super.render();
+
+    // Emit repair-ready glow during player turn if ready to repair
+    if (this.juego.currentTurn === 'player' && this.isReadyToRepair()) {
+      this.emitRepairGlow();
+    }
   }
 }
 

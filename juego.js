@@ -606,10 +606,7 @@ class Juego {
     this.createBackground();
 
     this.particleEmitter = new ParticleEmitter(this);
-    console.log('✅ ParticleEmitter created:', this.particleEmitter);
-    console.log('   Graphics object:', this.particleEmitter.graphics);
-    console.log('   Parent container:', this.particleEmitter.graphics.parent);
-
+    
     this.gameArea = {
       x: 200,
       y: 0,
