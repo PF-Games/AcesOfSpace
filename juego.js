@@ -36,7 +36,7 @@ class Juego {
     this.turnoDeljugador = true;
 
     this.currentTurn = 'ai';
-    this.aiTurnDuration = 2500; //using miliseconds calculated with delta time
+    this.aiTurnDuration = 2500; //using milliseconds calculated with delta time
     this.aiTurnTimer = 0;
     this.turnsPassed = 0;
   }

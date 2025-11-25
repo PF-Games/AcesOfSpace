@@ -5,7 +5,7 @@ class ShipDeathAnimation {
     this.juego = juego;
     this.shipType = shipType; // 'red', 'black', 'shield', 'support'
     this.currentFrame = 0;
-    this.totalFrames = 8;
+    this.totalFrames = 16;
     this.frameRate = 5; // Change frame every 3 game ticks
     this.frameCounter = 0;
     this.finished = false;
