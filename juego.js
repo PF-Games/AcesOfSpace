@@ -9,7 +9,7 @@ class Juego {
   deck;
   discardPile;
   playerHand;
-  cardsHeight = 265;
+  cardsHeight = 100;
 
   constructor() {
     this.updateDimensions();
@@ -17,7 +17,6 @@ class Juego {
     this.mapHeight = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
 
-    // Variables para el zoom
     this.zoom = 0.9;
     this.minZoom = 0.7;
     this.maxZoom = 2;
@@ -29,28 +28,34 @@ class Juego {
     this.cellSize = 100;
     this.frameCounter = 0;
     this.rockets = [];
+    this.explosions = [];
+    this.shipDeathAnimations = [];
 
     this.initCardSystem();
 
     this.turnoDeljugador = true;
+
+    this.currentTurn = 'ai';
+    this.aiTurnDuration = 2500; //using milliseconds calculated with delta time
+    this.aiTurnTimer = 0;
+    this.turnsPassed = 0;
   }
 
   initMatterJS() {
     const Engine = Matter.Engine;
     const Runner = Matter.Runner;
 
-    // Crear motor de física
     this.engine = Engine.create();
     this.engine.gravity.y = 0; // Sin gravedad para las cartas
 
     // Crear runner
     this.matterRunner = Runner.create();
     Runner.run(this.matterRunner, this.engine);
-    console.log("✅ Matter.js inicializado");
+    console.log('✅ Matter.js inicializado');
   }
 
   async initCardVisuals() {
-    console.log("=== INICIALIZANDO VISUALES DE CARTAS ===");
+    console.log('=== INICIALIZANDO VISUALES DE CARTAS ===');
 
     // Container para las cartas en la mano (con física)
     this.cardsContainer = new PIXI.Container();
@@ -75,42 +80,30 @@ class Juego {
       "DECK"
     );
 
-    // Esperar a que se creen los visuales
     await this.deckRenderer.createVisuals();
     await this.discardRenderer.createVisuals();
 
-    // Crear visuales para cartas iniciales
-    console.log("Creating hand visuals for cards:", this.playerHand.cards);
+    console.log('Creating hand visuals for cards:', this.playerHand.cards);
     this.syncHandVisuals();
 
-    // Debug first card
+    // Debug
     if (this.handRenderer.cardVisuals[0]) {
-      console.log("First card visual:", this.handRenderer.cardVisuals[0]);
+      console.log('First card visual:', this.handRenderer.cardVisuals[0]);
       await this.handRenderer.cardVisuals[0].debugTextureLoading();
     }
 
     this.updateDeckCounters();
-
-    console.log("✅ Visuales de cartas listas");
-    console.log(
-      "Cards container children:",
-      this.cardsContainer.children.length
-    );
-    console.log(
-      "First card container:",
-      this.handRenderer.cardVisuals[0]?.container
-    );
-    console.log("First card position:", {
+    console.log('✅ Visuales de cartas listas');
+    console.log('Cards container children:', this.cardsContainer.children.length);
+    console.log('First card container:', this.handRenderer.cardVisuals[0]?.container);
+    console.log('First card position:', {
       x: this.handRenderer.cardVisuals[0]?.container.x,
-      y: this.handRenderer.cardVisuals[0]?.container.y,
+      y: this.handRenderer.cardVisuals[0]?.container.y
     });
   }
 
   syncHandVisuals() {
-    // Limpiar visuales existentes
     this.handRenderer.clear();
-
-    // Crear visual para cada carta en la mano
     this.playerHand.cards.forEach((card, index) => {
       this.handRenderer.createCardVisual(card, index);
     });
@@ -128,24 +121,17 @@ class Juego {
   }
 
   initCardSystem() {
-    console.log("=== INICIALIZANDO SISTEMA DE CARTAS ===");
-
-    // Crear y barajar el mazo
     this.deck = new Deck();
     this.deck.shuffle();
-
-    // Crear pila de descarte
     this.discardPile = new DiscardPile();
-
-    // Crear mano del jugador con configuración personalizable
-    this.playerHand = new playerHand(this.deck, this.discardPile, {
-      maxCards: 12, // Máximo de cartas acumulables
-      cardsToDraw: 5, // Cartas a reponer por turno
-      initialCards: 7, // Cartas iniciales
+    this.playerHand = new PlayerHand(this.deck, this.discardPile, {
+      maxCards: 12,
+      cardsToDraw: 5,
+      initialCards: 7
     });
 
-    // Robar mano inicial
     this.playerHand.drawInitialHand();
+    this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
 
     console.log(`Deck inicializado: ${this.deck.numberOfCards} cartas`);
     console.log(`Mano inicial: ${this.playerHand.numberOfCards} cartas`);
@@ -156,13 +142,11 @@ class Juego {
     window.playerHand = this.playerHand;
     window.juego = this;
 
-    console.log("✅ Sistema de cartas listo");
-    console.log("💡 Usa la consola para probar: playerHand, deck, discardPile");
+    console.log('✅ Sistema de cartas listo');
   }
 
-  // Método para terminar turno y tomar cartas
   async endTurn() {
-    console.log("\n=== FIN DE TURNO ===");
+    console.log('\n=== FIN DE TURNO ===');
 
     // Jugar cartas seleccionadas
     if (this.playerHand.hasSelectedCards) {
@@ -171,7 +155,7 @@ class Juego {
       console.log(`Jugaste: ${result.handInfo.handName}`);
 
       // Remover visuales de cartas jugadas
-      cardsToRemove.forEach((card) => {
+      cardsToRemove.forEach(card => {
         this.handRenderer.removeCardVisual(card);
       });
     }
@@ -191,21 +175,21 @@ class Juego {
     this.handRenderer.updatePositions();
     this.updateDeckCounters();
 
-    console.log(
-      `Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`
-    );
+    console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
     console.log(`Cartas en deck: ${this.deck.numberOfCards}`);
     console.log(`Cartas descartadas: ${this.discardPile.numberOfCards}`);
   }
 
-  // Método helper para ver las cartas en la mano
-  showHand() {
-    console.log("\n=== CARTAS EN LA MANO ===");
-    this.playerHand.cards.forEach((card, index) => {
-      const estado = card.fsm ? card.fsm.currentStateName : "sin FSM";
-      console.log(`${index}: ${card.toString()} [${estado}]`);
-    });
-    console.log(`Total: ${this.playerHand.numberOfCards} cartas`);
+  updateHandValueDisplay() {
+    if (!this.handValueText) return;
+
+    if (this.playerHand.hasSelectedCards) {
+      // Lllama a la función que YA EXISTE en playerHand
+      const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+      this.handValueText.text = handInfo.handName.toUpperCase();
+    } else {
+      this.handValueText.text = "";
+    }
   }
 
   // Método helper para seleccionar una carta por índice
@@ -218,6 +202,8 @@ class Juego {
     const success = this.playerHand.selectCard(card);
     if (success) {
       this.handRenderer.selectCard(card);
+      this.uiManager.updateHandValueDisplay();
+      this.uiManager.updatePlayHandButton();
     }
     return success;
   }
@@ -232,7 +218,161 @@ class Juego {
     if (success && this.handRenderer) {
       this.handRenderer.deselectCard(card);
     }
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+
     return success;
+  }
+
+  deselectAllCards() {
+    console.log('\n=== DESELECTING ALL CARDS ===');
+    this.playerHand.deselectAll();
+
+    // Update all visuals to show deselected state
+    this.handRenderer.cardVisuals.forEach(cardVisual => {
+      cardVisual.setSelected(false);
+      cardVisual.targetY = this.handRenderer.handY;
+    });
+
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+
+    console.log('All cards deselected');
+  }
+
+  findClosestUntargetedShip() {
+    // Find closest untargeted enemy ship
+    let closestShip = null;
+    let distMenor = Infinity;
+
+    for (let ship of this.ships) {
+      if (ship.isTargeted) continue;
+      const dist = calcularDistancia(this.protagonista.posicion, ship.posicion);
+      if (dist < distMenor) {
+        distMenor = dist;
+        closestShip = ship;
+      }
+    }
+
+    // If all ships are targeted, target the Boss/Antagonista
+    if (!closestShip && this.antagonista && !this.antagonista.muerto) {
+      closestShip = this.antagonista;
+    }
+
+    return closestShip;
+  }
+
+  fireRocketsForHand(handInfo) {
+    const rocketsToFire = this.getRocketsForHand(handInfo);
+    console.log(`Firing ${rocketsToFire} rockets for ${handInfo.handName}`);
+
+    for (let i = 0; i < rocketsToFire; i++) {
+      setTimeout(() => {
+        if (this.protagonista && !this.protagonista.muerto) {
+          // Find target NOW (not before)
+          let target = this.findClosestUntargetedShip();
+
+          if (!target) {
+            console.log('No targets available');
+            return;
+          }
+
+          // Mark as targeted NOW
+          if (target !== this.antagonista) {
+            target.isTargeted = true;
+          }
+
+          // If targeting mothership, create offset target position
+          if (target === this.antagonista) {
+            // Random offset between -20 and +20 pixels
+            const offsetX = (Math.random() * 50) - 20;
+
+            // Create a fake target object with offset position
+            target = {
+              posicion: {
+                x: this.antagonista.posicion.x + offsetX,
+                y: this.antagonista.posicion.y
+              },
+              radio: this.antagonista.radio,
+              muerto: false,
+              recibirDanio: (damage) => {
+                this.antagonista.recibirDanio(damage);
+              }
+            };
+          }
+
+          //search random texture for rockets 
+          const randomRocket = Math.floor(Math.random() * 3) + 1;
+          const rocketTexture = `assets/rockets/rocket${randomRocket}.png`;
+
+          // Create rocket
+          const rocket = new Rocket(
+            rocketTexture,
+            this.protagonista.posicion.x,
+            this.protagonista.posicion.y,
+            this,
+            target
+          );
+          rocket.crearSprite();
+          this.rockets.push(rocket);
+        }
+      }, i * 100);
+    }
+  }
+
+  getRocketsForHand(handInfo) {
+    const rocketsPerHand = {
+      'Royal Flush': 100,
+      'Straight Flush': 60,
+      'Four of a Kind': 30,
+      'Full House': 25,
+      'Flush': 20,
+      'Straight': 16,
+      'Three of a Kind': 12,
+      'Two Pair': 8,
+      'Pair': 3,
+      'High Card': 1
+    };
+    return rocketsPerHand[handInfo.handName] || 1;
+  }
+
+  sortHandByRank() {
+    console.log('\n=== SORTING BY RANK ===');
+
+    this.playerHand.deselectAll();
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+
+    // Sort the cards array by rank value (high to low)
+    this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
+
+    // Recreate visuals in new order
+    this.syncHandVisuals();
+
+    console.log('Hand sorted by rank');
+  }
+
+  sortHandBySuit() {
+    console.log('\n=== SORTING BY SUIT ===');
+
+    this.playerHand.deselectAll();
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+
+    // Define suit order: Spades, Clubs, Diamonds, Hearts
+    const suitOrder = { 'S': 0, 'C': 1, 'D': 2, 'H': 3 };
+
+    // Sort by suit first, then by rank within each suit
+    this.playerHand.cards.sort((a, b) => {
+      const suitDiff = suitOrder[a.suit] - suitOrder[b.suit];
+      if (suitDiff !== 0) return suitDiff;
+      return b.rankValue - a.rankValue; // Within same suit, sort by rank
+    });
+
+    // Recreate visuals in new order
+    this.syncHandVisuals();
+
+    console.log('Hand sorted by suit');
   }
 
   updateDimensions() {
@@ -255,25 +395,176 @@ class Juego {
   createInterface() {
     this.interface = new PIXI.Container();
     this.interface.name = "INTERFACE";
+    this.interface.zIndex = 1000;
     this.pixiApp.stage.addChild(this.interface);
-
-    this.fpsText = new PIXI.Text({
-      text: "FPS: 60",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 4,
-      },
-    });
-
-    this.fpsText.x = this.width - 120;
-    this.fpsText.y = 20;
-    this.interface.addChild(this.fpsText);
+    this.uiManager = new UIManager(this);
+    this.uiManager.createAllUI();
   }
 
-  //async indica q este metodo es asyncronico, es decir q puede usar "await"
+  sortHandByRank() {
+    console.log('\n=== SORTING BY RANK ===');
+    this.playerHand.deselectAll();
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+
+    this.playerHand.cards.sort((a, b) => b.rankValue - a.rankValue);
+    this.syncHandVisuals();
+    console.log('Hand sorted by rank');
+  }
+
+  sortHandBySuit() {
+    console.log('\n=== SORTING BY SUIT ===');
+    this.playerHand.deselectAll();
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+
+    const suitOrder = { 'S': 0, 'H': 1, 'D': 2, 'C': 3 };
+    this.playerHand.cards.sort((a, b) => {
+      const suitDiff = suitOrder[a.suit] - suitOrder[b.suit];
+      if (suitDiff !== 0) return suitDiff;
+      return b.rankValue - a.rankValue;
+    });
+
+    this.syncHandVisuals();
+    console.log('Hand sorted by suit');
+  }
+
+  deselectAllCards() {
+    console.log('\n=== DESELECTING ALL CARDS ===');
+    this.playerHand.deselectAll();
+
+    this.handRenderer.cardVisuals.forEach(cardVisual => {
+      cardVisual.setSelected(false);
+      cardVisual.targetY = this.handRenderer.handY;
+    });
+
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+    console.log('All cards deselected');
+  }
+
+  async playSelectedCards() {
+    if (!this.playerHand.hasSelectedCards) return;
+
+    console.log('\n=== PLAYING SELECTED CARDS ===');
+
+    const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
+    console.log(`Played: ${handInfo.handName}`);
+
+    const rocketsToFire = this.getRocketsForHand(handInfo);
+
+    const cardsToRemove = [...this.playerHand.selectedCards];
+    const result = this.playerHand.playSelectedCards();
+
+    cardsToRemove.forEach(card => {
+      this.handRenderer.removeCardVisual(card);
+    });
+
+    // Fire the rockets
+    this.fireRocketsForHand(handInfo);
+
+    this.handRenderer.updatePositions();
+    this.updateDeckCounters();
+    this.uiManager.updateHandValueDisplay();
+    this.uiManager.updatePlayHandButton();
+  }
+
+  async endPlayerTurn() {
+    console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
+
+    // Complete repairs for support ships in repairing state
+    for (let ship of this.ships) {
+      if (ship instanceof SupportShip &&
+        ship.fsm.currentStateName === 'repairing' &&
+        ship.allyToRepair && !ship.allyToRepair.muerto) {
+
+        console.log(`✅ ${ship.debugId} completed repair of ${ship.allyToRepair.debugId}`);
+        console.log(`   ${ship.allyToRepair.debugId}.escudo before: ${ship.allyToRepair.escudo}`);
+        ship.allyToRepair.escudo = 1;
+        console.log(`   ${ship.allyToRepair.debugId}.escudo after: ${ship.allyToRepair.escudo}`);
+
+        ship.allyToRepair = null;
+        ship.fsm.setState('pursuing');
+      }
+    }
+
+    // Draw new cards
+    const previousCount = this.playerHand.numberOfCards;
+    this.playerHand.drawCards();
+    const newCards = this.playerHand.numberOfCards - previousCount;
+
+    // Crear visuales para nuevas cartas
+    for (let i = 0; i < newCards; i++) {
+      const cardIndex = previousCount + i;
+      const card = this.playerHand.cards[cardIndex];
+      await this.handRenderer.createCardVisual(card, cardIndex);
+    }
+    //Clear ALL targeting flags at turn end (safety net)
+    for (let aShip of this.ships) {
+      aShip.isTargeted = false;
+    }
+
+    this.sortHandByRank();
+    this.updateDeckCounters();
+
+    console.log(`Cartas en mano: ${this.playerHand.numberOfCards}/${this.playerHand.maxCards}`);
+
+
+
+    // Cambiar a turno de IA
+    this.startAITurn();
+  }
+
+  startAITurn() {
+    console.log('\n=== TURNO DE LA IA ===');
+    this.currentTurn = 'ai';
+    this.aiTurnTimer = 0;
+    this.turnsPassed++;
+
+    // Check for support ships to respond to damaged shields
+    for (let ship of this.ships) {
+      if (ship instanceof SupportShip && ship.fsm.currentStateName === 'pursuing') {
+        ship.checkForAlliesNeedingRepair();
+      }
+    }
+
+    // Actualizar UI
+    this.uiManager.updateEndTurnButton();
+    this.uiManager.updateTurnIndicator('ai');
+    // Spawn de naves si corresponde
+    if (this.antagonista && this.turnsPassed % this.antagonista.turnosParaSpawn === 0) {
+      this.antagonista.spawnearNave();
+    }
+  }
+
+  updateAITurn() {
+  // Add elapsed time in milliseconds instead of counting frames
+  const deltaTimeMs = this.pixiApp.ticker.deltaTime * (1000 / 60); // Convert to ms
+  this.aiTurnTimer += deltaTimeMs;
+    // Fin del turno de IA
+    if (this.aiTurnTimer >= this.aiTurnDuration) {
+      this.endAITurn();
+    }
+  }
+
+  endAITurn() {
+    console.log('\n=== FIN DE TURNO DE LA IA ===');
+
+    // Check if support ships can transition to repairing
+    for (let ship of this.ships) {
+      if (ship instanceof SupportShip) {
+        ship.checkIfReadyToRepair();
+      }
+    }
+
+    this.currentTurn = 'player';
+    this.aiTurnTimer = 0;
+
+    // Actualizar UI
+    this.uiManager.updateEndTurnButton();
+    this.uiManager.updateTurnIndicator('player');
+  }
+
   async initPIXI() {
     //creamos la aplicacion de pixi y la guardamos en la propiedad pixiApp
     this.pixiApp = new PIXI.Application();
@@ -284,6 +575,7 @@ class Juego {
       height: this.height,
       resizeTo: window,
     };
+
 
     await this.pixiApp.init(opcionesDePixi);
     document.body.appendChild(this.pixiApp.canvas);
@@ -310,11 +602,13 @@ class Juego {
     await this.loadTextures();
     this.createBackground();
 
+    this.particleEmitter = new ParticleEmitter(this);
+
     this.gameArea = {
       x: 200,
       y: 0,
       width: 1500,
-      height: 1500,
+      height: 1500
     };
 
     // Dibujar rectángulo amarillo de debug
@@ -328,26 +622,25 @@ class Juego {
     this.rectanguloDebug.stroke({ width: 4, color: 0xffff00, alpha: 1 });
     this.containerPrincipal.addChild(this.rectanguloDebug);
 
-    this.addRocketControls();
+
     this.crearAntagonista();
     await this.crearProtagonista();
-    this.crearEnemigos(5, BlackShip);
-    this.crearEnemigos(5, RedShip);
-    this.crearEnemigos(3, ShieldShip);
-    this.crearEnemigos(2, SupportShip);
+    this.crearEnemigos(20, BlackShip);
+    this.crearEnemigos(30, RedShip);
+    this.crearEnemigos(30, ShieldShip);
+    this.crearEnemigos(20, SupportShip);
     this.createAsteroids();
-    this.asignarProtagonistaComoTargetATodosLospersonas();
+    this.makePlayerAsGlobalTarget();
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
     this.width = this.mapWidth;
     this.height = this.mapHeight;
-    this.grid = new Grid(this, this.cellSize);
+    //this.grid = new Grid(this, this.cellSize);
     this.iniciarControles();
 
     this.interfaceContainer = new PIXI.Container();
     this.interfaceContainer.sortableChildren = true;
     this.pixiApp.stage.addChild(this.interfaceContainer);
-
     // Crear el background una sola vez
     this.interfaceBackground = new PIXI.Graphics();
     this.interfaceBackground.zIndex = -1;
@@ -368,13 +661,36 @@ class Juego {
   async loadTextures() {
     try {
       // Cargar el spritesheet
-      const spritesheet = await PIXI.Assets.load("assets/cards/cards.json");
-
+      const spritesheet = await PIXI.Assets.load('assets/cards/cards.json');
       // Guardar en cache para acceso fácil
       PIXI.Assets.cache.set("deckAtlas", spritesheet);
 
       console.log("✅ Card atlas loaded");
       console.log("Available frames:", Object.keys(spritesheet.textures));
+      console.log("Loading explosion frames...");
+      const explosionPromises = [];
+      for (let i = 1; i <= 29; i++) {
+        explosionPromises.push(
+          PIXI.Assets.load(`explosion/Fire Burst_${i}.png`)
+        );
+      }
+      await Promise.all(explosionPromises);
+      console.log("✅ Explosion frames loaded");
+
+      console.log("Loading ship destruction frames...");
+      const shipTypes = ['red', 'black', 'shield', 'support'];
+      const destructionPromises = [];
+
+      for (let shipType of shipTypes) {
+        for (let i = 1; i <= 8; i++) {
+          destructionPromises.push(
+            PIXI.Assets.load(`assets/ships/${shipType}/destruction/Destruction${i}.png`)
+          );
+        }
+      }
+
+      await Promise.all(destructionPromises);
+      console.log("✅ Ship destruction frames loaded");
 
       return true;
     } catch (error) {
@@ -401,61 +717,22 @@ class Juego {
     }
   }
 
-  addRocketControls() {
-    this.pixiApp.canvas.onclick = (event) => {
-      const x = event.x - this.containerPrincipal.x;
-      const y = event.y - this.containerPrincipal.y;
-
-      // Buscar enemigo más cercano al click
-      let closestShip = null;
-      let distMenor = Infinity;
-      // IMPORTANTE: CREAR UNA FUNCION BUSCAR NAVE MAS CERCANA QUE MANEJE ESTO
-      for (let ship of this.ships) {
-        if (ship.isTargeted) continue;
-        const dist = calcularDistancia({ x, y }, ship.posicion);
-        if (dist < distMenor) {
-          distMenor = dist;
-          closestShip = ship;
-        }
-      }
-
-      if (this.ships.length === 0 && this.antagonista) {
-        closestShip = this.antagonista;
-      }
-
-      if (closestShip) {
-        closestShip.isTargeted = true;
-        const rocket = new Rocket(
-          "assets/rockets/rocket1.png",
-          this.protagonista.posicion.x,
-          this.protagonista.posicion.y,
-          this,
-          closestShip
-        );
-        rocket.crearSprite();
-        this.rockets.push(rocket);
-      }
-    };
-  }
-
   async crearProtagonista() {
-    const x = this.mapWidth / 2;
+    const x = this.mapWidth / 2
     const y = this.gameArea.y + this.gameArea.height - 100;
     const protagonista = new Protagonista(x, y, this);
-    // this.ships.push(protagonista);
     this.protagonista = protagonista;
-  }
+  };
 
   crearAntagonista() {
-    const x = this.mapWidth / 2;
+    const x = this.mapWidth / 2
     const y = this.gameArea.y + 50;
     const antagonista = new Antagonista(x, y, this);
-    //this.ships.push(antagonista);
     this.antagonista = antagonista;
-  }
+  };
+
 
   agregarInteractividadDelMouse() {
-    // Escuchar el evento mousemove
     this.pixiApp.canvas.onmousemove = (event) => {
       this.mouse.posicion = {
         x: event.x - this.containerPrincipal.x,
@@ -478,7 +755,7 @@ class Juego {
       this.mouse.apretado = false;
     };
 
-    // Event listener para la rueda del mouse (zoom)
+
     this.pixiApp.canvas.addEventListener("wheel", (event) => {
       event.preventDefault(); // Prevenir el scroll de la página
 
@@ -489,25 +766,24 @@ class Juego {
       );
 
       if (nuevoZoom !== this.zoom) {
-        // Obtener la posición del mouse antes del zoom
         const mouseX = event.x;
         const mouseY = event.y;
 
-        // Calcular el punto en coordenadas del mundo antes del zoom
         const worldPosX = (mouseX - this.containerPrincipal.x) / this.zoom;
         const worldPosY = (mouseY - this.containerPrincipal.y) / this.zoom;
 
-        // Aplicar el nuevo zoom
         this.zoom = nuevoZoom;
         this.containerPrincipal.scale.set(this.zoom);
 
-        // Ajustar la posición del contenedor para mantener el mouse en el mismo punto del mundo
         this.containerPrincipal.x = mouseX - worldPosX * this.zoom;
         this.containerPrincipal.y = mouseY - worldPosY * this.zoom;
       }
     });
 
-    this.pixiApp.canvas.addEventListener("click", (event) => {
+    this.pixiApp.canvas.addEventListener('click', (event) => {
+      if (this.currentTurn === 'ai') {
+        return; // No permitir clicks en cartas durante turno de IA
+      }
       const mouseX = event.clientX;
       const mouseY = event.clientY;
 
@@ -529,15 +805,6 @@ class Juego {
     });
   }
 
-  convertirCoordenadaDelMouse(mouseX, mouseY) {
-    // Convertir coordenadas del mouse del viewport a coordenadas del mundo
-    // teniendo en cuenta la posición y escala del containerPrincipal
-    return {
-      x: (mouseX - this.containerPrincipal.x) / this.zoom,
-      y: (mouseY - this.containerPrincipal.y) / this.zoom,
-    };
-  }
-
   gameLoop(time) {
     if (this.teclado["w"]) {
       this.containerPrincipal.y += 10;
@@ -551,26 +818,39 @@ class Juego {
     if (this.teclado["d"]) {
       this.containerPrincipal.x -= 10;
     }
-    //iteramos por todos los personas
-    //this.dibujador.clear();//14-10
+
     this.frameCounter++;
 
-    // Procesar antagonista
+    if (this.particleEmitter) {
+      this.particleEmitter.tick();
+      this.particleEmitter.render();
+    }
+
     if (this.antagonista) {
-      this.antagonista.tick();
+      // SOLO tick durante turno de IA
+      if (this.currentTurn === 'ai') {
+        this.antagonista.tick();
+      }
       this.antagonista.render();
     }
 
-    // Procesar naves
+    // Actualizar turno de IA si corresponde
+    if (this.currentTurn === 'ai') {
+      this.updateAITurn();
 
-    for (let aShip of this.ships) {
-      //ejecutamos el metodo tick de cada persona
-      aShip.tick();
-      aShip.render();
+      // Durante turno de IA, las naves se mueven
+      for (let aShip of this.ships) {
+        aShip.tick();  // Llamar tick() solo en turno IA
+        aShip.render();
+      }
+    } else {
+      // Durante turno del jugador, solo renderizar sin mover
+      for (let aShip of this.ships) {
+        aShip.render(); // Solo render, sin tick()
+      }
     }
 
-    // this.grid.update();
-    // this.hacerQLaCamaraSigaAlProtagonista();
+    // Actualizar renderizador de cartas
     if (this.handRenderer) {
       this.handRenderer.tick();
       this.handRenderer.render();
@@ -582,7 +862,19 @@ class Juego {
       rocket.tick();
       rocket.render();
     }
+
+    for (let explosion of this.explosions) {
+      explosion.tick();
+      explosion.render();
+    }
+  
+
+
+  for(let deathAnim of this.shipDeathAnimations) {
+    deathAnim.tick();
+    deathAnim.render();
   }
+}
 
   iniciarControles() {
     window.addEventListener("keydown", (event) => {
@@ -594,37 +886,21 @@ class Juego {
     });
   }
 
-  //hacerQLaCamaraSigaAlProtagonista() {
-  /*if (!this.protagonista) return;
-  this.containerPrincipal.x = -this.protagonista.posicion.x + this.width / 2;
-  this.containerPrincipal.y = -this.protagonista.posicion.y + 1000;
-  */
-
-  /*if (this.mouse.apretado){
-       this.containerPrincipal.x = this.mouse.posicion.x;
-       this.containerPrincipal.y = this.mouse.posicion.y;
-       }
-       */
-
   updateInterface() {
     if (!this.interfaceContainer) return;
+
+    // Limpiar y redibujar el background existente
     if (this.interfaceBackground) {
       this.interfaceBackground.clear();
-    } else {
-      this.interfaceBackground = new PIXI.Graphics();
-      this.interfaceContainer.addChild(this.interfaceBackground);
+      this.interfaceBackground.beginFill(0x222222);
+      this.interfaceBackground.drawRect(
+        0,
+        this.pixiApp.renderer.height * 0.8,
+        this.pixiApp.renderer.width,
+        this.pixiApp.renderer.height * 0.2
+      );
+      this.interfaceBackground.endFill();
     }
-
-    const interfaceBackground = new PIXI.Graphics();
-    interfaceBackground.beginFill(0x222222);
-    interfaceBackground.drawRect(
-      0,
-      this.pixiApp.renderer.height * 0.8,
-      this.pixiApp.renderer.width,
-      this.pixiApp.renderer.height * 0.2
-    );
-    interfaceBackground.endFill();
-    this.interfaceContainer.addChild(interfaceBackground);
 
     // Actualizar posiciones de los mazos según nuevo tamaño de ventana
     if (this.discardRenderer) {
@@ -643,18 +919,21 @@ class Juego {
       this.handRenderer.updatePositions();
     }
 
-    if (this.fpsText) {
-      this.fpsText.x = this.width - 120;
-      this.fpsText.y = 20;
+    if (this.uiManager) {
+      this.uiManager.updateFPS(this.pixiApp.ticker.FPS);
+      this.uiManager.updatePositions();
     }
-    this.fpsText.text = this.pixiApp.ticker.FPS.toFixed(2);
+
+    if (this.uiManager) {
+      this.uiManager.updatePositions();
+    }
   }
 
   finDelJuego() {
     alert("Te moriste! fin del juego");
   }
 
-  asignarProtagonistaComoTargetATodosLospersonas() {
+  makePlayerAsGlobalTarget() {
     for (let ship of this.ships) {
       ship.asignarTarget(this.protagonista);
     }

@@ -17,9 +17,10 @@ class CardVisual {
     this.container.addChild(this.border);
 
     this.body = Matter.Bodies.rectangle(x, y, this.width, this.height, {
-      friction: 0.3,
-      restitution: 0.2,
-      density: 0.001
+      friction: 0.8,
+      restitution: 0.05,
+      density: 0.01,
+      frictionAir: 0.15
     });
 
     this.body.cardVisual = this;
@@ -33,7 +34,7 @@ class CardVisual {
   }
 
   async crearSprite() {
-    console.log('Creating sprite for:', this.card.toString());
+//console.log('Creating sprite for:', this.card.toString());
 
     const texture = this.getCardTexture(this.card.rank, this.card.suit);
     // Fallback si no se encuentra
@@ -47,7 +48,7 @@ class CardVisual {
     this.sprite = sprite;
     this.container.addChild(sprite);
 
-    console.log(`✅ Sprite created for ${this.card.toString()}`);
+    //console.log(`✅ Sprite created for ${this.card.toString()}`);
     return sprite;
   }
 
@@ -113,8 +114,20 @@ setSelected(selected) {
     // Aplicar fuerzas de resorte hacia posición objetivo
     this.applySpringForce();
 
+    const leftWall = 220;
+  if (this.body.position.x < leftWall) {
+    Matter.Body.setPosition(this.body, {
+      x: leftWall,
+      y: this.body.position.y
+    });
+    Matter.Body.setVelocity(this.body, {
+      x: Math.max(0, this.body.velocity.x), // Solo permitir movimiento hacia la derecha
+      y: this.body.velocity.y
+    });
+  }
+
     // Limitar velocidad
-    const maxSpeed = 10;
+    const maxSpeed = 5;
     const speed = Math.sqrt(
       this.body.velocity.x ** 2 + this.body.velocity.y ** 2
     );
@@ -152,8 +165,8 @@ class HandRenderer {
     this.juego = juego;
     this.cardVisuals = []; // Array de CardVisual
     this.handY = juego.height - 150; // Posición Y de la mano
-    this.spacing = 100; // Espaciado entre cartas cuando hay pocas
-    this.minSpacing = 40; // Espaciado mínimo cuando hay muchas
+    this.spacing = 0; // Espaciado entre cartas cuando hay pocas
+    this.minSpacing = 0; // Espaciado mínimo cuando hay muchas
   }
 
   async createCardVisual(card, index) {
@@ -262,34 +275,39 @@ class DeckRenderer {
     this.cardSprite.height = 120;
     this.container.addChild(this.cardSprite);
 
-    this.counterText = new PIXI.Text({
-      text: "0",
-      style: {
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 4
-      }
-    });
-    this.counterText.anchor.set(0.5, 0.5);
-    this.counterText.y = 80;
-    this.container.addChild(this.counterText);
+     this.counterBg = new PIXI.Graphics();
+  this.counterBg.rect(-30, 65, 60, 30);
+  this.counterBg.fill(0x222222);
+  this.container.addChild(this.counterBg);
 
-    this.labelText = new PIXI.Text({
-      text: this.label,
-      style: {
-        fontFamily: "Arial",
-        fontSize: 16,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 3
-      }
-    });
-    this.labelText.anchor.set(0.5, 0.5);
-    this.labelText.y = -80;
-    this.container.addChild(this.labelText);
-  }
+  this.counterText = new PIXI.Text({
+    text: "0",
+    style: {
+      fontFamily: "Arial",
+      fontSize: 24,
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4
+    }
+  });
+  this.counterText.anchor.set(0.5, 0.5);
+  this.counterText.y = 80;
+  this.container.addChild(this.counterText);
+
+  this.labelText = new PIXI.Text({
+    text: this.label,
+    style: {
+      fontFamily: "Arial",
+      fontSize: 16,
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 3
+    }
+  });
+  this.labelText.anchor.set(0.5, 0.5);
+  this.labelText.y = -80;
+  this.container.addChild(this.labelText);
+}
 
   updateCounter(count) {
     if (this.counterText) {

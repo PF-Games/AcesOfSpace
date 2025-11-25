@@ -12,10 +12,23 @@ class ShipState {
 
 class PursuingState extends ShipState {
   onEnter() {
-    this.owner.velocidadMaxima = this.owner.defaultSpeed;
+    // Set speed based on shield status (for ShieldShip only)
+    if (this.owner instanceof ShieldShip && this.owner.escudo === 0) {
+      this.owner.velocidadMaxima = 0.5; // Slow down when damaged
+    } else {
+      this.owner.velocidadMaxima = this.owner.defaultSpeed;
+    }
   }
 
   onUpdate() {
+    // Update speed if shield status changed
+    if (this.owner instanceof ShieldShip) {
+      if (this.owner.escudo === 0) {
+        this.owner.velocidadMaxima = 0.5; // Keep slow
+      } else {
+        this.owner.velocidadMaxima = this.owner.defaultSpeed; // Normal speed
+      }
+    }
     // Check if reached player attack range
     if (this.owner.checkPlayerAttackRange()) {
       this.fsm.setState('attacking');
@@ -100,51 +113,94 @@ class ProtectingState extends ShipState {
   }
 }
 
-
 class SpeedingToRepairState extends ShipState {
+  onEnter() {
+    console.log(`${this.owner.debugId} speeding to repair ${this.owner.allyToRepair.debugId}`);
+    console.log(`   ${this.owner.allyToRepair.debugId}.escudo: ${this.owner.allyToRepair.escudo}`);
+    this.owner.velocidadMaxima = this.owner.boostSpeed || 6;
+  }
+
   onUpdate() {
     if (!this.owner.allyToRepair || this.owner.allyToRepair.muerto) {
+      console.log(`${this.owner.debugId} ally died, returning to pursuing`);
       this.owner.allyToRepair = null;
       this.fsm.setState('pursuing');
       return;
     }
 
-    const dist = calcularDistancia(this.owner.posicion, this.owner.allyToRepair.posicion);
-    if (dist < this.owner.repairRange) {
-      this.fsm.setState('repairing');
-    } else {
-      this.owner.target = this.owner.allyToRepair;
-      this.owner.perseguir();
+    // Check if shield already repaired
+    if (this.owner.allyToRepair.escudo > 0) {
+      console.log(`${this.owner.debugId} ally already repaired, returning to pursuing`);
+      this.owner.allyToRepair = null;
+      this.fsm.setState('pursuing');
+      return;
     }
+
+    // Move towards ally
+    this.owner.target = this.owner.allyToRepair;
+    this.owner.perseguir();
+
+    // Log when close enough (but don't transition yet - wait for endAITurn)
+    const dist = calcularDistancia(this.owner.posicion, this.owner.allyToRepair.posicion);
+    if (dist < this.owner.repairRange && !this.loggedRange) {
+      console.log(`${this.owner.debugId} reached repair range of ${this.owner.allyToRepair.debugId}`);
+      this.loggedRange = true;
+    }
+  }
+
+  onExit() {
+    this.owner.velocidadMaxima = this.owner.defaultSpeed;
   }
 }
 
 class RepairingState extends ShipState {
   onEnter() {
-    this.repairTimer = 0;
-    this.repairDuration = 120; // 2 seconds at 60fps
+    console.log(`${this.owner.debugId} now repairing ${this.owner.allyToRepair.debugId}`);
+    console.log(`${this.owner.allyToRepair.debugId}.escudo: ${this.owner.allyToRepair.escudo}`);
   }
 
   onUpdate() {
     if (!this.owner.allyToRepair || this.owner.allyToRepair.muerto) {
+      console.log(`${this.owner.debugId} ally died during repair, returning to pursuing`);
       this.owner.allyToRepair = null;
       this.fsm.setState('pursuing');
       return;
     }
 
-    this.repairTimer++;
-    if (this.repairTimer >= this.repairDuration) {
-      // Repair complete
-      if (this.owner.allyToRepair.escudo !== undefined) {
-        this.owner.allyToRepair.escudo = 1;
-        console.log(`${this.owner.debugId} reparó el escudo de ${this.owner.allyToRepair.debugId}`);
-      }
+    // Check if already repaired
+    if (this.owner.allyToRepair.escudo > 0) {
+      console.log(`${this.owner.debugId} repair complete, returning to pursuing`);
       this.owner.allyToRepair = null;
       this.fsm.setState('pursuing');
+      return;
     }
 
-    // Stay near ally during repair
-    this.owner.target = this.owner.allyToRepair;
-    this.owner.perseguir();
+    // Check if too far away
+    const dist = calcularDistancia(this.owner.posicion, this.owner.allyToRepair.posicion);
+    if (dist > this.owner.repairRange * 1.5) {
+      console.log(`${this.owner.debugId} lost repair range, returning to speeding`);
+      this.fsm.setState('speedingToRepair');
+      return;
+    }
+
+    // Stay near ally during repair (gentle movement)
+    if (dist > this.owner.repairRange * 0.5) {
+      const direction = {
+        x: this.owner.allyToRepair.posicion.x - this.owner.posicion.x,
+        y: this.owner.allyToRepair.posicion.y - this.owner.posicion.y
+      };
+      const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+      if (magnitude > 0) {
+        this.owner.aceleracion.x += (direction.x / magnitude) * this.owner.aceleracionMaxima * 15;
+        this.owner.aceleracion.y += (direction.y / magnitude) * this.owner.aceleracionMaxima * 15;
+      }
+    }
+  }
+
+  onExit() {
+    if (this.owner.allyToRepair) {
+      this.owner.allyToRepair.beingRepairedBy = null; // Release the claim
+    }
+    console.log(`${this.owner.debugId} exiting Repairing state`);
   }
 }

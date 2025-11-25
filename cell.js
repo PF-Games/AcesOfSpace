@@ -55,7 +55,6 @@ class Celda {
     let arr = [];
     for (let i = -1; i <= 1; i++) {
       for (let j = -1; j <= 1; j++) {
-        // console.log(this,this.x + i, this.y + j);
         if (i == 0 && j == 0) continue;
 
         let indiceX = this.x + i;
@@ -82,7 +81,6 @@ class Celda {
     let arr = [];
     for (let i = -2; i <= 2; i++) {
       for (let j = -2; j <= 2; j++) {
-        // console.log(this,this.x + i, this.y + j);
         if (i == 0 && j == 0) continue;
 
         let indiceX = this.x + i;

@@ -72,7 +72,7 @@ class Protagonista extends Spawner {
 
 class Antagonista extends Spawner {
   constructor(x, y, juego) {
-    super(x, y, juego, "assets/naves/mothership.png");
+    super(x, y, juego, "assets/ships/mothership.png");
     this.vida = 100;
     this.turnos = 0;
     this.turnosParaSpawn = 5;

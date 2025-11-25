@@ -10,9 +10,14 @@ class Ship extends GameObject {
     this.factorSeparacion = 20;
     this.factorCohesion = 0.3;
     this.factorAlineacion = 0.4;
-    this.aceleracionMaxima = 0.2;
-    this.velocidadMaxima = 1;
+    this.aceleracionMaxima = 5;
+    this.velocidadMaxima = 5;
     this.amigos = [];
+
+    this.emitParticles = true; // Set to false to disable trails
+    this.particleColor = 0x00AAFF; // Default blue
+    this.particleEmitRate = 3; // Emit every N frames
+    this.frameCounter = 0;
   }
 
 
@@ -43,6 +48,7 @@ class Ship extends GameObject {
     this.calcularAnguloYVelocidadLineal();
   }
 
+
   calcularAnguloYVelocidadLineal() {
     /**
      * CÁLCULO DE PARÁMETROS DE ANIMACIÓN
@@ -66,7 +72,7 @@ class Ship extends GameObject {
     this.sprite = new PIXI.Sprite(
       await PIXI.Assets.load(this.texturePath)
     );
-    this.sprite.anchor.set(0.5, 1);
+    this.sprite.anchor.set(0.5, 0.5);
     this.container.addChild(this.sprite);
     this.render();
   }
@@ -192,6 +198,21 @@ class Ship extends GameObject {
     if (this.muerto) return;
 
     this.muerto = true;
+     // Create death animation BEFORE destroying sprite
+  if (this.shipType && this.juego.shipDeathAnimations) {
+    // Get current rotation (in radians)
+    const rotation = this.sprite ? this.sprite.rotation : 0;
+    
+    const deathAnim = new ShipDeathAnimation(
+      this.posicion.x,
+      this.posicion.y,
+      rotation,
+      this.juego,
+      this.shipType
+    );
+    this.juego.shipDeathAnimations.push(deathAnim);
+  }
+
     this.juego.ships = this.juego.ships.filter((ship) => ship !== this);
     //this.juego.enemigos = this.juego.enemigos.filter((ship) => ship !== this);
     //this.juego.amigos = this.juego.amigos.filter((ship) => ship !== this);
@@ -202,7 +223,7 @@ class Ship extends GameObject {
     this.container = null;
 
 
-    this.borrarmeComoTargetDeTodos();
+    //this.borrarmeComoTargetDeTodos();
   }
 
   pegarSiEstaEnMiRango() {
