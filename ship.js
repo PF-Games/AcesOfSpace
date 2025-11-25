@@ -198,6 +198,21 @@ class Ship extends GameObject {
     if (this.muerto) return;
 
     this.muerto = true;
+     // Create death animation BEFORE destroying sprite
+  if (this.shipType && this.juego.shipDeathAnimations) {
+    // Get current rotation (in radians)
+    const rotation = this.sprite ? this.sprite.rotation : 0;
+    
+    const deathAnim = new ShipDeathAnimation(
+      this.posicion.x,
+      this.posicion.y,
+      rotation,
+      this.juego,
+      this.shipType
+    );
+    this.juego.shipDeathAnimations.push(deathAnim);
+  }
+
     this.juego.ships = this.juego.ships.filter((ship) => ship !== this);
     //this.juego.enemigos = this.juego.enemigos.filter((ship) => ship !== this);
     //this.juego.amigos = this.juego.amigos.filter((ship) => ship !== this);

@@ -29,6 +29,7 @@ class Juego {
     this.frameCounter = 0;
     this.rockets = [];
     this.explosions = [];
+    this.shipDeathAnimations = [];
 
     this.initCardSystem();
 
@@ -282,23 +283,23 @@ class Juego {
           }
 
           // If targeting mothership, create offset target position
-        if (target === this.antagonista) {
-          // Random offset between -20 and +20 pixels
-          const offsetX = (Math.random() * 50) - 20;
-          
-          // Create a fake target object with offset position
-          target = {
-            posicion: {
-              x: this.antagonista.posicion.x + offsetX,
-              y: this.antagonista.posicion.y
-            },
-            radio: this.antagonista.radio,
-            muerto: false,
-            recibirDanio: (damage) => {
-              this.antagonista.recibirDanio(damage);
-            }
-          };
-        }
+          if (target === this.antagonista) {
+            // Random offset between -20 and +20 pixels
+            const offsetX = (Math.random() * 50) - 20;
+
+            // Create a fake target object with offset position
+            target = {
+              posicion: {
+                x: this.antagonista.posicion.x + offsetX,
+                y: this.antagonista.posicion.y
+              },
+              radio: this.antagonista.radio,
+              muerto: false,
+              recibirDanio: (damage) => {
+                this.antagonista.recibirDanio(damage);
+              }
+            };
+          }
 
           //search random texture for rockets 
           const randomRocket = Math.floor(Math.random() * 3) + 1;
@@ -675,6 +676,21 @@ class Juego {
       await Promise.all(explosionPromises);
       console.log("✅ Explosion frames loaded");
 
+      console.log("Loading ship destruction frames...");
+      const shipTypes = ['red', 'black', 'shield', 'support'];
+      const destructionPromises = [];
+
+      for (let shipType of shipTypes) {
+        for (let i = 1; i <= 8; i++) {
+          destructionPromises.push(
+            PIXI.Assets.load(`assets/ships/${shipType}/destruction/Destruction${i}.png`)
+          );
+        }
+      }
+
+      await Promise.all(destructionPromises);
+      console.log("✅ Ship destruction frames loaded");
+
       return true;
     } catch (error) {
       console.error("❌ Error loading textures:", error);
@@ -850,7 +866,14 @@ class Juego {
       explosion.tick();
       explosion.render();
     }
+  
+
+
+  for(let deathAnim of this.shipDeathAnimations) {
+    deathAnim.tick();
+    deathAnim.render();
   }
+}
 
   iniciarControles() {
     window.addEventListener("keydown", (event) => {

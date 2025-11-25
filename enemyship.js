@@ -171,6 +171,7 @@ class BlackShip extends enemyShip {
     this.velocidadMaxima = 1;
     this.playerDamage = 2;
     this.colorType = 'black';
+    this.shipType = 'black';
     this.weight = 5; //this will be used to create levels and allocate difficulty
 
     this.particleColor = 0x9A9A9A;
@@ -180,11 +181,12 @@ class BlackShip extends enemyShip {
 
 class RedShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/red/Red_Idle.png", x, y, juego, "R");
+    super("assets/ships/red/Red_Idle.png", x, y, juego, "R");
     this.defaultSpeed = 2.5;
     this.velocidadMaxima = 2.5;
     this.playerDamage = 1;
     this.colorType = 'red';
+    this.shipType = 'red';
     this.weight = 5; //this will be used to create levels and allocate difficulty
 
     this.particleColor = 0xFF3333;
@@ -194,10 +196,11 @@ class RedShip extends enemyShip {
 
 class ShieldShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/shield/Shield_Idle.png", x, y, juego, "S");
+    super("assets/ships/shield/Shield_Idle.png", x, y, juego, "S");
     this.defaultSpeed = 3;
     this.velocidadMaxima = 3;
     this.playerDamage = 1;
+    this.shipType = 'shield';
     this.escudo = 1;
     this.protectionRange = 150;
     this.weight = 5; //this will be used to create levels and allocate difficulty
@@ -274,6 +277,7 @@ class SupportShip extends enemyShip {
     this.velocidadMaxima = 0.75;
     this.boostSpeed = 6;
     this.playerDamage = 1;
+    this.shipType = 'support';
     this.repairRange = 100;
     this.maxRepairDistance = 500;  
     this.weight = 5; //this will be used to create levels and allocate difficulty
