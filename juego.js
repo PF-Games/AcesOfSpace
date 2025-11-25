@@ -571,7 +571,7 @@ class Juego {
     this.pixiApp = new PIXI.Application();
     globalThis.__PIXI_APP__ = this.pixiApp;
     const opcionesDePixi = {
-      background: "#1099bb",
+      background: "#010106ff",
       width: this.width,
       height: this.height,
       resizeTo: window,
@@ -591,8 +591,10 @@ class Juego {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
     this.fondo.zIndex = -2;
     this.fondo.tileScale.set(1);
-    this.fondo.width = this.mapWidth +500;
-    this.fondo.height = this.mapHeight + 500;
+    this.fondo.x = -this.mapWidth / 2;  // Center horizontally
+  this.fondo.y = -this.mapHeight / 2; // Center vertically
+  this.fondo.width = this.mapWidth * 3;
+  this.fondo.height = this.mapHeight * 3;
     this.containerPrincipal.addChild(this.fondo);
   }
 
@@ -727,11 +729,11 @@ class Juego {
 
   crearAntagonista() {
     const x = this.mapWidth / 2
-    const y = this.gameArea.y + 150;
+    const y = this.gameArea.y + 50;
     const antagonista = new Antagonista(x, y, this);
     this.antagonista = antagonista;
   };
-  
+
 
   agregarInteractividadDelMouse() {
     this.pixiApp.canvas.onmousemove = (event) => {
