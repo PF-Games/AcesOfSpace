@@ -625,10 +625,10 @@ class Juego {
 
     this.crearAntagonista();
     await this.crearProtagonista();
-    this.crearEnemigos(20, BlackShip);
-    this.crearEnemigos(30, RedShip);
-    this.crearEnemigos(30, ShieldShip);
-    this.crearEnemigos(20, SupportShip);
+    this.crearEnemigos(10, BlackShip);
+    this.crearEnemigos(15, RedShip);
+    this.crearEnemigos(15, ShieldShip);
+    this.crearEnemigos(10, SupportShip);
     this.createAsteroids();
     this.makePlayerAsGlobalTarget();
     this.dibujador = new PIXI.Graphics();
