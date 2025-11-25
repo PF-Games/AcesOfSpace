@@ -9,7 +9,7 @@ class Particle {
     this.maxLifetime = 30; // frames
     this.age = 0;
     this.color = color;
-    this.initialSize = 10;
+    this.initialSize = 3;
   }
 
   tick() {
@@ -28,7 +28,7 @@ class Particle {
   }
 
   getAlpha() {
-    return this.lifetime * 0.6; // Max 60% opacity
+    return this.lifetime * 0.9; // Max 90% opacity
   }
 }
 

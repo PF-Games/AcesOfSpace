@@ -155,8 +155,8 @@ class SpeedingToRepairState extends ShipState {
 
 class RepairingState extends ShipState {
   onEnter() {
-    console.log(`🔧 ${this.owner.debugId} now repairing ${this.owner.allyToRepair.debugId}`);
-    console.log(`   ${this.owner.allyToRepair.debugId}.escudo: ${this.owner.allyToRepair.escudo}`);
+    console.log(`${this.owner.debugId} now repairing ${this.owner.allyToRepair.debugId}`);
+    console.log(`${this.owner.allyToRepair.debugId}.escudo: ${this.owner.allyToRepair.escudo}`);
   }
 
   onUpdate() {

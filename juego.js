@@ -473,10 +473,8 @@ class Juego {
     console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
   }
 
-
   async endPlayerTurn() {
     console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
-
 
     // Complete repairs for support ships in repairing state
     for (let ship of this.ships) {

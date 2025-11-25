@@ -60,8 +60,6 @@ class enemyShip extends Ship {
       if (this.frameCounter >= this.particleEmitRate) {
         this.frameCounter = 0;
 
-        console.log(`${this.debugId || 'Ship'} emitting particle at`, this.posicion);
-        console.log(`🔵 ${this.debugId || 'Ship'} emitting particle at (${Math.round(this.posicion.x)}, ${Math.round(this.posicion.y)})`);
         // Emit from behind the ship
         this.juego.particleEmitter.emit(
           this.posicion.x,
@@ -69,12 +67,9 @@ class enemyShip extends Ship {
           1,
           this.particleColor
         );
-        console.log('   Total particles:', this.juego.particleEmitter.particles.length);
-
       }
     }
   }
-
 
   checkPlayerAttackRange() {
     if (!this.juego.protagonista) return false;
@@ -82,7 +77,6 @@ class enemyShip extends Ship {
     const miFila = Math.floor(this.posicion.y / this.juego.cellSize);
     return miFila === filaProtagonista;
   }
-
 
   isOutOfBounds() {
     const margen = 200;
@@ -179,8 +173,8 @@ class BlackShip extends enemyShip {
     this.colorType = 'black';
     this.weight = 5; //this will be used to create levels and allocate difficulty
 
-    this.particleColor = 0x333333; // Dark gray
-    this.particleEmitRate = 4;
+    this.particleColor = 0x9A9A9A;
+    this.particleEmitRate = 1;
   }
 }
 
@@ -193,7 +187,7 @@ class RedShip extends enemyShip {
     this.colorType = 'red';
     this.weight = 5; //this will be used to create levels and allocate difficulty
 
-    this.particleColor = 0xFF3333; // Red
+    this.particleColor = 0xFF3333;
     this.particleEmitRate = 3;
   }
 }
@@ -208,7 +202,7 @@ class ShieldShip extends enemyShip {
     this.protectionRange = 150;
     this.weight = 5; //this will be used to create levels and allocate difficulty
 
-    this.particleColor = 0x00FF00; // Green
+    this.particleColor = 0x0892D0; // same color as shield
     this.particleEmitRate = 3;
   }
 
@@ -243,9 +237,7 @@ class ShieldShip extends enemyShip {
 
   recibirDanio(danio) {
     if (this.escudo > 0) {
-      this.escudo--;
-      console.log('Escudo impactado, escudo restante:', this.escudo);
-      // Opcional: efecto visual de escudo
+      this.escudo--;            
     } else {
       this.morir();
     }
@@ -287,7 +279,7 @@ class SupportShip extends enemyShip {
     this.weight = 5; //this will be used to create levels and allocate difficulty
 
     this.particleColor = 0xFFFF00; // Yellow
-    this.particleEmitRate = 2; // More frequent for faster ship
+    this.particleEmitRate = 1; // More frequent for faster ship
   }
 
   initFSM() {
@@ -348,7 +340,6 @@ class SupportShip extends enemyShip {
   
   return closestAlly;
 }
-
 
   // NEW: Check if ready to transition to repairing (called at end of AI turn)
   checkIfReadyToRepair() {

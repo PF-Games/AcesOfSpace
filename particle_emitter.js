@@ -3,7 +3,7 @@ class ParticleEmitter {
     this.juego = juego;
     this.particles = [];
     this.graphics = new PIXI.Graphics();
-    this.graphics.zIndex = 500; // Behind ships
+    this.graphics.zIndex = -1; // Behind ships
     this.juego.containerPrincipal.addChild(this.graphics);
   }
 
@@ -14,12 +14,11 @@ class ParticleEmitter {
   }
 
   tick() {
-    // Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       this.particles[i].tick();
 
       if (this.particles[i].isFinished()) {
-        this.particles.splice(i, 1);
+        this.particles.splice(i, 1); //As used in coding train tutorials
       }
     }
   }
@@ -27,21 +26,9 @@ class ParticleEmitter {
   render() {
     this.graphics.clear();
 
-    if (this.particles.length > 0) {
-      console.log('Rendering', this.particles.length, 'particles');
-    }
-
     for (let particle of this.particles) {
       const size = particle.getSize();
-      const alpha = 1;
-
-      console.log('  Particle:', {
-      pos: particle.posicion,
-      size: size,
-      alpha: alpha,
-      color: particle.color.toString(16)
-    });
-
+      const alpha = particle.getAlpha()
       this.graphics.circle(
         particle.posicion.x,
         particle.posicion.y,
