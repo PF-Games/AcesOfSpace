@@ -544,6 +544,7 @@ class Juego {
     // Fin del turno de IA
     if (this.aiTurnTimer >= this.aiTurnDuration) {
       this.endAITurn();
+      this.makePlayerAsGlobalTarget();
     }
   }
 
@@ -629,7 +630,7 @@ class Juego {
     this.crearEnemigos(15, RedShip);
     this.crearEnemigos(15, ShieldShip);
     this.crearEnemigos(10, SupportShip);
-    this.createAsteroids();
+    //this.createAsteroids();
     this.makePlayerAsGlobalTarget();
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
