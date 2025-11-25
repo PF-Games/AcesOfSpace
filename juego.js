@@ -449,7 +449,7 @@ class Juego {
     this.uiManager.updateHandValueDisplay();
     this.uiManager.updatePlayHandButton();
 
-    console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
+    console.log(`SDASDS ${rocketsToFire} rockets for ${handInfo.handName}`);
   }
 
   async endPlayerTurn() {
@@ -682,49 +682,6 @@ class Juego {
       const asteroid = new Asteroid(x, y, this);
       this.asteroids.push(asteroid);
     }
-  }
-
-
-  handlePlayHand() {
-    if (!this.playerHand.hasSelectedCards) {
-      console.warn('No cards selected to play');
-      return;
-    }
-
-    if (this.currentTurn !== 'player') {
-      console.warn('Cannot play cards during AI turn');
-      return;
-    }
-
-    // Get hand info BEFORE playing cards
-    const handInfo = this.playerHand.validateHand(this.playerHand.selectedCards);
-    console.log(`Playing hand: ${handInfo.handName}`);
-
-    // Determine number of rockets based on hand rank
-    const rocketsToFire = this.getRocketsForHand(handInfo);
-
-    // Play the cards using the EXISTING playerHand method
-    const cardsToRemove = [...this.playerHand.selectedCards];
-    const result = this.playerHand.playSelectedCards();
-
-    // Remove card visuals
-    cardsToRemove.forEach(card => {
-      this.handRenderer.removeCardVisual(card);
-    });
-
-    this.fireRocketsForHand(handInfo);
-
-    // Update UI
-    this.handRenderer.updatePositions();
-    this.updateDeckCounters();
-    this.uiManager.updateHandValueDisplay();
-    this.uiManager.updatePlayHandButton();
-
-    console.log(`Fired ${rocketsToFire} rockets for ${handInfo.handName}`);
-    /* Trying to reset the targeted state here or in EndTurn. Not working so far.
-         for (let aShip of this.ships) {
-            aShip.isTargeted = false;
-          }*/
   }
 
   async crearProtagonista() {
