@@ -261,31 +261,7 @@ class Juego {
     return closestShip;
   }
 
-  // 2. NEW method to fire a single rocket at closest target
-  fireRocket() {
-
-
-    if (!target) {
-      console.log('No targets available');
-      return false;
-    }
-
-    if (target !== this.antagonista) {
-      target.isTargeted = true;
-    }
-
-    const rocket = new Rocket(
-      "assets/rockets/rocket1.png",
-      this.protagonista.posicion.x,
-      this.protagonista.posicion.y,
-      this,
-      target
-    );
-    rocket.crearSprite();
-    this.rockets.push(rocket);
-
-    return true;
-  }
+  
 
   fireRocketsForHand(handInfo) {
     const rocketsToFire = this.getRocketsForHand(handInfo);
