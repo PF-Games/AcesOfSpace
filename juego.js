@@ -590,9 +590,9 @@ class Juego {
   async createBackground() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
     this.fondo.zIndex = -2;
-    this.fondo.tileScale.set(0.5);
-    this.fondo.width = this.mapWidth;
-    this.fondo.height = this.mapHeight;
+    this.fondo.tileScale.set(1);
+    this.fondo.width = this.mapWidth +500;
+    this.fondo.height = this.mapHeight + 500;
     this.containerPrincipal.addChild(this.fondo);
   }
 
@@ -727,11 +727,10 @@ class Juego {
 
   crearAntagonista() {
     const x = this.mapWidth / 2
-    const y = this.gameArea.y + 50;
+    const y = this.gameArea.y + 150;
     const antagonista = new Antagonista(x, y, this);
     this.antagonista = antagonista;
   };
-
 
   agregarInteractividadDelMouse() {
     this.pixiApp.canvas.onmousemove = (event) => {
