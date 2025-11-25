@@ -269,7 +269,7 @@ class Juego {
       setTimeout(() => {
         if (this.protagonista && !this.protagonista.muerto) {
           // Find target NOW (not before)
-          const target = this.findClosestUntargetedShip();
+          let target = this.findClosestUntargetedShip();
 
           if (!target) {
             console.log('No targets available');
@@ -280,6 +280,25 @@ class Juego {
           if (target !== this.antagonista) {
             target.isTargeted = true;
           }
+
+          // If targeting mothership, create offset target position
+        if (target === this.antagonista) {
+          // Random offset between -20 and +20 pixels
+          const offsetX = (Math.random() * 50) - 20;
+          
+          // Create a fake target object with offset position
+          target = {
+            posicion: {
+              x: this.antagonista.posicion.x + offsetX,
+              y: this.antagonista.posicion.y
+            },
+            radio: this.antagonista.radio,
+            muerto: false,
+            recibirDanio: (damage) => {
+              this.antagonista.recibirDanio(damage);
+            }
+          };
+        }
 
           //search random texture for rockets 
           const randomRocket = Math.floor(Math.random() * 3) + 1;
