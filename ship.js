@@ -13,6 +13,11 @@ class Ship extends GameObject {
     this.aceleracionMaxima = 5;
     this.velocidadMaxima = 5;
     this.amigos = [];
+
+    this.emitParticles = true; // Set to false to disable trails
+    this.particleColor = 0x00AAFF; // Default blue
+    this.particleEmitRate = 3; // Emit every N frames
+    this.frameCounter = 0;
   }
 
 
@@ -41,7 +46,27 @@ class Ship extends GameObject {
     this.pegarSiEstaEnMiRango();
     // Datos para el sistema de animación
     this.calcularAnguloYVelocidadLineal();
+
+    if (this.emitParticles && this.juego.particleEmitter) {
+      this.frameCounter++;
+      if (this.frameCounter >= this.particleEmitRate) {
+        this.frameCounter = 0;
+
+        console.log(`${this.debugId || 'Ship'} emitting particle at`, this.posicion);
+        console.log(`🔵 ${this.debugId || 'Ship'} emitting particle at (${Math.round(this.posicion.x)}, ${Math.round(this.posicion.y)})`);
+        // Emit from behind the ship
+        this.juego.particleEmitter.emit(
+          this.posicion.x,
+          this.posicion.y,
+          1,
+          this.particleColor
+        );
+        console.log('   Total particles:', this.juego.particleEmitter.particles.length);
+
+      }
+    }
   }
+
 
   calcularAnguloYVelocidadLineal() {
     /**

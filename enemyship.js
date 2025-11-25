@@ -159,6 +159,9 @@ class BlackShip extends enemyShip {
     this.playerDamage = 2;
     this.colorType = 'black';
     this.weight = 5; //this will be used to create levels and allocate difficulty
+
+    this.particleColor = 0x333333; // Dark gray
+    this.particleEmitRate = 4;
   }
 }
 
@@ -170,6 +173,9 @@ class RedShip extends enemyShip {
     this.playerDamage = 1;
     this.colorType = 'red';
     this.weight = 5; //this will be used to create levels and allocate difficulty
+
+    this.particleColor = 0xFF3333; // Red
+    this.particleEmitRate = 3;
   }
 }
 
@@ -182,6 +188,9 @@ class ShieldShip extends enemyShip {
     this.escudo = 1;
     this.protectionRange = 150;
     this.weight = 5; //this will be used to create levels and allocate difficulty
+
+    this.particleColor = 0x00FF00; // Green
+    this.particleEmitRate = 3;
   }
 
 
@@ -257,6 +266,9 @@ class SupportShip extends enemyShip {
     this.playerDamage = 1;
     this.repairRange = 200;
     this.weight = 5; //this will be used to create levels and allocate difficulty
+
+    this.particleColor = 0xFFFF00; // Yellow
+    this.particleEmitRate = 2; // More frequent for faster ship
   }
 
   initFSM() {

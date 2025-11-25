@@ -477,24 +477,24 @@ class Juego {
   async endPlayerTurn() {
     console.log('\n=== FIN DE TURNO DEL JUGADOR ===');
 
-    
-     // Complete repairs for support ships in repairing state
-  for (let ship of this.ships) {
-    if (ship instanceof SupportShip && 
+
+    // Complete repairs for support ships in repairing state
+    for (let ship of this.ships) {
+      if (ship instanceof SupportShip &&
         ship.fsm.currentStateName === 'repairing' &&
         ship.allyToRepair && !ship.allyToRepair.muerto) {
-      
-      console.log(`✅ ${ship.debugId} completed repair of ${ship.allyToRepair.debugId}`);
-      console.log(`   ${ship.allyToRepair.debugId}.escudo before: ${ship.allyToRepair.escudo}`);
-      ship.allyToRepair.escudo = 1;
-      console.log(`   ${ship.allyToRepair.debugId}.escudo after: ${ship.allyToRepair.escudo}`);
-      
-      ship.allyToRepair = null;
-      ship.fsm.setState('pursuing');
-    }
-  }
 
-  // Draw new cards
+        console.log(`✅ ${ship.debugId} completed repair of ${ship.allyToRepair.debugId}`);
+        console.log(`   ${ship.allyToRepair.debugId}.escudo before: ${ship.allyToRepair.escudo}`);
+        ship.allyToRepair.escudo = 1;
+        console.log(`   ${ship.allyToRepair.debugId}.escudo after: ${ship.allyToRepair.escudo}`);
+
+        ship.allyToRepair = null;
+        ship.fsm.setState('pursuing');
+      }
+    }
+
+    // Draw new cards
     const previousCount = this.playerHand.numberOfCards;
     this.playerHand.drawCards();
     const newCards = this.playerHand.numberOfCards - previousCount;
@@ -606,6 +606,11 @@ class Juego {
     this.pixiApp.stage.addChild(this.containerPrincipal);
     await this.loadTextures();
     this.createBackground();
+
+    this.particleEmitter = new ParticleEmitter(this);
+    console.log('✅ ParticleEmitter created:', this.particleEmitter);
+    console.log('   Graphics object:', this.particleEmitter.graphics);
+    console.log('   Parent container:', this.particleEmitter.graphics.parent);
 
     this.gameArea = {
       x: 200,
@@ -841,6 +846,11 @@ class Juego {
     }
 
     this.frameCounter++;
+
+    if (this.particleEmitter) {
+      this.particleEmitter.tick();
+      this.particleEmitter.render();
+    }
 
     if (this.antagonista) {
       // SOLO tick durante turno de IA
