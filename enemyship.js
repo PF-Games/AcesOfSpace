@@ -166,7 +166,7 @@ class enemyShip extends Ship {
 
 class BlackShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/black/Black_Idle.png", x, y, juego, "B");
+    super("assets/ships/black/Black_Idle.png", x, y, juego, "B");
     this.defaultSpeed = 1;
     this.velocidadMaxima = 1;
     this.playerDamage = 2;
@@ -272,7 +272,7 @@ class ShieldShip extends enemyShip {
 
 class SupportShip extends enemyShip {
   constructor(x, y, juego, debugPrefix) {
-    super("assets/naves/support/Support_Idle.png", x, y, juego, "H");
+    super("assets/ships/support/Support_Idle.png", x, y, juego, "H");
     this.defaultSpeed = 0.75;
     this.velocidadMaxima = 0.75;
     this.boostSpeed = 6;

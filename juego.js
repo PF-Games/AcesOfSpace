@@ -36,7 +36,7 @@ class Juego {
     this.turnoDeljugador = true;
 
     this.currentTurn = 'ai';
-    this.aiTurnDuration = 180;
+    this.aiTurnDuration = 2500; //using miliseconds calculated with delta time
     this.aiTurnTimer = 0;
     this.turnsPassed = 0;
   }
@@ -538,8 +538,9 @@ class Juego {
   }
 
   updateAITurn() {
-    this.aiTurnTimer++;
-    this.uiManager.updateTurnIndicator('ai-progress');
+  // Add elapsed time in milliseconds instead of counting frames
+  const deltaTimeMs = this.pixiApp.ticker.deltaTime * (1000 / 60); // Convert to ms
+  this.aiTurnTimer += deltaTimeMs;
     // Fin del turno de IA
     if (this.aiTurnTimer >= this.aiTurnDuration) {
       this.endAITurn();
@@ -624,10 +625,10 @@ class Juego {
 
     this.crearAntagonista();
     await this.crearProtagonista();
-    this.crearEnemigos(5, BlackShip);
-    this.crearEnemigos(2, RedShip);
-    this.crearEnemigos(3, ShieldShip);
-    this.crearEnemigos(8, SupportShip);
+    this.crearEnemigos(20, BlackShip);
+    this.crearEnemigos(30, RedShip);
+    this.crearEnemigos(30, ShieldShip);
+    this.crearEnemigos(20, SupportShip);
     this.createAsteroids();
     this.makePlayerAsGlobalTarget();
     this.dibujador = new PIXI.Graphics();
