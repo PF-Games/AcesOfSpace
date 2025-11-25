@@ -261,8 +261,6 @@ class Juego {
     return closestShip;
   }
 
-  
-
   fireRocketsForHand(handInfo) {
     const rocketsToFire = this.getRocketsForHand(handInfo);
     console.log(`Firing ${rocketsToFire} rockets for ${handInfo.handName}`);
@@ -282,10 +280,14 @@ class Juego {
           if (target !== this.antagonista) {
             target.isTargeted = true;
           }
+        
+        //search random texture for rockets 
+        const randomRocket = Math.floor(Math.random() * 3) + 1;
+        const rocketTexture = `assets/rockets/rocket${randomRocket}.png`;
 
           // Create rocket
           const rocket = new Rocket(
-            "assets/rockets/rocket1.png",
+            rocketTexture,
             this.protagonista.posicion.x,
             this.protagonista.posicion.y,
             this,
