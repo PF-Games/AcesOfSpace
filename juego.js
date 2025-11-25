@@ -30,6 +30,7 @@ class Juego {
     this.rockets = [];
     this.explosions = [];
     this.shipDeathAnimations = [];
+    this.soundManager = new SoundManager();
 
     this.initCardSystem();
 
@@ -315,6 +316,7 @@ class Juego {
           );
           rocket.crearSprite();
           this.rockets.push(rocket);
+          this.soundManager.playRocketLaunch();
         }
       }, i * 100);
     }
@@ -538,9 +540,9 @@ class Juego {
   }
 
   updateAITurn() {
-  // Add elapsed time in milliseconds instead of counting frames
-  const deltaTimeMs = this.pixiApp.ticker.deltaTime * (1000 / 60); // Convert to ms
-  this.aiTurnTimer += deltaTimeMs;
+    // Add elapsed time in milliseconds instead of counting frames
+    const deltaTimeMs = this.pixiApp.ticker.deltaTime * (1000 / 60); // Convert to ms
+    this.aiTurnTimer += deltaTimeMs;
     // Fin del turno de IA
     if (this.aiTurnTimer >= this.aiTurnDuration) {
       this.endAITurn();
@@ -592,9 +594,9 @@ class Juego {
     this.fondo.zIndex = -2;
     this.fondo.tileScale.set(1);
     this.fondo.x = -this.mapWidth / 2;  // Center horizontally
-  this.fondo.y = -this.mapHeight / 2; // Center vertically
-  this.fondo.width = this.mapWidth * 3;
-  this.fondo.height = this.mapHeight * 3;
+    this.fondo.y = -this.mapHeight / 2; // Center vertically
+    this.fondo.width = this.mapWidth * 3;
+    this.fondo.height = this.mapHeight * 3;
     this.containerPrincipal.addChild(this.fondo);
   }
 
@@ -694,6 +696,11 @@ class Juego {
 
       await Promise.all(destructionPromises);
       console.log("✅ Ship destruction frames loaded");
+
+      console.log("Loading sounds...");
+      await this.soundManager.loadSound('rocketLaunch', 'assets/sounds/rocketLaunch.mp3');
+      await this.soundManager.loadSound('explosion', 'assets/sounds/explosion.wav');
+      console.log("✅ Sounds loaded");
 
       return true;
     } catch (error) {
@@ -870,14 +877,14 @@ class Juego {
       explosion.tick();
       explosion.render();
     }
-  
 
 
-  for(let deathAnim of this.shipDeathAnimations) {
-    deathAnim.tick();
-    deathAnim.render();
+
+    for (let deathAnim of this.shipDeathAnimations) {
+      deathAnim.tick();
+      deathAnim.render();
+    }
   }
-}
 
   iniciarControles() {
     window.addEventListener("keydown", (event) => {

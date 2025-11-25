@@ -3,7 +3,7 @@ class Rocket extends GameObject {
     super(x, y, juego);
 
     this.target = target;
-    this.velocidadMaxima = 10; 
+    this.velocidadMaxima = 10;
     this.aceleracionMaxima = 0.5;
     this.factorPerseguir = 1;
     this.radio = 5;
@@ -50,12 +50,16 @@ class Rocket extends GameObject {
     const explosion = new Explosion(this.posicion.x, this.posicion.y, this.juego);
     this.juego.explosions.push(explosion);
 
+    if (this.juego.soundManager) {
+      this.juego.soundManager.playExplosion();
+    }
+
     if (this.sprite) this.sprite.destroy();
     if (this.container) this.container.destroy();
-    this.container = null; // Importante: setear a null
+    this.container = null;
     this.juego.rockets = this.juego.rockets.filter(c => c !== this);
   }
-  
+
   render() {
     if (!this.container || this.destruido) return; // Agregar verificación de destruido
     super.render();
