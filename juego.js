@@ -676,7 +676,7 @@ class Juego {
       const explosionPromises = [];
       for (let i = 1; i <= 29; i++) {
         explosionPromises.push(
-          PIXI.Assets.load(`explosion/Fire Burst_${i}.png`)
+          PIXI.Assets.load(`assets/explosion/Fire Burst_${i}.png`)
         );
       }
       await Promise.all(explosionPromises);
