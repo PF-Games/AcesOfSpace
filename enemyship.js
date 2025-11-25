@@ -243,7 +243,6 @@ class ShieldShip extends enemyShip {
     }
   }
 
-
   render() {
     super.render();
 
@@ -275,7 +274,8 @@ class SupportShip extends enemyShip {
     this.velocidadMaxima = 0.75;
     this.boostSpeed = 6;
     this.playerDamage = 1;
-    this.repairRange = 200;
+    this.repairRange = 100;
+    this.maxRepairDistance = 500;  
     this.weight = 5; //this will be used to create levels and allocate difficulty
 
     this.particleColor = 0xFFFF00; // Yellow
@@ -300,7 +300,8 @@ class SupportShip extends enemyShip {
   
   if (ally) {
     this.allyToRepair = ally;
-    console.log(`${this.debugId} found damaged ally: ${ally.debugId} (escudo: ${ally.escudo})`);
+     ally.beingRepairedBy = this;
+    console.log(`${this.debugId} claimed damaged ally: ${ally.debugId}`);
     this.fsm.setState('speedingToRepair');
     return true;
   }
@@ -315,30 +316,18 @@ class SupportShip extends enemyShip {
   for (let ally of this.juego.ships) {
     if (ally === this || ally.muerto) continue;
     if (!(ally instanceof ShieldShip) || ally.escudo > 0) continue;
+     if (ally.beingRepairedBy) continue;
     
     // Check if someone is already repairing this ally
-    let someoneIsRepairing = false;
-    for (let otherShip of this.juego.ships) {
-      if (otherShip instanceof SupportShip && 
-          otherShip !== this && 
-          otherShip.allyToRepair === ally &&
-          (otherShip.fsm.currentStateName === 'repairing' || 
-           otherShip.fsm.currentStateName === 'speedingToRepair')) {
-        someoneIsRepairing = true;
-        break;
-      }
-    }
-    
-    if (!someoneIsRepairing) {
-      const dist = calcularDistancia(this.posicion, ally.posicion);
-      if (dist < closestDist && dist < this.repairRange * 3) {
-        closestDist = dist;
-        closestAlly = ally;
-      }
+     const dist = calcularDistancia(this.posicion, ally.posicion);
+    if (dist < closestDist && dist < this.maxRepairDistance) {
+      closestDist = dist;
+      closestAlly = ally;
     }
   }
   
   return closestAlly;
+
 }
 
   // NEW: Check if ready to transition to repairing (called at end of AI turn)

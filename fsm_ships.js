@@ -198,6 +198,9 @@ class RepairingState extends ShipState {
   }
 
   onExit() {
+    if (this.owner.allyToRepair) {
+      this.owner.allyToRepair.beingRepairedBy = null; // Release the claim
+    }
     console.log(`${this.owner.debugId} exiting Repairing state`);
   }
 }
