@@ -47,6 +47,9 @@ class Rocket extends GameObject {
       console.log("ataque una nave ver si es targeted")
     }
 
+    const explosion = new Explosion(this.posicion.x, this.posicion.y, this.juego);
+    this.juego.explosions.push(explosion);
+
     if (this.sprite) this.sprite.destroy();
     if (this.container) this.container.destroy();
     this.container = null; // Importante: setear a null

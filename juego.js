@@ -28,6 +28,7 @@ class Juego {
     this.cellSize = 100;
     this.frameCounter = 0;
     this.rockets = [];
+    this.explosions = [];
 
     this.initCardSystem();
 
@@ -670,12 +671,22 @@ class Juego {
 
       console.log("✅ Card atlas loaded");
       console.log("Available frames:", Object.keys(spritesheet.textures));
-      return true;
-    } catch (error) {
-      console.error("❌ Error loading textures:", error);
-      return false;
+      console.log("Loading explosion frames...");
+    const explosionPromises = [];
+    for (let i = 1; i <= 29; i++) {
+      explosionPromises.push(
+        PIXI.Assets.load(`explosion/Fire Burst_${i}.png`)
+      );
     }
+    await Promise.all(explosionPromises);
+    console.log("✅ Explosion frames loaded");
+
+    return true;
+  } catch (error) {
+    console.error("❌ Error loading textures:", error);
+    return false;
   }
+}
 
   crearEnemigos(cant, ClaseNave) {
     for (let i = 0; i < cant; i++) {
@@ -883,6 +894,11 @@ class Juego {
       rocket.tick();
       rocket.render();
     }
+
+     for (let explosion of this.explosions) {
+    explosion.tick();
+    explosion.render();
+  }
   }
 
   iniciarControles() {
