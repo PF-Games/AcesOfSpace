@@ -563,6 +563,10 @@ class Juego {
     this.currentTurn = 'player';
     this.aiTurnTimer = 0;
 
+    if (this.turnsPassed % 5 === 0) {
+    this.spawnWaveOfEnemies();
+  }
+
     // Actualizar UI
     this.uiManager.updateEndTurnButton();
     this.uiManager.updateTurnIndicator('player');
@@ -717,6 +721,16 @@ class Juego {
       this.ships.push(ship);
     }
   }
+
+  spawnWaveOfEnemies() {
+  console.log('\n=== 🌊 ENEMY WAVE SPAWNED ===');
+  this.crearEnemigos(10, BlackShip);
+  this.crearEnemigos(15, RedShip);
+  this.crearEnemigos(15, ShieldShip);
+  this.crearEnemigos(10, SupportShip);
+  console.log(`Total ships now: ${this.ships.length}`);
+}
+
 
   createAsteroids() {
     for (let i = 0; i < 2; i++) {

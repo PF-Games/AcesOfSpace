@@ -2,7 +2,7 @@ class Spawner {
   constructor(x, y, juego, texturePath) {
     this.posicion = { x, y };
     this.juego = juego;
-    this.vida = 100;
+    this.vida = 20;
     this.muerto = false;
     this.texturePath = texturePath;
     this.radio = 40; //Este radio me sirve para poder calcular la colision de los ataques
@@ -46,7 +46,7 @@ class Spawner {
 class Protagonista extends Spawner {
   constructor(x, y, juego) {
     super(x, y, juego, "Assets2/Ships/Unity/Cruiser 3.png");
-    this.vida = 1000;
+    this.vida = 20;
     this.rocketCooldown = 0;
   }
 
