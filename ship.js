@@ -164,7 +164,7 @@ class Ship extends GameObject {
       if (ship !== this) {
         const distancia = calcularDistancia(this.posicion, ship.posicion);
         // Zona crítica de separación
-        if (distancia < this.radio * 1.5) {
+        if (distancia < this.radio * 5) {
           cont++;
           vectorPromedioDePosiciones.x += ship.posicion.x;
           vectorPromedioDePosiciones.y += ship.posicion.y;

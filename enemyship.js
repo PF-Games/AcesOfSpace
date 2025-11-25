@@ -15,7 +15,7 @@ class enemyShip extends Ship {
 
 
     this.crearSprite();
-    this.crearTextoDebug();
+  //this.crearTextoDebug();
     this.initFSM();
   }
 

@@ -544,6 +544,7 @@ class Juego {
     // Fin del turno de IA
     if (this.aiTurnTimer >= this.aiTurnDuration) {
       this.endAITurn();
+      this.makePlayerAsGlobalTarget();
     }
   }
 
@@ -589,9 +590,9 @@ class Juego {
   async createBackground() {
     this.fondo = new PIXI.TilingSprite(await PIXI.Assets.load("assets/bg.jpg"));
     this.fondo.zIndex = -2;
-    this.fondo.tileScale.set(0.5);
-    this.fondo.width = this.mapWidth;
-    this.fondo.height = this.mapHeight;
+    this.fondo.tileScale.set(1);
+    this.fondo.width = this.mapWidth +500;
+    this.fondo.height = this.mapHeight + 500;
     this.containerPrincipal.addChild(this.fondo);
   }
 
@@ -625,11 +626,11 @@ class Juego {
 
     this.crearAntagonista();
     await this.crearProtagonista();
-    this.crearEnemigos(20, BlackShip);
-    this.crearEnemigos(30, RedShip);
-    this.crearEnemigos(30, ShieldShip);
-    this.crearEnemigos(20, SupportShip);
-    this.createAsteroids();
+    this.crearEnemigos(10, BlackShip);
+    this.crearEnemigos(15, RedShip);
+    this.crearEnemigos(15, ShieldShip);
+    this.crearEnemigos(10, SupportShip);
+    //this.createAsteroids();
     this.makePlayerAsGlobalTarget();
     this.dibujador = new PIXI.Graphics();
     this.containerPrincipal.addChild(this.dibujador);
@@ -726,11 +727,11 @@ class Juego {
 
   crearAntagonista() {
     const x = this.mapWidth / 2
-    const y = this.gameArea.y + 50;
+    const y = this.gameArea.y + 150;
     const antagonista = new Antagonista(x, y, this);
     this.antagonista = antagonista;
   };
-
+  
 
   agregarInteractividadDelMouse() {
     this.pixiApp.canvas.onmousemove = (event) => {
